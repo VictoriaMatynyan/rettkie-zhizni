@@ -2,7 +2,7 @@
     <header class="site-header">
       <div class="header-container">
         <!-- Логотип и название -->
-        <router-link to="/" class="logo-block">
+        <router-link to="/rettkie-zhizni" class="logo-block">
           <img src="/src/assets/logo_square.png" alt="Логотип" class="logo-img" />
           <span class="site-title">РЕТТкие Жизни</span>
         </router-link>

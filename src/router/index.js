@@ -3,7 +3,7 @@ import HomePage from '../pages/HomePage.vue';
 // import AboutPage from '../pages/AboutPage.vue';
 
 const routes = [
-    {path: '/', name: 'Home', component: HomePage},
+    {path: '/rettkie-zhizni', name: 'Home', component: HomePage},
     // {path: '/about', name: 'About', component: AboutPage},
 ]
 

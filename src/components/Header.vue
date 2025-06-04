@@ -22,10 +22,10 @@
             <div class="dropdown-content">
               <router-link to="/patients/newbie">Для новичков</router-link>
               <router-link to="/patients/stories">Истории семей</router-link>
-              <router-link to="/patients/stories">Статьи</router-link>
-              <router-link to="/patients/stories">О разработке лекарства</router-link>
-              <router-link to="/patients/stories">Как помочь</router-link>
-              <router-link to="/patients/stories">Обратиться в сообщество</router-link>
+              <router-link to="/patients/articles">Статьи</router-link>
+              <router-link to="/patients/drug-development">О разработке лекарства</router-link>
+              <router-link to="/patients/support">Как помочь</router-link>
+              <router-link to="/patients/contact">Обратиться в сообщество</router-link>
               <router-link to="/patients/rehab">Реабилитация</router-link>
             </div>
           </div>
@@ -43,7 +43,6 @@
               <router-link to="/patient-registry/privacy-policy">Политика обработки персональных данных</router-link>
             </div>
           </div>
-          <router-link to="/donate">Пожертвование</router-link>
           <router-link to="/donate" class="btn-donate">Помочь</router-link>
           <router-link to="/patients/newbie" class="btn-help">Что делать</router-link>
         </nav>
@@ -116,22 +115,41 @@
   
   .main-nav a:hover {
     color: #007acc;
-  }
-  
-  .btn-donate {
-    background-color: #e91e63;
-    color: #fff !important;
-    border-radius: 4px;
-    padding: 6px 12px;
-  }
-  
+  }  
+
+  .btn-donate,
   .btn-help {
-    background-color: #2196f3;
-    color: #fff !important;
-    border-radius: 4px;
-    padding: 6px 12px;
+    display: inline-block;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, box-shadow 0.2s ease;
+    cursor: pointer;
   }
-  
+
+  .main-nav > .btn-donate {
+    color: #018628;
+    border: 1px solid #10813f;
+  }
+
+  .main-nav > .btn-donate:hover {
+    color: #229954;
+    box-shadow: 0 2px 6px rgba(16, 129, 63, 0.4);
+  }
+
+  .main-nav > .btn-help {
+    color: #0160a2;
+    border: 1px solid #0160a2;
+
+  }
+
+  .btn-help:hover {
+    color: #0370bb;
+    box-shadow: 0 2px 6px rgba(41, 128, 185, 0.4);
+  }
+    
   /* Выпадающее меню */
   .dropdown {
     position: relative;
@@ -169,8 +187,7 @@
     display: block;
   }
   
-  /* Мобильная версия */
-  @media (max-width: 768px) {
+@media (max-width: 1190px) {
     .burger {
       display: block;
     }

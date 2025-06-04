@@ -13,27 +13,25 @@
           <p class="footer-heading">Мы в соцсетях:</p>
           <div class="social-links">
             <a href="#" target="_blank" rel="noopener" aria-label="ВКонтакте">
-              <img src="" alt="VK" class="icon" />
+              <img src="/src/assets/vk_logo.svg" alt="лого ВК" class="icon" />
             </a>
-            <a href="#" target="_blank" rel="noopener" aria-label="Facebook">
-              <!-- <img src="/icons/facebook.svg" alt="Facebook" class="icon" /> -->
+            <a href="#" target="_blank" rel="noopener" aria-label="Телеграм">
+              <img src="/src/assets/telegram_logo.svg" alt="лого Телеграм" class="icon" />
             </a>
-            <a href="#" target="_blank" rel="noopener" aria-label="Instagram">
-              <!-- <img src="/icons/instagram.svg" alt="Instagram" class="icon" /> -->
+            <a href="#" target="_blank" rel="noopener" aria-label="WhatsApp">
+              <img src="/src/assets/whatsapp_logo.png" alt="лого WhatsApp" class="icon" />
             </a>
           </div>
         </div>
-  
-        <!-- Мессенджеры -->
-        <div class="footer-section">
+          <div class="footer-section">
           <p class="footer-heading">Связаться с нами:</p>
           <div class="messenger-links">
             <a href="#" target="_blank" class="messenger-link">
-              <!-- <img src="/icons/telegram.svg" alt="Telegram" class="icon" /> -->
+              <img src="/src/assets/telegram_logo.svg" alt="лого Телеграм" class="icon" />
               <span>Имя (Telegram)</span>
             </a>
             <a href="#" target="_blank" class="messenger-link">
-              <!-- <img src="/icons/whatsapp.svg" alt="WhatsApp" class="icon" /> -->
+              <img src="/src/assets/whatsapp_logo.png" alt="лого WhatsApp" class="icon" />
               <span>Имя (WhatsApp)</span>
             </a>
           </div>

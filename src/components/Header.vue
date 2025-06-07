@@ -14,7 +14,7 @@
   
         <!-- Навигация -->
         <nav class="main-nav" :class="{ open: menuOpen }">
-          <router-link to="/about">О синдроме Ретта</router-link>
+          <router-link to="/about-rett">О синдроме Ретта</router-link>
           <router-link to="/doctors">Врачам</router-link>
   
           <div class="dropdown">

@@ -67,12 +67,14 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc))
 
 <style scoped>
 .standard-content {
-  line-height: 1.6;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .standard-text {
   line-height: 1.6;
   margin-bottom: 16px;
+  text-align: center;
 }
 
 .media-section {

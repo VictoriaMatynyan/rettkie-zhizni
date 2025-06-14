@@ -1,10 +1,10 @@
 <template>
   
   <div class="standard-page">
-    <h1>О синдроме Ретта</h1>
+    <h1>Для новичков</h1>
     <StandardContent
       :paragraphs="[
-        'Синдром Ретта — редкое генетическое заболевание, поражающее центральную нервную систему.'
+        'Здесь будет информация для новичков'
         ]"
       :imageSrc="symptomsImg"
       :imageSrcModal="symptomsImg"

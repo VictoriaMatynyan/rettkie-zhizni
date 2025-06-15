@@ -6,7 +6,9 @@ import Newbie from "../pages/Newbie.vue";
 import DrugDevelopment from "../pages/DrugDevelopment.vue";
 import Support from "../pages/Support.vue";
 import Stories from "../pages/Stories.vue";
-import StoryPage from "../components/StoryPage.vue";
+import StoryPage from "../pages/StoryPage.vue";
+import Articles from "../pages/Articles.vue";
+import ArticlePage from "../pages/ArticlePage.vue";
 
 const routes = [
     {path: '/rettkie-zhizni', name: 'Home', component: HomePage},
@@ -17,6 +19,8 @@ const routes = [
     {path: '/patients/support', name: 'Support', component: Support},
     {path: '/patients/stories', name: 'Stories', component: Stories},
     {path: '/stories/:id', name: 'StoryPage', component: StoryPage},
+    {path: '/patients/articles', name: 'Articles', component: Articles},
+    {path: '/articles/:id', name: 'ArticlePage', component: ArticlePage},
 ]
 
 export default createRouter({

@@ -17,7 +17,6 @@
       videoUrl="https://rutube.ru/play/embed/someVideoId/"
       >
     </StandardContent>
-    <!-- Блок с историями -->
     <section class="family-stories">
       <h2 class="block-title">Истории семей</h2>
       <div class="card-list">
@@ -130,24 +129,24 @@ const stories = ref([
 ])
 
 // кол-во отображаемых историй
-const pageSize = 10
-const currentPage = ref(1)
+const pageSize = 10;
+const currentPage = ref(1);
 
 const sortedStories = computed(() =>
   [...stories.value].sort((a, b) => new Date(b.date) - new Date(a.date))
-)
+);
 const visibleStories = computed(() =>
   sortedStories.value.slice(0, currentPage.value * pageSize)
-)
-const hasMore = computed(() => visibleStories.value.length < sortedStories.value.length)
+);
+const hasMore = computed(() => visibleStories.value.length < sortedStories.value.length);
 
 function loadMore() {
   currentPage.value++
-}
+};
 
 function goToStory(id) {
   router.push(`/stories/${id}`)
-}
+};
 </script>
 
 <style scoped>

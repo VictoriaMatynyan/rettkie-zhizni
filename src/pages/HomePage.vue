@@ -63,6 +63,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    /* TODO: убрать padding (= 0)  */
     padding: 24px;
   }
   

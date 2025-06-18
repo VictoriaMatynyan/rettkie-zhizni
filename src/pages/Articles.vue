@@ -114,7 +114,7 @@ const articles = ref([
     title: 'Статья 6',
     image: articleImg,
     preview: 'Анонс статьи',
-    category: 'Рекомендации',
+    category: 'Реабилитация',
     date: '2025-05-20'
   },
   {
@@ -130,7 +130,7 @@ const articles = ref([
     title: 'Статья 8',
     image: articleImg,
     preview: 'Анонс статьи',
-    category: 'Рекомендации',
+    category: 'Реабилитация',
     date: '2025-05-20'
   },
   {
@@ -154,7 +154,7 @@ const articles = ref([
     title: 'Статья 11',
     image: articleImg,
     preview: 'Анонс статьи',
-    category: 'Рекомендации',
+    category: 'Реабилитация',
     date: '2025-05-20'
   },
 ])

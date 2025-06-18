@@ -9,6 +9,8 @@ import Stories from "../pages/Stories.vue";
 import StoryPage from "../pages/StoryPage.vue";
 import Articles from "../pages/Articles.vue";
 import ArticlePage from "../pages/ArticlePage.vue";
+import Contact from "../pages/Contact.vue";
+import Rehab from "../pages/Rehab.vue";
 
 const routes = [
     {path: '/rettkie-zhizni', name: 'Home', component: HomePage},
@@ -21,6 +23,8 @@ const routes = [
     {path: '/stories/:id', name: 'StoryPage', component: StoryPage},
     {path: '/patients/articles', name: 'Articles', component: Articles},
     {path: '/articles/:id', name: 'ArticlePage', component: ArticlePage},
+    {path: '/patients/contact', name: 'Contact', component: Contact},
+    {path: '/patients/rehab', name: 'Rehab', component: Rehab},
 ]
 
 export default createRouter({

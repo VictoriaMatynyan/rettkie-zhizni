@@ -11,6 +11,8 @@ import Articles from "../pages/Articles.vue";
 import ArticlePage from "../pages/ArticlePage.vue";
 import Contact from "../pages/Contact.vue";
 import Rehab from "../pages/Rehab.vue";
+import News from "../pages/News.vue";
+import NewsPage from "../pages/NewsPage.vue";
 
 const routes = [
     {path: '/rettkie-zhizni', name: 'Home', component: HomePage},
@@ -25,6 +27,8 @@ const routes = [
     {path: '/articles/:id', name: 'ArticlePage', component: ArticlePage},
     {path: '/patients/contact', name: 'Contact', component: Contact},
     {path: '/patients/rehab', name: 'Rehab', component: Rehab},
+    {path: '/news', name: 'News', component: News},
+    {path: '/news/:id', name: 'NewsPage', component: NewsPage},
 ]
 
 export default createRouter({

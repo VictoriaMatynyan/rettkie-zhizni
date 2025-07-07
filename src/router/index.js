@@ -13,6 +13,9 @@ import Contact from "../pages/Contact.vue";
 import Rehab from "../pages/Rehab.vue";
 import News from "../pages/News.vue";
 import NewsPage from "../pages/NewsPage.vue";
+import Events from "../pages/Events.vue";
+import EventPage from "../pages/EventPage.vue";
+import AboutUs from "../pages/AboutUs.vue";
 
 const routes = [
     {path: '/rettkie-zhizni', name: 'Home', component: HomePage},
@@ -29,6 +32,9 @@ const routes = [
     {path: '/patients/rehab', name: 'Rehab', component: Rehab},
     {path: '/news', name: 'News', component: News},
     {path: '/news/:id', name: 'NewsPage', component: NewsPage},
+    {path: '/events', name: 'Events', component: Events},
+    {path: '/events/:id', name: 'EventPage', component: EventPage},
+    {path: '/about-us', name: 'AboutUs', component: AboutUs},
 ]
 
 export default createRouter({

@@ -1,22 +1,20 @@
 <template>
   <div class="news-page">
     <h1 class="news-title">{{ news?.title }}</h1>
-
-    <!-- <img :src="news?.image" :alt="news?.title" class="news-image" /> -->
-
-    <StandardContent
-      :paragraphs="news?.content"
-      :imageSrc="news?.image"
-      :imageSrcModal="news?.image"
-      imageAlt="Обложка новости"
-      imageAltModal="Обложка новости (увеличено)"
-      :downloadLink="news?.downloadLink"
-      downloadLabel="Скачать дополнительный материал: "
-      :downloadLinkName="news?.downloadLinkName"
-      :videoUrl="news?.videoUrl"
-    />
-
-    <p v-if="!news" class="not-found">Новость не найдена</p>
+    <template v-if="news">
+      <StandardContent
+        :paragraphs="news?.content"
+        :imageSrc="news?.image"
+        :imageSrcModal="news?.image"
+        imageAlt="Обложка новости"
+        imageAltModal="Обложка новости (увеличено)"
+        :downloadLink="news?.downloadLink"
+        downloadLabel="Скачать дополнительный материал: "
+        :downloadLinkName="news?.downloadLinkName"
+        :videoUrl="news?.videoUrl"
+      />
+    </template>
+    <p v-if="!news" class="not-found">Данные не найдены</p>
   </div>
 </template>
 
@@ -94,7 +92,7 @@ const newsArr = [
     id: '8',
     title: 'Новость 8',
     image: newsImg,
-    preview: 'Анонс новости',
+    content: ['Анонс новости'],
     downloadLink: '',
     downloadLinkName: '',
     videoUrl: ''
@@ -116,21 +114,12 @@ const newsArr = [
     downloadLink: '',
     downloadLinkName: '',
     videoUrl: ''
-  },
-   {
-    id: '11',
-    title: 'Новость 11',
-    image: newsImg,
-    content: ['Анонс новости'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: ''
-  },
+  }
 ]
 
 const route = useRoute();
 const news = computed(() => {
-  return newsArr.find((a) => a.id === route.params.id)
+  return newsArr.find((a) => a.id === route.params.id?.toString());
 })
 </script>
 

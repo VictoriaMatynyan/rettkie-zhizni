@@ -94,7 +94,7 @@ const articles = [
     id: '8',
     title: 'Статья 8',
     image: articleImg,
-    preview: 'Анонс статьи',
+    preview: ['Анонс статьи'],
     downloadLink: '',
     downloadLinkName: '',
     videoUrl: ''
@@ -125,7 +125,7 @@ const articles = [
     downloadLink: '',
     downloadLinkName: '',
     videoUrl: ''
-  },
+  }
 ]
 
 const route = useRoute();

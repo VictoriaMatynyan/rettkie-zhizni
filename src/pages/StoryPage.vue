@@ -94,7 +94,7 @@ const stories = [
     id: '8',
     title: 'История 8',
     image: familyImg,
-    preview: 'История борьбы и надежды одной семьи...',
+    preview: ['История борьбы и надежды одной семьи...'],
     downloadLink: '',
     downloadLinkName: '',
     videoUrl: ''

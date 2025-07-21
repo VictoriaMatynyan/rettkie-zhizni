@@ -8,12 +8,12 @@
         </router-link>
   
         <!-- Бургер -->
-        <button class="burger" @click="menuOpen = !menuOpen">
+        <button class="burger" ref="burgerRef" @click="menuOpen = !menuOpen">
           ☰
         </button>
   
         <!-- Навигация -->
-        <nav class="main-nav" :class="{ open: menuOpen }">
+        <nav class="main-nav" ref="menuRef" :class="{ open: menuOpen }" @mouseleave="menuOpen = false">
           <router-link to="/about-rett">О синдроме Ретта</router-link>
           <router-link to="/doctors">Врачам</router-link>
   
@@ -50,10 +50,31 @@
     </header>
   </template>
   
-  <script setup>
-  import { ref } from 'vue'
-  const menuOpen = ref(false)
-  </script>
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+
+const menuOpen = ref(false);
+const menuRef = ref(null);
+const burgerRef = ref(null);
+
+function handleClickOutside(event) {
+  const clickedOutsideMenu = menuRef.value && !menuRef.value.contains(event.target);
+  const clickedBurger = burgerRef.value && burgerRef.value.contains(event.target);
+
+  if (clickedOutsideMenu && !clickedBurger) {
+    menuOpen.value = false;
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
+</script>
+
   
   <style scoped>
   .site-header {
@@ -193,18 +214,26 @@
     }
   
     .main-nav {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.4s ease, opacity 0.3s ease;
+      flex-direction: column;
       position: absolute;
       top: 60px;
       left: 0;
       right: 0;
       background-color: #fff;
-      flex-direction: column;
-      padding: 16px;
-      display: none;
+      padding: 0 16px;
+      pointer-events: none;
     }
+    
   
     .main-nav.open {
-      display: flex;
+      max-height: 500px;
+      opacity: 1;
+      padding: 16px;
+      pointer-events: auto;
     }
   
     .main-nav a,

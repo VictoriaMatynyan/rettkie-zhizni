@@ -1,4 +1,3 @@
-<!-- components/YandexMap.vue -->
 <template>
   <div ref="mapContainer" class="yandex-map"></div>
 </template>

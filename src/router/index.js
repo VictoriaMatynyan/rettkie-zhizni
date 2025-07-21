@@ -16,6 +16,7 @@ import NewsPage from "../pages/NewsPage.vue";
 import Events from "../pages/Events.vue";
 import EventPage from "../pages/EventPage.vue";
 import AboutUs from "../pages/AboutUs.vue";
+import PersonalAccount from "../pages/PersonalAccount.vue";
 
 const routes = [
     {path: '/rettkie-zhizni', name: 'Home', component: HomePage},
@@ -35,6 +36,7 @@ const routes = [
     {path: '/events', name: 'Events', component: Events},
     {path: '/events/:id', name: 'EventPage', component: EventPage},
     {path: '/about-us', name: 'AboutUs', component: AboutUs},
+    {path: '/patient-registry/personal-account', name: 'PersonalAccount', component: PersonalAccount},
 ]
 
 export default createRouter({

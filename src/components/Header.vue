@@ -1,22 +1,16 @@
 <template>
     <header class="site-header">
       <div class="header-container">
-        <!-- Логотип и название -->
         <router-link to="/rettkie-zhizni" class="logo-block">
           <img src="/src/assets/logo_square.png" alt="Логотип" class="logo-img" />
           <span class="site-title">РЕТТкие Жизни</span>
         </router-link>
-  
-        <!-- Бургер -->
         <button class="burger" ref="burgerRef" @click="menuOpen = !menuOpen">
           ☰
         </button>
-  
-        <!-- Навигация -->
         <nav class="main-nav" ref="menuRef" :class="{ open: menuOpen }" @mouseleave="menuOpen = false">
           <router-link to="/about-rett">О синдроме Ретта</router-link>
           <router-link to="/doctors">Врачам</router-link>
-  
           <div class="dropdown">
             <span class="dropdown-trigger">Пациентам</span>
             <div class="dropdown-content">
@@ -29,12 +23,12 @@
               <router-link to="/patients/rehab">Реабилитация</router-link>
             </div>
           </div>
-  
+
           <!-- <router-link to="/articles">Статьи</router-link> -->
+
           <router-link to="/news">Новости</router-link>
           <router-link to="/events">Мероприятия</router-link>
           <router-link to="/about-us">О нас</router-link>
-
           <div class="dropdown">
             <span class="dropdown-trigger">Реестр пациентов</span>
             <div class="dropdown-content">

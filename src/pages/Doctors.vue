@@ -1,5 +1,4 @@
 <template>
-  
   <div class="standard-page">
     <h1>Для врачей</h1>
     <StandardContent
@@ -17,7 +16,6 @@
       videoUrl="https://rutube.ru/play/embed/someVideoId/"
       >
     </StandardContent>
-
   </div>
 </template>
 

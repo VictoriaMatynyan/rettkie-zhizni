@@ -6,8 +6,8 @@ import Footer from './components/Footer.vue'
 
 <template>
   <div class="app-container">
+    <Header />
     <main class="main-content">
-      <Header />
       <router-view />
     </main>
     <Footer />
@@ -23,6 +23,7 @@ import Footer from './components/Footer.vue'
 }
 .main-content {
   flex: 1;
+  align-self: center;
 }
 .logo {
   height: 6em;

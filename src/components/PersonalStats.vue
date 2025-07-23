@@ -79,6 +79,7 @@ import StandardContent from '../components/StandardContent.vue';
 import symptomsImg from '../assets/symptoms.png';
 import YandexMap from '../components/YandexMap.vue';
 // import MutationBarChart from '@/components/MutationBarChart.vue';
+console.log('symptomsImg', symptomsImg)
 
 export default {
   name: 'PersonalStats',
@@ -93,6 +94,7 @@ export default {
       mutations: [], // из БД
       regionData: [], // из БД
       userMutationId: null,
+      symptomsImg: symptomsImg
     };
   },
   computed: {
@@ -112,7 +114,7 @@ export default {
     },
   },
   mounted() {
-    // Здесь можно симулировать получение данных из БД
+    // здесь можно симулировать получение данных из БД
     this.mutations = this.fetchMutations();
     this.regionData = this.fetchRegionStats();
     this.userMutationId = 'MECP2'; // симуляция

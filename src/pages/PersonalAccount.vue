@@ -40,9 +40,10 @@ function logout() {
 
 <style scoped>
 .personal-account {
-  max-width: 960px;
+  max-width: 1050px;
+  width: 100vw;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: 0;
 }
 
 .tabs {

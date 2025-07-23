@@ -13,8 +13,8 @@
           <p>Дата рождения: {{ child.birthDate }}</p>
         </div>
         <div class="child-actions">
-          <button @click="editChild(index)">Редактировать</button>
-          <button @click="deleteChild(index)">Удалить</button>
+          <button class="menu-button edit-button" @click="editChild(index)">Редактировать</button>
+          <button class="menu-button delete-button" @click="deleteChild(index)">Удалить</button>
         </div>
       </li>
     </ul>
@@ -87,15 +87,45 @@ export default {
 }
 .child-actions {
   margin-top: 0.5em;
+  display: flex;
+  justify-content: space-between;
 }
 
+.menu-button {
+  background-color: transparent;
+  border: 1px solid #23938c;
+  color: #23938c;
+  padding: 10px 15px 10px 30px;;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.menu-button:hover {
+  background-color: #23938c;
+  color: white;
+}
+
+.edit-button {
+  background: url('../assets/edit-icon.png') no-repeat 7px 6px/13%;
+}
+.edit-button:hover {
+  background-image: url('../assets/edit-icon-hover.png');
+}
+
+.delete-button { 
+  background: url('../assets/delete-icon.png') no-repeat 7px 11px/14%;
+}
+.delete-button:hover {
+  background-image: url('../assets/delete-icon-hover.png');
+}
 
 .add-button {
   margin-top: 16px;
   background-color: transparent;
   border: 1px solid #23938c;
   color: #23938c;
-  padding: 10px 16px;
+  padding: 10px 15px;
   font-size: 14px;
   border-radius: 6px;
   cursor: pointer;

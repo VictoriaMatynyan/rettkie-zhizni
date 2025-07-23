@@ -1,8 +1,9 @@
 <template>
   <div class="personal-stats">
+    <h2 class="block-title">Статистика</h2>
     <StandardContent
       :paragraphs="[
-        'Здесь будет информация о статистике'
+        'Здесь будет статистика пациентов'
         ]"
       :imageSrc="symptomsImg"
       :imageSrcModal="symptomsImg"
@@ -141,6 +142,10 @@ export default {
 </script>
 
 <style scoped>
+.block-title {
+  text-align: center;
+}
+
 .map-section,
 .chart-section,
 .table-section {

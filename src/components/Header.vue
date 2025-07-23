@@ -30,10 +30,11 @@
           <router-link to="/events">Мероприятия</router-link>
           <router-link to="/about-us">О нас</router-link>
           <div class="dropdown">
-            <span class="dropdown-trigger">Реестр пациентов</span>
+            <!-- <span class="dropdown-trigger">Реестр пациентов</span> -->
+            <router-link to="/patient-registry">Реестр пациентов</router-link>
             <div class="dropdown-content">
               <router-link to="/patient-registry/personal-account">Личный кабинет</router-link>
-              <router-link to="/patient-registry/patient-file">Карта пациентов</router-link>
+              <router-link to="/patient-registry/patient-map">Карта пациентов</router-link>
               <router-link to="/patient-registry/privacy-policy">Политика обработки персональных данных</router-link>
             </div>
           </div>

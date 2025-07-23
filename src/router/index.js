@@ -16,7 +16,10 @@ import NewsPage from "../pages/NewsPage.vue";
 import Events from "../pages/Events.vue";
 import EventPage from "../pages/EventPage.vue";
 import AboutUs from "../pages/AboutUs.vue";
+import PatientRegistry from "../pages/PatientRegistry.vue";
 import PersonalAccount from "../pages/PersonalAccount.vue";
+import PatientMap from "../pages/PatientMap.vue";
+import PrivacyPolicy from "../pages/PrivacyPolicy.vue";
 
 const routes = [
     {path: '/rettkie-zhizni', name: 'Home', component: HomePage},
@@ -36,7 +39,10 @@ const routes = [
     {path: '/events', name: 'Events', component: Events},
     {path: '/events/:id', name: 'EventPage', component: EventPage},
     {path: '/about-us', name: 'AboutUs', component: AboutUs},
+    {path: '/patient-registry', name: 'PatientRegistry', component: PatientRegistry},
     {path: '/patient-registry/personal-account', name: 'PersonalAccount', component: PersonalAccount},
+    {path: '/patient-registry/patient-map', name: 'PatientMap', component: PatientMap},
+    {path: '/patient-registry/privacy-policy', name: 'PrivacyPolicy', component: PrivacyPolicy},
 ]
 
 export default createRouter({

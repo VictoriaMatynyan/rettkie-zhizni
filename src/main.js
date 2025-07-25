@@ -33,6 +33,17 @@ window.addEventListener('unhandledrejection', (event) => {
   event.preventDefault();
 });
 
+// Инициализация Yandex Metrika
+import { initYandexMetrika } from './utils/external-apis.js';
+
+// Инициализируем метрику после загрузки приложения
+app.config.globalProperties.$nextTick(() => {
+  const metrikaId = import.meta.env.VITE_YANDEX_METRIKA_ID;
+  if (metrikaId) {
+    initYandexMetrika(metrikaId);
+  }
+});
+
 app.use(router);
 app.directive('mask', VueMaskDirective);
 app.mount('#app');

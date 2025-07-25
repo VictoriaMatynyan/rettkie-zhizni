@@ -23,7 +23,7 @@ export const initYandexMaps = (callback) => {
 
 // Проверка доступности Yandex Metrika
 export const isYandexMetrikaAvailable = () => {
-  return typeof window !== 'undefined' && window.Ya && window.Ya.Metrika2;
+  return typeof window !== 'undefined' && typeof window.ym === 'function';
 };
 
 // Безопасная инициализация Yandex Metrika
@@ -34,10 +34,17 @@ export const initYandexMetrika = (counterId, options = {}) => {
   }
 
   try {
-    return new window.Ya.Metrika2(options);
+    window.ym(counterId, 'init', {
+      clickmap: true,
+      trackLinks: true,
+      accurateTrackBounce: true,
+      webvisor: true,
+      ...options,
+    });
+    return true;
   } catch (error) {
     console.error('Ошибка инициализации Yandex Metrika:', error);
-    return null;
+    return false;
   }
 };
 

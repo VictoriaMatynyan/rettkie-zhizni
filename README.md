@@ -19,6 +19,37 @@
 
 ## ⚙️ Установка и запуск проекта
 
+### 1. Клонирование и установка зависимостей
+
+```bash
+git clone https://github.com/VictoriaMatynyan/rettkie-zhizni.git
+cd rettkie-zhizni
+npm install
+```
+
+### 2. Настройка переменных окружения
+
+⚠️ **ВАЖНО**: Никогда не коммитьте реальные API ключи!
+
+1. Скопируйте файлы примеров:
+
+```bash
+cp .env.example .env.development
+cp .env.production.example .env.production
+```
+
+2. Заполните реальными значениями в `.env.development`:
+
+```bash
+# Получите API ключ Yandex Maps на https://developer.yandex.ru/
+VITE_YANDEX_MAPS_API_KEY=ваш_реальный_ключ_yandex_maps
+
+# ID счетчика Yandex Metrika
+VITE_YANDEX_METRIKA_ID=ваш_id_метрики
+```
+
+### 3. Запуск в development режиме
+
 ```bash
 # Установить зависимости
 npm install

@@ -32,10 +32,12 @@ const stories = [
     id: '1',
     title: 'История семьи Ивановых',
     image: familyImg,
-    content: ['Это трогательная история семьи, которая столкнулась с синдромом Ретта...'],
+    content: [
+      'Это трогательная история семьи, которая столкнулась с синдромом Ретта...',
+    ],
     downloadLink: '/files/story-ivanovy.pdf',
     downloadLinkName: 'PDF',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
   },
   {
     id: '2',
@@ -44,7 +46,7 @@ const stories = [
     content: ['Маша была активным и весёлым ребёнком до 2 лет...'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '3',
@@ -53,7 +55,7 @@ const stories = [
     content: ['История борьбы и надежды одной семьи...'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '4',
@@ -62,7 +64,7 @@ const stories = [
     content: ['История борьбы и надежды одной семьи...'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '5',
@@ -71,7 +73,8 @@ const stories = [
     content: ['История борьбы и надежды одной семьи...'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''  },
+    videoUrl: '',
+  },
   {
     id: '6',
     title: 'История 6',
@@ -79,7 +82,7 @@ const stories = [
     content: ['История борьбы и надежды одной семьи...'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '7',
@@ -88,7 +91,7 @@ const stories = [
     content: ['История борьбы и надежды одной семьи...'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '8',
@@ -97,7 +100,7 @@ const stories = [
     preview: ['История борьбы и надежды одной семьи...'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '9',
@@ -106,7 +109,7 @@ const stories = [
     content: ['История борьбы и надежды одной семьи...'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '10',
@@ -115,23 +118,23 @@ const stories = [
     content: ['История борьбы и надежды одной семьи...'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
-   {
+  {
     id: '11',
     title: 'История 11',
     image: familyImg,
     content: ['История борьбы и надежды одной семьи...'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
-]
+];
 
-const route = useRoute()
+const route = useRoute();
 const story = computed(() => {
-  return stories.find((s) => s.id === route.params.id)
-})
+  return stories.find((s) => s.id === route.params.id);
+});
 </script>
 
 <style scoped>

@@ -1,11 +1,8 @@
 <template>
-  
   <div class="standard-page">
     <h1>О разработке лекарства</h1>
     <StandardContent
-      :paragraphs="[
-        'Здесь будут новости о разработке лекарства'
-        ]"
+      :paragraphs="['Здесь будут новости о разработке лекарства']"
       :imageSrc="symptomsImg"
       :imageSrcModal="symptomsImg"
       imageAlt="Схема симптомов Ретта"
@@ -15,9 +12,7 @@
       captionText="Изображение: основные проявления синдрома Ретта"
       downloadLinkName="Гайд-заглушка (1.2 МБ)"
       videoUrl="https://rutube.ru/play/embed/someVideoId/"
-      >
-    </StandardContent>
-
+    ></StandardContent>
   </div>
 </template>
 

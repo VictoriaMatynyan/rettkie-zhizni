@@ -31,7 +31,7 @@ const events = [
     content: ['Анонс мероприятия'],
     downloadLink: '/files/event-ivanovy.pdf',
     downloadLinkName: 'PDF',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
   },
   {
     id: '2',
@@ -40,7 +40,7 @@ const events = [
     content: ['Анонс мероприятия'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '3',
@@ -49,7 +49,7 @@ const events = [
     content: ['Анонс мероприятия'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '4',
@@ -58,7 +58,7 @@ const events = [
     content: ['Анонс мероприятия'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '5',
@@ -67,7 +67,8 @@ const events = [
     content: ['Анонс мероприятия'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''  },
+    videoUrl: '',
+  },
   {
     id: '6',
     title: 'Мероприятие 6',
@@ -75,7 +76,7 @@ const events = [
     content: ['Анонс мероприятия'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '7',
@@ -84,7 +85,7 @@ const events = [
     content: ['Анонс мероприятия'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '8',
@@ -93,7 +94,7 @@ const events = [
     preview: ['Анонс мероприятия'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '9',
@@ -102,7 +103,7 @@ const events = [
     content: ['Анонс мероприятия'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '10',
@@ -111,23 +112,23 @@ const events = [
     content: ['Анонс мероприятия'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
-   {
+  {
     id: '11',
     title: 'Мероприятие 11',
     image: eventImg,
     content: ['Анонс мероприятия'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
-]
+];
 
 const route = useRoute();
 const event = computed(() => {
-  return events.find((a) => a.id === route.params.id)
-})
+  return events.find((a) => a.id === route.params.id);
+});
 </script>
 
 <style scoped>

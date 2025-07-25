@@ -1,9 +1,17 @@
 <template>
   <div class="donate-page">
     <h1 class="donate-title">Поддержите проект «РЕТТкие Жизни»</h1>
-    <div class = "donate-intro">
-        <p class="donate-text">Ваше пожертвование поможет развивать инициативу «РЕТТкие Жизни»: информировать, поддерживать семьи, развивать карту пациентов и обучать специалистов.</p>
-        <p class="donate-text">Вы можете выбрать фиксированную сумму или указать свою. Доступны различные способы перевода: банковская карта, СБП, SMS, а также прямой перевод по реквизитам.</p>
+    <div class="donate-intro">
+      <p class="donate-text">
+        Ваше пожертвование поможет развивать инициативу «РЕТТкие Жизни»:
+        информировать, поддерживать семьи, развивать карту пациентов и обучать
+        специалистов.
+      </p>
+      <p class="donate-text">
+        Вы можете выбрать фиксированную сумму или указать свою. Доступны
+        различные способы перевода: банковская карта, СБП, SMS, а также прямой
+        перевод по реквизитам.
+      </p>
     </div>
     <div class="donate-section">
       <h2>Сумма пожертвования</h2>
@@ -17,9 +25,9 @@
           {{ amount }} ₽
         </button>
         <input
+          v-model.number="customAmount"
           type="number"
           placeholder="Другая сумма"
-          v-model.number="customAmount"
           @focus="selectedAmount = null"
         />
       </div>
@@ -35,25 +43,49 @@
     <div class="donate-section">
       <h2>Реквизиты для перевода</h2>
       <div class="bank-details">
-        <p><strong>Получатель:</strong> АНО «РЕТТкие Жизни»</p>
-        <p><strong>ИНН:</strong> 1234567890</p>
-        <p><strong>КПП:</strong> 123401001</p>
-        <p><strong>Расчетный счет:</strong> 40703810900000000001</p>
-        <p><strong>Банк:</strong> ПАО «Сбербанк»</p>
-        <p><strong>БИК:</strong> 044525000</p>
-        <p><strong>Корр. счёт:</strong> 30101810400000000225</p>
-        <p><strong>Назначение:</strong> Пожертвование на уставные цели</p>
+        <p>
+          <strong>Получатель:</strong>
+          АНО «РЕТТкие Жизни»
+        </p>
+        <p>
+          <strong>ИНН:</strong>
+          1234567890
+        </p>
+        <p>
+          <strong>КПП:</strong>
+          123401001
+        </p>
+        <p>
+          <strong>Расчетный счет:</strong>
+          40703810900000000001
+        </p>
+        <p>
+          <strong>Банк:</strong>
+          ПАО «Сбербанк»
+        </p>
+        <p>
+          <strong>БИК:</strong>
+          044525000
+        </p>
+        <p>
+          <strong>Корр. счёт:</strong>
+          30101810400000000225
+        </p>
+        <p>
+          <strong>Назначение:</strong>
+          Пожертвование на уставные цели
+        </p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const predefinedAmounts = [300, 500, 1000, 2000]
-const selectedAmount = ref(500)
-const customAmount = ref(null)
+const predefinedAmounts = [300, 500, 1000, 2000];
+const selectedAmount = ref(500);
+const customAmount = ref(null);
 </script>
 
 <style scoped>

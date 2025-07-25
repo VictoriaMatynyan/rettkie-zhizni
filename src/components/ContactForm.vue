@@ -6,41 +6,52 @@
       <div class="form-group">
         <label>
           Имя
-          <span v-if="showHelp.name" class="help-text">Введите ваше полное имя</span>
-          <input type="text" v-model="form.name" required />
+          <span v-if="showHelp.name" class="help-text">
+            Введите ваше полное имя
+          </span>
+          <input v-model="form.name" type="text" required />
         </label>
       </div>
 
       <div class="form-group">
         <label>
           E-mail
-          <span v-if="showHelp.email" class="help-text">Используется для связи и уведомлений</span>
-          <input type="email" v-model="form.email" required />
+          <span v-if="showHelp.email" class="help-text">
+            Используется для связи и уведомлений
+          </span>
+          <input v-model="form.email" type="email" required />
         </label>
       </div>
 
-     <div class="form-group">
-    <label>
-      Телефон
-      <span v-if="showHelp.phone" class="help-text">В формате +7 (999) 999-99-99</span>
-      <input
-      id="phone"
-      name="phone"
-        type="tel"
-        required
-        v-mask="'+7 (###) ###-##-##'"
-        inputmode="numeric"
-        v-model="form.phone"
-        placeholder="+7 (___) ___-__-__"
-        autocomplete="tel"
-      />
-    </label>
-  </div>
-       <div class="form-group notications">
+      <div class="form-group">
         <label>
-                    <input type="checkbox" v-model="form.notifications" id="notifications" name="notifications" />
+          Телефон
+          <span v-if="showHelp.phone" class="help-text">
+            В формате +7 (999) 999-99-99
+          </span>
+          <input
+            id="phone"
+            v-model="form.phone"
+            v-mask="'+7 (###) ###-##-##'"
+            name="phone"
+            type="tel"
+            required
+            inputmode="numeric"
+            placeholder="+7 (___) ___-__-__"
+            autocomplete="tel"
+          />
+        </label>
+      </div>
+      <div class="form-group notications">
+        <label>
+          <input
+            id="notifications"
+            v-model="form.notifications"
+            type="checkbox"
+            name="notifications"
+          />
 
-          <span class="label-text" v-if="showHelp.notifications" >
+          <span v-if="showHelp.notifications" class="label-text">
             Получать важные новости на почту
           </span>
         </label>
@@ -49,36 +60,38 @@
       <button type="submit" class="save-button">Сохранить</button>
     </form>
 
-    <div v-if="submitted" class="success-message">Данные успешно сохранены!</div>
+    <div v-if="submitted" class="success-message">
+      Данные успешно сохранены!
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
 
 const form = ref({
   notifications: true,
   name: '',
   email: '',
   phone: '',
-})
+});
 
-const submitted = ref(false)
+const submitted = ref(false);
 
 const showHelp = {
   notifications: true,
   name: true,
   email: true,
   phone: true,
-}
+};
 
 function handleSubmit() {
   // здесь будет API-запрос на POST/UPDATE
-  submitted.value = true
+  submitted.value = true;
   setTimeout(() => {
-    console.log('Form submitted:', form.value)
-    submitted.value = false
-  }, 5000)
+    console.log('Form submitted:', form.value);
+    submitted.value = false;
+  }, 5000);
 }
 </script>
 
@@ -122,7 +135,7 @@ input[type='tel'] {
 
 .save-button {
   margin-top: 16px;
-  background-color: #2AAEA2;
+  background-color: #2aaea2;
   color: white;
   border: none;
   padding: 10px 16px;
@@ -137,11 +150,11 @@ input[type='tel'] {
 
 .success-message {
   margin-top: 12px;
-  color: #2AAEA2;
+  color: #2aaea2;
   font-weight: 500;
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   margin: 0;
   cursor: pointer;
 }

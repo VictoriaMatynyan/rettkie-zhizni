@@ -1,24 +1,41 @@
 <template>
   <div class="child-form">
-    <h3 class="child-form-title">{{ child ? 'Редактировать анкету' : 'Новая анкета' }}</h3>
+    <h3 class="child-form-title">
+      {{ child ? 'Редактировать анкету' : 'Новая анкета' }}
+    </h3>
 
     <form @submit.prevent="submitForm">
       <div class="form-group">
-        <label class="form-label">Фамилия
-          <input class="form-input" type="text" v-model="form.lastName" required />
+        <label class="form-label">
+          Фамилия
+          <input
+            v-model="form.lastName"
+            class="form-input"
+            type="text"
+            required
+          />
         </label>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Имя
-          <input class="form-input" type="text" v-model="form.firstName" required />
+        <label class="form-label">
+          Имя
+          <input
+            v-model="form.firstName"
+            class="form-input"
+            type="text"
+            required
+          />
         </label>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Пол
-          <select class="form-select" v-model="form.gender" required>
-            <option class="form-option gender" disabled value="">Выберите пол</option>
+        <label class="form-label">
+          Пол
+          <select v-model="form.gender" class="form-select" required>
+            <option class="form-option gender" disabled value="">
+              Выберите пол
+            </option>
             <option class="form-option" value="м">Мужской</option>
             <option class="form-option" value="ж">Женский</option>
           </select>
@@ -26,14 +43,22 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Дата рождения
-          <input class="form-input" type="date" v-model="form.birthDate" required />
+        <label class="form-label">
+          Дата рождения
+          <input
+            v-model="form.birthDate"
+            class="form-input"
+            type="date"
+            required
+          />
         </label>
       </div>
 
       <div class="form-buttons">
         <button class="btn submit" type="submit">Сохранить</button>
-        <button class="btn cancel" type="button" @click="$emit('cancel')">Отмена</button>
+        <button class="btn cancel" type="button" @click="$emit('cancel')">
+          Отмена
+        </button>
       </div>
     </form>
   </div>
@@ -43,29 +68,33 @@
 export default {
   name: 'ChildForm',
   props: {
-    child: Object
+    child: {
+      type: Object,
+      default: () => null,
+    },
   },
+  emits: ['save', 'cancel'],
   data() {
     return {
       form: {
         lastName: '',
         firstName: '',
         gender: '',
-        birthDate: ''
-      }
-    }
+        birthDate: '',
+      },
+    };
   },
   mounted() {
     if (this.child) {
-      this.form = { ...this.child }
+      this.form = { ...this.child };
     }
   },
   methods: {
     submitForm() {
-      this.$emit('save', { ...this.form })
-    }
-  }
-}
+      this.$emit('save', { ...this.form });
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -89,7 +118,8 @@ export default {
   margin-bottom: 0.4rem;
 }
 
-.form-input, .form-select {
+.form-input,
+.form-select {
   padding: 0.6rem 0.8rem;
   border: none;
   border-bottom: 1px solid #ccc;
@@ -109,7 +139,7 @@ select {
 
 input:focus,
 select:focus {
-  border-color: #8132AD;
+  border-color: #8132ad;
   outline: none;
 }
 
@@ -137,8 +167,8 @@ select:focus {
   color: white;
 }
 
-.btn.cancel{
-  border-bottom: 1px solid rgba(244, 67, 54, .5);
+.btn.cancel {
+  border-bottom: 1px solid rgba(244, 67, 54, 0.5);
 }
 
 .btn.cancel:hover {

@@ -1,11 +1,10 @@
 <template>
-  
   <div class="standard-page">
     <h1>Истории семей</h1>
     <StandardContent
       :paragraphs="[
-        'Ниже, после стандартного контента, будут представлены истории семей'
-        ]"
+        'Ниже, после стандартного контента, будут представлены истории семей',
+      ]"
       :imageSrc="symptomsImg"
       :imageSrcModal="symptomsImg"
       imageAlt="Схема симптомов Ретта"
@@ -15,15 +14,14 @@
       captionText="Изображение: здесь будет какое-то контекстное изображение"
       downloadLinkName="Гайд-заглушка (1.2 МБ)"
       videoUrl="https://rutube.ru/play/embed/someVideoId/"
-      >
-    </StandardContent>
+    ></StandardContent>
     <section class="family-stories">
       <h2 class="block-title">Истории семей</h2>
       <div class="card-list">
         <div
-          class="story-card"
           v-for="story in visibleStories"
           :key="story.id"
+          class="story-card"
           @click="goToStory(story.id)"
         >
           <img :src="story.image" :alt="story.title" class="story-image" />
@@ -31,7 +29,7 @@
           <p>{{ story.preview }}</p>
         </div>
       </div>
-      <button v-if="hasMore" @click="loadMore" class="load-more">
+      <button v-if="hasMore" class="load-more" @click="loadMore">
         Загрузить ещё
       </button>
     </section>
@@ -45,7 +43,7 @@ import symptomsImg from '../assets/symptoms.png';
 import familyImg from '../assets/family.png';
 import StandardContent from '../components/StandardContent.vue';
 
-const router = useRouter()
+const router = useRouter();
 
 // массив историй - заглушки; позже будут загружаться с сервера)
 const stories = ref([
@@ -54,79 +52,79 @@ const stories = ref([
     title: 'История семьи Ивановых',
     image: familyImg,
     preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-06-01'
+    date: '2025-06-01',
   },
   {
     id: 2,
     title: 'История Маши',
     image: familyImg,
     preview: 'Как маленькая Маша училась жить с диагнозом...',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 3,
     title: 'История семьи Поповых',
     image: familyImg,
     preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-21'
+    date: '2025-05-21',
   },
   {
     id: 4,
     title: 'История 4',
     image: familyImg,
     preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 5,
     title: 'История 5',
     image: familyImg,
     preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 6,
     title: 'История 6',
     image: familyImg,
     preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 7,
     title: 'История 7',
     image: familyImg,
     preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 8,
     title: 'История 8',
     image: familyImg,
     preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 9,
     title: 'История 9',
     image: familyImg,
     preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 10,
     title: 'История 10',
     image: familyImg,
     preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
-   {
+  {
     id: 11,
     title: 'История 11',
     image: familyImg,
     preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
-])
+]);
 
 // кол-во отображаемых историй
 const pageSize = 10;
@@ -138,15 +136,17 @@ const sortedStories = computed(() =>
 const visibleStories = computed(() =>
   sortedStories.value.slice(0, currentPage.value * pageSize)
 );
-const hasMore = computed(() => visibleStories.value.length < sortedStories.value.length);
+const hasMore = computed(
+  () => visibleStories.value.length < sortedStories.value.length
+);
 
 function loadMore() {
-  currentPage.value++
-};
+  currentPage.value++;
+}
 
 function goToStory(id) {
-  router.push(`/stories/${id}`)
-};
+  router.push(`/stories/${id}`);
+}
 </script>
 
 <style scoped>
@@ -209,15 +209,15 @@ function goToStory(id) {
   display: block;
   padding: 10px 20px;
   font-size: 16px;
-  color:  #2AAEA2;
+  color: #2aaea2;
   background-color: transparent;
-  border: 1px solid #2AAEA2;
+  border: 1px solid #2aaea2;
   border-radius: 6px;
   cursor: pointer;
 }
 .load-more:hover {
-  background-color: #2AAEA2;
-  border: 1px solid #2AAEA2;
+  background-color: #2aaea2;
+  border: 1px solid #2aaea2;
   color: #fff;
 }
 </style>

@@ -35,7 +35,7 @@ const articles = [
     content: ['Анонс статьи'],
     downloadLink: '/files/article-ivanovy.pdf',
     downloadLinkName: 'PDF',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
   },
   {
     id: '2',
@@ -44,7 +44,7 @@ const articles = [
     content: ['Анонс статьи'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '3',
@@ -53,7 +53,7 @@ const articles = [
     content: ['Анонс статьи'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '4',
@@ -62,7 +62,7 @@ const articles = [
     content: ['Анонс статьи'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '5',
@@ -71,7 +71,8 @@ const articles = [
     content: ['Анонс статьи'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''  },
+    videoUrl: '',
+  },
   {
     id: '6',
     title: 'Статья 6',
@@ -79,7 +80,7 @@ const articles = [
     content: ['Анонс статьи'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '7',
@@ -88,7 +89,7 @@ const articles = [
     content: ['Анонс статьи'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '8',
@@ -97,7 +98,7 @@ const articles = [
     preview: ['Анонс статьи'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '9',
@@ -106,7 +107,7 @@ const articles = [
     content: ['Анонс статьи'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '10',
@@ -115,23 +116,23 @@ const articles = [
     content: ['Анонс статьи'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
-   {
+  {
     id: '11',
     title: 'Статья 11',
     image: articleImg,
     content: ['Анонс статьи'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
-  }
-]
+    videoUrl: '',
+  },
+];
 
 const route = useRoute();
 const article = computed(() => {
-  return articles.find((a) => a.id === route.params.id)
-})
+  return articles.find((a) => a.id === route.params.id);
+});
 </script>
 
 <style scoped>

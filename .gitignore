@@ -12,6 +12,19 @@ dist
 dist-ssr
 *.local
 
+# Environment variables - НИКОГДА НЕ КОММИТИТЬ!
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+.env.*.development
+.env.*.production
+
+# API ключи и секреты
+config/secrets.js
+config/api-keys.js
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

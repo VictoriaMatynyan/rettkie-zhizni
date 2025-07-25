@@ -10,14 +10,18 @@ export const isYandexMapsAvailable = () => {
 // Безопасная инициализация Yandex Maps
 export const initYandexMaps = (callback) => {
   if (!isYandexMapsAvailable()) {
-    console.warn('Yandex Maps API недоступен');
+    if (import.meta.env.DEV) {
+      console.warn('Yandex Maps API недоступен');
+    }
     return;
   }
 
   try {
     window.ymaps.ready(callback);
   } catch (error) {
-    console.error('Ошибка инициализации Yandex Maps:', error);
+    if (import.meta.env.DEV) {
+      console.error('Ошибка инициализации Yandex Maps:', error);
+    }
   }
 };
 
@@ -29,7 +33,9 @@ export const isYandexMetrikaAvailable = () => {
 // Безопасная инициализация Yandex Metrika
 export const initYandexMetrika = (counterId, options = {}) => {
   if (!isYandexMetrikaAvailable()) {
-    console.warn('Yandex Metrika недоступна');
+    if (import.meta.env.DEV) {
+      console.warn('Yandex Metrika недоступна');
+    }
     return;
   }
 
@@ -43,7 +49,9 @@ export const initYandexMetrika = (counterId, options = {}) => {
     });
     return true;
   } catch (error) {
-    console.error('Ошибка инициализации Yandex Metrika:', error);
+    if (import.meta.env.DEV) {
+      console.error('Ошибка инициализации Yandex Metrika:', error);
+    }
     return false;
   }
 };
@@ -53,7 +61,7 @@ export const safeExternalCall = (fn, errorMessage = 'Ошибка внешнег
   try {
     return fn();
   } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.error(errorMessage, error);
     }
     return null;

@@ -73,7 +73,7 @@ export default {
         }
       } catch (error) {
         // В development режиме логируем ошибки
-        if (process.env.NODE_ENV === 'development') {
+        if (import.meta.env.DEV) {
           console.warn(`Не удалось добавить точку ${point.region}:`, error);
         }
       }

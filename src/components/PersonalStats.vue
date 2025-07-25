@@ -73,8 +73,8 @@
 </template>
 
 <script>
-import StandardContent from '../components/StandardContent.vue';
 import symptomsImg from '../assets/symptoms.png';
+import StandardContent from '../components/StandardContent.vue';
 import YandexMap from '../components/YandexMap.vue';
 // import MutationBarChart from '@/components/MutationBarChart.vue';
 

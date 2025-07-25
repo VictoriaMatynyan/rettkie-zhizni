@@ -1,10 +1,10 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
 
-const repoName = 'rettkie-zhizni'
+const repoName = 'rettkie-zhizni';
 
 // https://vite.dev/config/
 export default defineConfig({
-  base:  `/${repoName}`,
+  base: `/${repoName}`,
   plugins: [vue()],
-})
+});

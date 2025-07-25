@@ -3,8 +3,8 @@
     <h1>Реабилитация</h1>
     <StandardContent
       :paragraphs="[
-        'Здесь будет информация о методах реабилитации при синдроме Ретта, а также подборка рекомендованных материалов.'
-        ]"
+        'Здесь будет информация о методах реабилитации при синдроме Ретта, а также подборка рекомендованных материалов.',
+      ]"
       :imageSrc="symptomsImg"
       :imageSrcModal="symptomsImg"
       imageAlt="Схема симптомов Ретта"
@@ -14,13 +14,18 @@
       captionText="Изображение: основные проявления синдрома Ретта"
       downloadLinkName="Гайд-заглушка (1.2 МБ)"
       videoUrl="https://rutube.ru/play/embed/someVideoId/"
-      >
-    </StandardContent>
+    ></StandardContent>
     <section class="rehab-articles">
       <h2 class="block-title">Рекомендованные статьи</h2>
       <ul class="article-list">
-        <li class="article-item" v-for="article in rehabArticles" :key="article.id">
-          <RouterLink :to="`/articles/${article.id}`">{{ article.title }}</RouterLink>
+        <li
+          v-for="article in rehabArticles"
+          :key="article.id"
+          class="article-item"
+        >
+          <RouterLink :to="`/articles/${article.id}`">
+            {{ article.title }}
+          </RouterLink>
         </li>
       </ul>
     </section>
@@ -35,14 +40,14 @@ import StandardContent from '../components/StandardContent.vue';
 import articleImg from '../assets/news.jpeg';
 
 // массив статей - заглушки; позже будут загружаться с сервера)
-const articles = ([
+const articles = [
   {
     id: 1,
     title: 'Статья 1',
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Медицина',
-    date: '2025-06-01'
+    date: '2025-06-01',
   },
   {
     id: 2,
@@ -50,7 +55,7 @@ const articles = ([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Истории',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 3,
@@ -58,7 +63,7 @@ const articles = ([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Медицина',
-    date: '2025-05-21'
+    date: '2025-05-21',
   },
   {
     id: 4,
@@ -66,7 +71,7 @@ const articles = ([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Истории',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 5,
@@ -74,7 +79,7 @@ const articles = ([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Медицина',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 6,
@@ -82,7 +87,7 @@ const articles = ([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Реабилитация',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 7,
@@ -90,7 +95,7 @@ const articles = ([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Истории',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 8,
@@ -98,7 +103,7 @@ const articles = ([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Реабилитация',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 9,
@@ -106,7 +111,7 @@ const articles = ([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Медицина',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 10,
@@ -114,22 +119,21 @@ const articles = ([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Медицина',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
-   {
+  {
     id: 11,
     title: 'Статья 11',
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Реабилитация',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
-]);
+];
 
-const rehabArticles = computed(() => 
-  articles.filter(article => article.category === 'Реабилитация')
+const rehabArticles = computed(() =>
+  articles.filter((article) => article.category === 'Реабилитация')
 );
-
 </script>
 
 <style scoped>

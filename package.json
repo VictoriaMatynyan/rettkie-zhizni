@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && gh-pages -d dist"
+    "deploy": "npm run build && gh-pages -d dist",
+    "lint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .vue,.js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "engines": {
     "node": "22.17.1",
@@ -20,10 +24,17 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.32.0",
     "@vitejs/plugin-vue": "^5.2.3",
+    "@vue/eslint-config-prettier": "^10.2.0",
     "autoprefixer": "^10.4.21",
+    "eslint": "^9.32.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.3",
+    "eslint-plugin-vue": "^10.3.0",
     "gh-pages": "^6.3.0",
     "postcss": "^8.5.3",
+    "prettier": "^3.6.2",
     "vite": "^6.3.5"
   }
 }

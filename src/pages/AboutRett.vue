@@ -1,11 +1,10 @@
 <template>
-  
   <div class="standard-page">
     <h1>О синдроме Ретта</h1>
     <StandardContent
       :paragraphs="[
-        'Синдром Ретта — редкое генетическое заболевание, поражающее центральную нервную систему.'
-        ]"
+        'Синдром Ретта — редкое генетическое заболевание, поражающее центральную нервную систему.',
+      ]"
       :imageSrc="symptomsImg"
       :imageSrcModal="symptomsImg"
       imageAlt="Схема симптомов Ретта"
@@ -15,9 +14,7 @@
       captionText="Изображение: основные проявления синдрома Ретта"
       downloadLinkName="Гайд-заглушка (1.2 МБ)"
       videoUrl="https://rutube.ru/play/embed/someVideoId/"
-      >
-    </StandardContent>
-
+    ></StandardContent>
   </div>
 </template>
 

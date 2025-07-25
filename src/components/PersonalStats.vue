@@ -2,9 +2,7 @@
   <div class="personal-stats">
     <h2 class="block-title">Статистика</h2>
     <StandardContent
-      :paragraphs="[
-        'Здесь будет статистика пациентов'
-        ]"
+      :paragraphs="['Здесь будет статистика пациентов']"
       :imageSrc="symptomsImg"
       :imageSrcModal="symptomsImg"
       imageAlt="Схема симптомов Ретта"
@@ -14,8 +12,7 @@
       captionText="Изображение: основные проявления синдрома Ретта"
       downloadLinkName="Гайд-заглушка (1.2 МБ)"
       videoUrl="https://rutube.ru/play/embed/someVideoId/"
-      >
-    </StandardContent>
+    ></StandardContent>
 
     <!-- Карта -->
     <div class="map-section">
@@ -80,7 +77,6 @@ import StandardContent from '../components/StandardContent.vue';
 import symptomsImg from '../assets/symptoms.png';
 import YandexMap from '../components/YandexMap.vue';
 // import MutationBarChart from '@/components/MutationBarChart.vue';
-console.log('symptomsImg', symptomsImg)
 
 export default {
   name: 'PersonalStats',
@@ -95,7 +91,7 @@ export default {
       mutations: [], // из БД
       regionData: [], // из БД
       userMutationId: null,
-      symptomsImg: symptomsImg
+      symptomsImg: symptomsImg,
     };
   },
   computed: {
@@ -123,10 +119,42 @@ export default {
   methods: {
     fetchMutations() {
       return [
-        { id: 'MECP2', gene: 'MECP2', shortName: 'MECP2', altNames: '', type: 'миссенс-мутация', link: '', count: 15 },
-        { id: 'CDKL5', gene: 'CDKL5', shortName: 'CDKL5', altNames: '', type: 'делеция', link: '', count: 5 },
-        { id: 'FOXG1', gene: 'FOXG1', shortName: 'FOXG1', altNames: '', type: 'нонсенс-мутация', link: '', count: 3 },
-        { id: 'other1', gene: 'N/A', shortName: '...', altNames: '', type: '', link: '', count: 1 },
+        {
+          id: 'MECP2',
+          gene: 'MECP2',
+          shortName: 'MECP2',
+          altNames: '',
+          type: 'миссенс-мутация',
+          link: '',
+          count: 15,
+        },
+        {
+          id: 'CDKL5',
+          gene: 'CDKL5',
+          shortName: 'CDKL5',
+          altNames: '',
+          type: 'делеция',
+          link: '',
+          count: 5,
+        },
+        {
+          id: 'FOXG1',
+          gene: 'FOXG1',
+          shortName: 'FOXG1',
+          altNames: '',
+          type: 'нонсенс-мутация',
+          link: '',
+          count: 3,
+        },
+        {
+          id: 'other1',
+          gene: 'N/A',
+          shortName: '...',
+          altNames: '',
+          type: '',
+          link: '',
+          count: 1,
+        },
       ];
     },
     fetchRegionStats() {
@@ -136,8 +164,8 @@ export default {
         { region: 'Петербург', count: 3 },
         { region: 'Татарстан', count: 4 },
       ];
-    }
-  }
+    },
+  },
 };
 </script>
 

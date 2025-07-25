@@ -16,7 +16,11 @@
       videoUrl="https://rutube.ru/play/embed/someVideoId/"
     />
     <div class="registry-button">
-      <router-link to="/patient-registry/personal-account" class="btn-register" target="_blank">
+      <router-link
+        to="/patient-registry/personal-account"
+        class="btn-register"
+        target="_blank"
+      >
         Зарегистрироваться
       </router-link>
     </div>
@@ -24,7 +28,6 @@
       <h3 class="block-title">География пациентов</h3>
       <YandexMap :points="regionData" />
     </div>
-    
   </div>
 </template>
 
@@ -78,15 +81,14 @@ onMounted(() => {
   font-size: 16px;
   font-weight: 600;
   background-color: transparent;
-  border: 1px solid #2AAEA2;
+  border: 1px solid #2aaea2;
   border-radius: 8px;
   text-decoration: none;
   transition: background-color 0.3s ease;
 }
 
 .btn-register:hover {
-  background-color: #2AAEA2;
+  background-color: #2aaea2;
   color: #fff;
 }
-
 </style>

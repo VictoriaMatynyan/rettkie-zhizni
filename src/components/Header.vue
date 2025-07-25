@@ -125,18 +125,18 @@ onBeforeUnmount(() => {
   .main-nav a {
     text-decoration: none;
     color: #333;
-    padding: 6px 8px;
+    padding: 0;
     transition: color 0.2s;
   }
   
   .main-nav a:hover {
-    color: #007acc;
+    color: #23938c;
   }  
 
-  .btn-donate,
-  .btn-help {
-    display: inline-block;
-    padding: 8px 16px;
+  .main-nav > .btn-donate,
+  .main-nav > .btn-help {
+    display: flex;
+    padding: 7px 13px;
     font-size: 14px;
     font-weight: 500;
     border-radius: 6px;
@@ -146,24 +146,26 @@ onBeforeUnmount(() => {
   }
 
   .main-nav > .btn-donate {
-    color: #018628;
-    border: 1px solid #10813f;
+    color: #23938c;
+    border: 1px solid #23938c;
   }
 
   .main-nav > .btn-donate:hover {
-    color: #229954;
+    color: white;
+    background-color: #23938c;
     box-shadow: 0 2px 6px rgba(16, 129, 63, 0.4);
   }
 
   .main-nav > .btn-help {
-    color: #0160a2;
-    border: 1px solid #0160a2;
+    color: #8232ad;
+    border: 1px solid #8232ad;
 
   }
 
-  .btn-help:hover {
-    color: #0370bb;
+  .main-nav > .btn-help:hover {
+    color: white;
     box-shadow: 0 2px 6px rgba(41, 128, 185, 0.4);
+    background-color: #8232ad;
   }
     
   /* Выпадающее меню */
@@ -173,7 +175,11 @@ onBeforeUnmount(() => {
   
   .dropdown-trigger {
     cursor: pointer;
-    padding: 6px 8px;
+    padding: 0;
+  }
+
+  .dropdown-trigger:hover {
+    color: #23938c;
   }
   
   .dropdown-content {
@@ -195,7 +201,7 @@ onBeforeUnmount(() => {
     text-decoration: none;
   }
   
-  .dropdown-content a:hover {
+  .dropdown-content a:hover span:hover {
     background-color: #f1f1f1;
   }
   

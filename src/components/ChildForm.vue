@@ -120,33 +120,6 @@ select:focus {
   margin-top: 1.5rem;
 }
 
-/* .btn {
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-} */
-
-/* .btn.primary {
-  background: #0066cc;
-  color: white;
-}
-
-.btn.primary:hover {
-  background: #005bb5;
-}
-
-.btn.secondary {
-  background: #f2f2f2;
-  color: #333;
-}
-
-.btn.secondary:hover {
-  background: #e0e0e0;
-} */
-
 .btn {
   margin-top: 16px;
   background-color: transparent;

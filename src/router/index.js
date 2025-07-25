@@ -20,6 +20,7 @@ import PatientRegistry from "../pages/PatientRegistry.vue";
 import PersonalAccount from "../pages/PersonalAccount.vue";
 import PatientMap from "../pages/PatientMap.vue";
 import PrivacyPolicy from "../pages/PrivacyPolicy.vue";
+import Donate from "../pages/Donate.vue";
 
 const routes = [
     {path: '/rettkie-zhizni', name: 'Home', component: HomePage},
@@ -43,6 +44,7 @@ const routes = [
     {path: '/patient-registry/personal-account', name: 'PersonalAccount', component: PersonalAccount},
     {path: '/patient-registry/patient-map', name: 'PatientMap', component: PatientMap},
     {path: '/patient-registry/privacy-policy', name: 'PrivacyPolicy', component: PrivacyPolicy},
+    {path: '/donate', name: 'Donate', component: Donate},
 ]
 
 export default createRouter({

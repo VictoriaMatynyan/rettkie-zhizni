@@ -1,23 +1,19 @@
 <template>
-  
   <div class="standard-page">
     <h1>Как помочь</h1>
     <StandardContent
-      :paragraphs="[
-        'Здесь будет информация о способах помощи'
-        ]"
-      :imageSrc="symptomsImg"
-      :imageSrcModal="symptomsImg"
-      imageAlt="Схема симптомов Ретта"
-      imageAltModal="Схема симптомов Ретта"
-      downloadLink="/files/rett-info-brochure.pdf"
-      downloadLabel="Скачать памятку по заболеванию: "
-      captionText="Изображение: основные проявления синдрома Ретта"
-      downloadLinkName="Гайд-заглушка (1.2 МБ)"
-      videoUrl="https://rutube.ru/play/embed/someVideoId/"
-      >
+      :paragraphs="['Здесь будет информация о способах помощи']"
+      :image-src="symptomsImg"
+      :image-src-modal="symptomsImg"
+      image-alt="Схема симптомов Ретта"
+      image-alt-modal="Схема симптомов Ретта"
+      download-link="/files/rett-info-brochure.pdf"
+      download-label="Скачать памятку по заболеванию: "
+      caption-text="Изображение: основные проявления синдрома Ретта"
+      download-link-name="Гайд-заглушка (1.2 МБ)"
+      video-url="https://rutube.ru/play/embed/someVideoId/"
+    >
     </StandardContent>
-
   </div>
 </template>
 

@@ -9,7 +9,7 @@ export default {
     points: {
       type: Array,
       required: true,
-    }
+    },
   },
   mounted() {
     if (window.ymaps) {
@@ -21,7 +21,7 @@ export default {
       this.map = new ymaps.Map(this.$refs.mapContainer, {
         center: [55.751574, 37.573856], // Центр карты — Москва
         zoom: 5,
-        controls: ['zoomControl']
+        controls: ['zoomControl'],
       });
 
       this.points.forEach(point => {
@@ -29,14 +29,14 @@ export default {
           const coords = res.geoObjects.get(0)?.geometry.getCoordinates();
           if (coords) {
             const placemark = new ymaps.Placemark(coords, {
-              balloonContent: `${point.region}: ${point.count} пациентов`
+              balloonContent: `${point.region}: ${point.count} пациентов`,
             });
             this.map.geoObjects.add(placemark);
           }
         });
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

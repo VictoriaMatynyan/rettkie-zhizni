@@ -2,33 +2,37 @@
   <div class="home-page">
     <h1 class="home-page-title">Добро пожаловать!</h1>
     <section class="banner-block">
-      <img src="/src/assets/logo_horizontal.png" alt="Логотип на главной странице" class="home-page-logo">
+      <img
+        src="/src/assets/logo_horizontal.png"
+        alt="Логотип на главной странице"
+        class="home-page-logo"
+      />
     </section>
     <section class="standard-content">
       <StandardContent
         :paragraphs="[
-          'Мы стремимся делиться актуальной и полезной информацией с родителями, врачами и всеми, кто хочет помочь.'
-          ]"
-        :imageSrc="symptomsImg"
-        :imageSrcModal="symptomsImg"
-        imageAlt="Схема симптомов Ретта"
-        imageAltModal="Схема симптомов Ретта"
-        downloadLink="/files/rett-info-brochure.pdf"
-        downloadLabel="Скачать памятку по заболеванию: "
-        captionText="Изображение: основные проявления синдрома Ретта"
-        downloadLinkName="Гайд-заглушка (1.2 МБ)"
-        videoUrl="https://rutube.ru/play/embed/someVideoId/"
-        >
+          'Мы стремимся делиться актуальной и полезной информацией с родителями, врачами и всеми, кто хочет помочь.',
+        ]"
+        :image-src="symptomsImg"
+        :image-src-modal="symptomsImg"
+        image-alt="Схема симптомов Ретта"
+        image-alt-modal="Схема симптомов Ретта"
+        download-link="/files/rett-info-brochure.pdf"
+        download-label="Скачать памятку по заболеванию: "
+        caption-text="Изображение: основные проявления синдрома Ретта"
+        download-link-name="Гайд-заглушка (1.2 МБ)"
+        video-url="https://rutube.ru/play/embed/someVideoId/"
+      >
       </StandardContent>
     </section>
-    
+
     <section class="latest-news">
       <h2 class="block-title">Последние новости</h2>
       <div class="card-list">
         <!-- <div v-for="(news, index) in newsList" :key="news.id">
           <h3>Новость №{{ index + 1 }}</h3>
         </div> -->
-        <div class="news-card" v-for="n in 3" :key="n">
+        <div v-for="n in 3" :key="n" class="news-card">
           <img src="/src/assets/news.jpeg" alt="Изображение новости" />
           <p class="date">01.06.2025</p>
           <h3 class="card-title">Заголовок новости №{{ n }}</h3>
@@ -40,44 +44,47 @@
     <section class="stories-block">
       <h2 class="block-title">Наши истории</h2>
       <div class="card-list">
-        <div class="story-card" v-for="s in 3" :key="s">
+        <div v-for="s in 3" :key="s" class="story-card">
           <img src="/src/assets/patient_history.jpeg" alt="История пациента" />
           <h3 class="card-title">История №{{ s }}</h3>
-          <p>Краткий анонс истории семьи / пациента, который можно будет открыть подробнее</p>
+          <p>
+            Краткий анонс истории семьи / пациента, который можно будет открыть
+            подробнее
+          </p>
         </div>
       </div>
     </section>
   </div>
-  </template>
-  
-  <script setup>
-  import symptomsImg from '../assets/symptoms.png';
-  import StandardContent from '../components/StandardContent.vue';
-  </script>
-  
-  <style scoped>
-  .home-page {
-    max-width: 1420px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    /* TODO: убрать padding (= 0)  */
-    padding: 24px;
-  }
-  
-  .home-page .home-page-title {
-    font-size: 24px;
-    margin-bottom: 24px;
-  }
+</template>
 
-  .home-page-logo {
-    max-width: 1420px;
-    width: 90%;
-  }
+<script setup>
+import symptomsImg from '../assets/symptoms.png';
+import StandardContent from '../components/StandardContent.vue';
+</script>
 
-  .banner-block {
+<style scoped>
+.home-page {
+  max-width: 1420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* TODO: убрать padding (= 0)  */
+  padding: 24px;
+}
+
+.home-page .home-page-title {
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+
+.home-page-logo {
+  max-width: 1420px;
+  width: 90%;
+}
+
+.banner-block {
   width: 100%;
   text-align: center;
 }
@@ -133,4 +140,4 @@
   font-size: 22px;
   margin-bottom: 16px;
 }
-</style>  
+</style>

@@ -9,17 +9,25 @@
     <ul v-else class="children-list">
       <li v-for="(child, index) in children" :key="child.id" class="child-card">
         <div class="child-info">
-          <p><strong>{{ child.lastName }} {{ child.firstName }}</strong> ({{ child.gender }})</p>
+          <p>
+            <strong>{{ child.lastName }} {{ child.firstName }}</strong> ({{
+              child.gender
+            }})
+          </p>
           <p>Дата рождения: {{ child.birthDate }}</p>
         </div>
         <div class="child-actions">
-          <button class="menu-button edit-button" @click="editChild(index)">Редактировать</button>
-          <button class="menu-button delete-button" @click="deleteChild(index)">Удалить</button>
+          <button class="menu-button edit-button" @click="editChild(index)">
+            Редактировать
+          </button>
+          <button class="menu-button delete-button" @click="deleteChild(index)">
+            Удалить
+          </button>
         </div>
       </li>
     </ul>
 
-    <button @click="showForm = true" class="add-button">Добавить анкету</button>
+    <button class="add-button" @click="showForm = true">Добавить анкету</button>
 
     <ChildForm
       v-if="showForm"
@@ -38,41 +46,43 @@ export default {
   components: { ChildForm },
   data() {
     return {
-      children: [],         // Здесь будет список анкет
+      children: [], // Здесь будет список анкет
       showForm: false,
       editedIndex: null,
-    }
+    };
   },
   computed: {
     editedChild() {
-      return this.editedIndex !== null ? { ...this.children[this.editedIndex] } : null;
+      return this.editedIndex !== null
+        ? { ...this.children[this.editedIndex] }
+        : null;
     },
   },
   methods: {
     saveChild(data) {
       if (this.editedIndex !== null) {
-        this.children.splice(this.editedIndex, 1, data)
+        this.children.splice(this.editedIndex, 1, data);
       } else {
-        data.id = Date.now()
-        this.children.push(data)
+        data.id = Date.now();
+        this.children.push(data);
       }
-      this.cancelEdit()
+      this.cancelEdit();
     },
     deleteChild(index) {
       if (confirm('Удалить эту анкету?')) {
-        this.children.splice(index, 1)
+        this.children.splice(index, 1);
       }
     },
     editChild(index) {
-      this.editedIndex = index
-      this.showForm = true
+      this.editedIndex = index;
+      this.showForm = true;
     },
     cancelEdit() {
-      this.editedIndex = null
-      this.showForm = false
-    }
-  }
-}
+      this.editedIndex = null;
+      this.showForm = false;
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -95,7 +105,7 @@ export default {
   background-color: transparent;
   border: 1px solid #23938c;
   color: #23938c;
-  padding: 10px 15px 10px 30px;;
+  padding: 10px 15px 10px 30px;
   font-size: 14px;
   border-radius: 6px;
   cursor: pointer;
@@ -113,7 +123,7 @@ export default {
   background-image: url('../assets/edit-icon-hover.png');
 }
 
-.delete-button { 
+.delete-button {
   background: url('../assets/delete-icon.png') no-repeat 7px 11px/14%;
 }
 .delete-button:hover {

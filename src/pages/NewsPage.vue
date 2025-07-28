@@ -4,14 +4,14 @@
     <template v-if="news">
       <StandardContent
         :paragraphs="news?.content"
-        :imageSrc="news?.image"
-        :imageSrcModal="news?.image"
-        imageAlt="Обложка новости"
-        imageAltModal="Обложка новости (увеличено)"
-        :downloadLink="news?.downloadLink"
-        downloadLabel="Скачать дополнительный материал: "
-        :downloadLinkName="news?.downloadLinkName"
-        :videoUrl="news?.videoUrl"
+        :image-src="news?.image"
+        :image-src-modal="news?.image"
+        image-alt="Обложка новости"
+        image-alt-modal="Обложка новости (увеличено)"
+        :download-link="news?.downloadLink"
+        download-label="Скачать дополнительный материал: "
+        :download-link-name="news?.downloadLinkName"
+        :video-url="news?.videoUrl"
       />
     </template>
     <p v-if="!news" class="not-found">Данные не найдены</p>
@@ -33,7 +33,7 @@ const newsArr = [
     content: ['Анонс новости'],
     downloadLink: '/files/news-rett.pdf',
     downloadLinkName: 'PDF',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
   },
   {
     id: '2',
@@ -42,7 +42,7 @@ const newsArr = [
     content: ['Анонс новости'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '3',
@@ -51,7 +51,7 @@ const newsArr = [
     content: ['Анонс новости'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '4',
@@ -60,7 +60,7 @@ const newsArr = [
     content: ['Анонс новости'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '5',
@@ -69,7 +69,8 @@ const newsArr = [
     content: ['Анонс новости'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''  },
+    videoUrl: '',
+  },
   {
     id: '6',
     title: 'Новость 6',
@@ -77,7 +78,7 @@ const newsArr = [
     content: ['Анонс новости'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '7',
@@ -86,7 +87,7 @@ const newsArr = [
     content: ['Анонс новости'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '8',
@@ -95,7 +96,7 @@ const newsArr = [
     content: ['Анонс новости'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '9',
@@ -104,7 +105,7 @@ const newsArr = [
     content: ['Анонс новости'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
+    videoUrl: '',
   },
   {
     id: '10',
@@ -113,14 +114,14 @@ const newsArr = [
     content: ['Анонс новости'],
     downloadLink: '',
     downloadLinkName: '',
-    videoUrl: ''
-  }
-]
+    videoUrl: '',
+  },
+];
 
 const route = useRoute();
 const news = computed(() => {
-  return newsArr.find((a) => a.id === route.params.id?.toString());
-})
+  return newsArr.find(a => a.id === route.params.id?.toString());
+});
 </script>
 
 <style scoped>

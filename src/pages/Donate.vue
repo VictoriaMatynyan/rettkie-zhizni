@@ -1,9 +1,17 @@
 <template>
   <div class="donate-page">
     <h1 class="donate-title">Поддержите проект «РЕТТкие Жизни»</h1>
-    <div class = "donate-intro">
-        <p class="donate-text">Ваше пожертвование поможет развивать инициативу «РЕТТкие Жизни»: информировать, поддерживать семьи, развивать карту пациентов и обучать специалистов.</p>
-        <p class="donate-text">Вы можете выбрать фиксированную сумму или указать свою. Доступны различные способы перевода: банковская карта, СБП, SMS, а также прямой перевод по реквизитам.</p>
+    <div class="donate-intro">
+      <p class="donate-text">
+        Ваше пожертвование поможет развивать инициативу «РЕТТкие Жизни»:
+        информировать, поддерживать семьи, развивать карту пациентов и обучать
+        специалистов.
+      </p>
+      <p class="donate-text">
+        Вы можете выбрать фиксированную сумму или указать свою. Доступны
+        различные способы перевода: банковская карта, СБП, SMS, а также прямой
+        перевод по реквизитам.
+      </p>
     </div>
     <div class="donate-section">
       <h2>Сумма пожертвования</h2>
@@ -17,9 +25,9 @@
           {{ amount }} ₽
         </button>
         <input
+          v-model.number="customAmount"
           type="number"
           placeholder="Другая сумма"
-          v-model.number="customAmount"
           @focus="selectedAmount = null"
         />
       </div>
@@ -49,11 +57,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const predefinedAmounts = [300, 500, 1000, 2000]
-const selectedAmount = ref(500)
-const customAmount = ref(null)
+const predefinedAmounts = [300, 500, 1000, 2000];
+const selectedAmount = ref(500);
+const customAmount = ref(null);
 </script>
 
 <style scoped>

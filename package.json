@@ -9,6 +9,10 @@
     "preview": "vite preview",
     "deploy": "npm run build && gh-pages -d dist"
   },
+  "engines": {
+    "node": "22.17.1",
+    "npm": ">=10.9.0"
+  },
   "dependencies": {
     "axios": "^1.9.0",
     "v-mask": "^2.3.0",

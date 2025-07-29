@@ -1,0 +1,11 @@
+{
+  "/api/*": "/$1",
+  "/api/children/:id": "/children/:id",
+  "/api/news/:id": "/news/:id",
+  "/api/articles/:id": "/articles/:id",
+  "/api/events/:id": "/events/:id",
+  "/api/stories/:id": "/stories/:id",
+  "/api/doctors/:id": "/doctors/:id",
+  "/api/regions": "/regions",
+  "/api/contacts": "/contacts"
+}

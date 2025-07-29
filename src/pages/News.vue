@@ -1,29 +1,29 @@
 <template>
-  
   <div class="standard-page">
     <h1>Новости</h1>
     <StandardContent
       :paragraphs="[
-        'Добро пожаловать в раздел новостей, где вы найдёте последние события, связанные с синдромом Ретта, нововведения в лечении, а также мероприятия сообщества.'
-        ]"
-      :imageSrc="symptomsImg"
-      :imageSrcModal="symptomsImg"
-      imageAlt="Схема симптомов Ретта"
-      imageAltModal="Схема симптомов Ретта"
-      downloadLink="/files/rett-info-brochure.pdf"
-      downloadLabel="Скачать памятку по заболеванию: "
-      captionText="Изображение: основные проявления синдрома Ретта"
-      downloadLinkName="Гайд-заглушка (1.2 МБ)"
-      videoUrl="https://rutube.ru/play/embed/someVideoId/"
-      >
+        'Добро пожаловать в раздел новостей, где вы найдёте последние события, связанные с синдромом Ретта, нововведения в лечении, а также мероприятия сообщества.',
+      ]"
+      :image-src="symptomsImg"
+      :image-src-modal="symptomsImg"
+      image-alt="Схема симптомов Ретта"
+      image-alt-modal="Схема симптомов Ретта"
+      download-link="/files/rett-info-brochure.pdf"
+      download-label="Скачать памятку по заболеванию: "
+      caption-text="Изображение: основные проявления синдрома Ретта"
+      download-link-name="Гайд-заглушка (1.2 МБ)"
+      video-url="https://rutube.ru/play/embed/someVideoId/"
+    >
     </StandardContent>
 
-   <section class="news-block">
+    <section class="news-block">
       <h2 class="block-title">Последние новости</h2>
       <div class="news-list">
-        <div class="news-card"
+        <div
           v-for="news in visibleNews"
           :key="news.id"
+          class="news-card"
           @click="goToNews(news.id)"
         >
           <img :src="news.image" :alt="news.title" class="news-image" />
@@ -32,7 +32,7 @@
           <p class="preview">{{ news.preview }}</p>
         </div>
       </div>
-      <button v-if="hasMore" @click="loadMore" class="load-more">
+      <button v-if="hasMore" class="load-more" @click="loadMore">
         Загрузить ещё
       </button>
     </section>
@@ -55,71 +55,71 @@ const newsArr = [
     title: 'Новость 1',
     image: newsImg,
     preview: 'Анонс новости',
-    date: '2025-06-01'
+    date: '2025-06-01',
   },
   {
     id: 2,
     title: 'Новость 2',
     image: newsImg,
     preview: 'Анонс новости',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 3,
     title: 'Новость 3',
     image: newsImg,
     preview: 'Анонс новости',
-    date: '2025-05-21'
+    date: '2025-05-21',
   },
   {
     id: 4,
     title: 'Новость 4',
     image: newsImg,
     preview: 'Анонс новости',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 5,
     title: 'Новость 5',
     image: newsImg,
     preview: 'Анонс новости',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 6,
     title: 'Новость 6',
     image: newsImg,
     preview: 'Анонс новости',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 7,
     title: 'Новость 7',
     image: newsImg,
     preview: 'Анонс новости',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 8,
     title: 'Новость 8',
     image: newsImg,
     preview: 'Анонс новости',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 9,
     title: 'Новость 9',
     image: newsImg,
     preview: 'Анонс новости',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 10,
     title: 'Новость 10',
     image: newsImg,
     preview: 'Анонс новости',
-    date: '2025-05-20'
-  }
+    date: '2025-05-20',
+  },
 ];
 
 // кол-во отображаемых историй
@@ -130,15 +130,17 @@ const sortedNews = computed(() =>
   [...newsArr].sort((a, b) => new Date(b.date) - new Date(a.date))
 );
 
-const visibleNews =  computed(() =>
+const visibleNews = computed(() =>
   sortedNews.value.slice(0, currentPage.value * pageSize)
 );
 
-const hasMore = computed(() => visibleNews.value.length < sortedNews.value.length);
+const hasMore = computed(
+  () => visibleNews.value.length < sortedNews.value.length
+);
 
 function loadMore() {
   currentPage.value++;
-};
+}
 
 function goToNews(id) {
   router.push(`/news/${id}`);
@@ -148,7 +150,6 @@ function formatDate(dateString) {
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
   return new Date(dateString).toLocaleDateString('ru-RU', options);
 }
-
 </script>
 
 <style scoped>
@@ -223,15 +224,17 @@ function formatDate(dateString) {
   padding: 10px 24px;
   font-size: 16px;
   background-color: transparent;
-  border: 1px solid #2AAEA2;
-  color: #2AAEA2;
+  border: 1px solid #2aaea2;
+  color: #2aaea2;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .load-more:hover {
-  background-color: #2AAEA2;
+  background-color: #2aaea2;
   color: #fff;
 }
 

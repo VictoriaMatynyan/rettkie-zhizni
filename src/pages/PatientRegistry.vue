@@ -5,18 +5,22 @@
       :paragraphs="[
         'Реестр пациентов — это добровольная база данных, в которой собирается информация о детях и взрослых с синдромом Ретта. Это помогает врачам и исследователям лучше понимать заболевание, разрабатывать эффективные подходы к лечению и реабилитации.',
       ]"
-      :imageSrc="symptomsImg"
-      :imageSrcModal="symptomsImg"
-      imageAlt="Реестр пациентов"
-      imageAltModal="Реестр пациентов(увеличено)"
-      downloadLink="/files/rett-about.pdf"
-      downloadLabel="Скачать презентацию о сообществе: "
-      captionText="Фотография с мероприятия сообщества"
-      downloadLinkName="Презентация (1.3 МБ)"
-      videoUrl="https://rutube.ru/play/embed/someVideoId/"
+      :image-src="symptomsImg"
+      :image-src-modal="symptomsImg"
+      image-alt="Реестр пациентов"
+      image-alt-modal="Реестр пациентов(увеличено)"
+      download-link="/files/rett-about.pdf"
+      download-label="Скачать презентацию о сообществе: "
+      caption-text="Фотография с мероприятия сообщества"
+      download-link-name="Презентация (1.3 МБ)"
+      video-url="https://rutube.ru/play/embed/someVideoId/"
     />
     <div class="registry-button">
-      <router-link to="/patient-registry/personal-account" class="btn-register" target="_blank">
+      <router-link
+        to="/patient-registry/personal-account"
+        class="btn-register"
+        target="_blank"
+      >
         Зарегистрироваться
       </router-link>
     </div>
@@ -24,7 +28,6 @@
       <h3 class="block-title">География пациентов</h3>
       <YandexMap :points="regionData" />
     </div>
-    
   </div>
 </template>
 
@@ -78,15 +81,14 @@ onMounted(() => {
   font-size: 16px;
   font-weight: 600;
   background-color: transparent;
-  border: 1px solid #2AAEA2;
+  border: 1px solid #2aaea2;
   border-radius: 8px;
   text-decoration: none;
   transition: background-color 0.3s ease;
 }
 
 .btn-register:hover {
-  background-color: #2AAEA2;
+  background-color: #2aaea2;
   color: #fff;
 }
-
 </style>

@@ -1,30 +1,29 @@
 <template>
-  
   <div class="standard-page">
     <h1>Мероприятия</h1>
     <StandardContent
       :paragraphs="[
-        'Добро пожаловать в раздел мероприятий, где вы можете узнать о предстоящих мероприятиях'
+        'Добро пожаловать в раздел мероприятий, где вы можете узнать о предстоящих мероприятиях',
       ]"
-      :imageSrc="symptomsImg"
-      :imageSrcModal="symptomsImg"
-      imageAlt="Схема симптомов Ретта"
-      imageAltModal="Схема симптомов Ретта"
-      downloadLink="/files/rett-info-brochure.pdf"
-      downloadLabel="Скачать памятку по заболеванию: "
-      captionText="Изображение: основные проявления синдрома Ретта"
-      downloadLinkName="Гайд-заглушка (1.2 МБ)"
-      videoUrl="https://rutube.ru/play/embed/someVideoId/"
-      >
+      :image-src="symptomsImg"
+      :image-src-modal="symptomsImg"
+      image-alt="Схема симптомов Ретта"
+      image-alt-modal="Схема симптомов Ретта"
+      download-link="/files/rett-info-brochure.pdf"
+      download-label="Скачать памятку по заболеванию: "
+      caption-text="Изображение: основные проявления синдрома Ретта"
+      download-link-name="Гайд-заглушка (1.2 МБ)"
+      video-url="https://rutube.ru/play/embed/someVideoId/"
+    >
     </StandardContent>
 
     <section class="events-block">
       <h2 class="block-title">Мероприятия</h2>
       <div class="event-list">
         <div
-          class="event-card"
           v-for="event in visibleEvents"
           :key="event.id"
+          class="event-card"
           @click="goToEvent(event.id)"
         >
           <img :src="event.image" :alt="event.title" class="event-image" />
@@ -32,7 +31,7 @@
           <p>{{ event.preview }}</p>
         </div>
       </div>
-      <button v-if="hasMore" @click="loadMore" class="load-more">
+      <button v-if="hasMore" class="load-more" @click="loadMore">
         Загрузить ещё
       </button>
     </section>
@@ -46,7 +45,7 @@ import symptomsImg from '../assets/symptoms.png';
 import eventImg from '../assets/news.jpeg';
 import StandardContent from '../components/StandardContent.vue';
 
-const router = useRouter()
+const router = useRouter();
 
 // массив мероприятий - заглушки; позже будут загружаться с сервера)
 const events = ref([
@@ -55,79 +54,79 @@ const events = ref([
     title: 'Мероприятие 1',
     image: eventImg,
     preview: 'Анонс Мероприятие',
-    date: '2025-06-01'
+    date: '2025-06-01',
   },
   {
     id: 2,
     title: 'Мероприятие 2',
     image: eventImg,
     preview: 'Анонс Мероприятие',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 3,
     title: 'Мероприятие 3',
     image: eventImg,
     preview: 'Анонс Мероприятие',
-    date: '2025-05-21'
+    date: '2025-05-21',
   },
   {
     id: 4,
     title: 'Мероприятие 4',
     image: eventImg,
     preview: 'Анонс Мероприятие',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 5,
     title: 'Мероприятие 5',
     image: eventImg,
     preview: 'Анонс Мероприятие',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 6,
     title: 'Мероприятие 6',
     image: eventImg,
     preview: 'Анонс Мероприятие',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 7,
     title: 'Мероприятие 7',
     image: eventImg,
     preview: 'Анонс Мероприятие',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 8,
     title: 'Мероприятие 8',
     image: eventImg,
     preview: 'Анонс Мероприятие',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 9,
     title: 'Мероприятие 9',
     image: eventImg,
     preview: 'Анонс Мероприятие',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 10,
     title: 'Мероприятие 10',
     image: eventImg,
     preview: 'Анонс Мероприятие',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
-   {
+  {
     id: 11,
     title: 'Мероприятие 11',
     image: eventImg,
     preview: 'Анонс Мероприятие',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
-])
+]);
 
 // кол-во отображаемых историй
 const pageSize = 10;
@@ -141,15 +140,17 @@ const visibleEvents = computed(() =>
   sortedEvents.value.slice(0, currentPage.value * pageSize)
 );
 
-const hasMore = computed(() => visibleEvents.value.length < sortedEvents.value.length);
+const hasMore = computed(
+  () => visibleEvents.value.length < sortedEvents.value.length
+);
 
 function loadMore() {
-  currentPage.value++
-};
+  currentPage.value++;
+}
 
 function goToEvent(id) {
-  router.push(`/events/${id}`)
-};
+  router.push(`/events/${id}`);
+}
 </script>
 
 <style scoped>
@@ -211,16 +212,16 @@ function goToEvent(id) {
   display: block;
   padding: 10px 20px;
   font-size: 16px;
-  color:  #2AAEA2;
+  color: #2aaea2;
   background-color: transparent;
-  border: 1px solid #2AAEA2;
+  border: 1px solid #2aaea2;
   border-radius: 6px;
   cursor: pointer;
 }
 
 .load-more:hover {
-  background-color: #2AAEA2;
-  border: 1px solid #2AAEA2;
+  background-color: #2aaea2;
+  border: 1px solid #2aaea2;
   color: #fff;
 }
 
@@ -247,7 +248,7 @@ function goToEvent(id) {
   cursor: pointer;
 }
 .filter-buttons .active {
-  background: #2AAEA2;
+  background: #2aaea2;
   color: #fff;
 }
 

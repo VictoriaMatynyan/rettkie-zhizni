@@ -1,21 +1,20 @@
 <template>
-  
   <div class="standard-page">
     <h1>Статьи</h1>
     <StandardContent
       :paragraphs="[
-        'Добро пожаловать в раздел статей, где вы найдёте полезные материалы о синдроме Ретта.'
-        ]"
-      :imageSrc="symptomsImg"
-      :imageSrcModal="symptomsImg"
-      imageAlt="Схема симптомов Ретта"
-      imageAltModal="Схема симптомов Ретта"
-      downloadLink="/files/rett-info-brochure.pdf"
-      downloadLabel="Скачать памятку по заболеванию: "
-      captionText="Изображение: основные проявления синдрома Ретта"
-      downloadLinkName="Гайд-заглушка (1.2 МБ)"
-      videoUrl="https://rutube.ru/play/embed/someVideoId/"
-      >
+        'Добро пожаловать в раздел статей, где вы найдёте полезные материалы о синдроме Ретта.',
+      ]"
+      :image-src="symptomsImg"
+      :image-src-modal="symptomsImg"
+      image-alt="Схема симптомов Ретта"
+      image-alt-modal="Схема симптомов Ретта"
+      download-link="/files/rett-info-brochure.pdf"
+      download-label="Скачать памятку по заболеванию: "
+      caption-text="Изображение: основные проявления синдрома Ретта"
+      download-link-name="Гайд-заглушка (1.2 МБ)"
+      video-url="https://rutube.ru/play/embed/someVideoId/"
+    >
     </StandardContent>
 
     <section class="filter">
@@ -24,12 +23,18 @@
         <button
           v-for="category in categories"
           :key="category"
-          @click="filterByCategory(category)"
           :class="{ active: selectedCategories.includes(category) }"
+          @click="filterByCategory(category)"
         >
           {{ category }}
         </button>
-        <button v-if="selectedCategories.length" @click="clearFilters" class="clear-button">Сбросить фильтр</button>
+        <button
+          v-if="selectedCategories.length"
+          class="clear-button"
+          @click="clearFilters"
+        >
+          Сбросить фильтр
+        </button>
       </div>
     </section>
 
@@ -37,18 +42,22 @@
       <h2 class="block-title">Статьи</h2>
       <div class="article-list">
         <div
-          class="article-card"
           v-for="article in visibleArticles"
           :key="article.id"
+          class="article-card"
           @click="goToArticle(article.id)"
         >
-          <img :src="article.image" :alt="article.title" class="article-image" />
-          <p class="category"> {{ article.category }}</p>
+          <img
+            :src="article.image"
+            :alt="article.title"
+            class="article-image"
+          />
+          <p class="category">{{ article.category }}</p>
           <h3 class="card-title">{{ article.title }}</h3>
           <p>{{ article.preview }}</p>
         </div>
       </div>
-      <button v-if="hasMore" @click="loadMore" class="load-more">
+      <button v-if="hasMore" class="load-more" @click="loadMore">
         Загрузить ещё
       </button>
       <p v-if="!visibleArticles.length" class="no-articles">
@@ -65,7 +74,7 @@ import symptomsImg from '../assets/symptoms.png';
 import articleImg from '../assets/news.jpeg';
 import StandardContent from '../components/StandardContent.vue';
 
-const router = useRouter()
+const router = useRouter();
 
 // массив статей - заглушки; позже будут загружаться с сервера)
 const articles = ref([
@@ -75,7 +84,7 @@ const articles = ref([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Медицина',
-    date: '2025-06-01'
+    date: '2025-06-01',
   },
   {
     id: 2,
@@ -83,7 +92,7 @@ const articles = ref([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Истории',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 3,
@@ -91,7 +100,7 @@ const articles = ref([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Медицина',
-    date: '2025-05-21'
+    date: '2025-05-21',
   },
   {
     id: 4,
@@ -99,7 +108,7 @@ const articles = ref([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Истории',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 5,
@@ -107,7 +116,7 @@ const articles = ref([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Медицина',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 6,
@@ -115,7 +124,7 @@ const articles = ref([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Реабилитация',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 7,
@@ -123,7 +132,7 @@ const articles = ref([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Истории',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 8,
@@ -131,7 +140,7 @@ const articles = ref([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Реабилитация',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 9,
@@ -139,7 +148,7 @@ const articles = ref([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Медицина',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
   {
     id: 10,
@@ -147,24 +156,24 @@ const articles = ref([
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Медицина',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
-   {
+  {
     id: 11,
     title: 'Статья 11',
     image: articleImg,
     preview: 'Анонс статьи',
     category: 'Реабилитация',
-    date: '2025-05-20'
+    date: '2025-05-20',
   },
-])
+]);
 
 // кол-во отображаемых историй
 const pageSize = 10;
 const currentPage = ref(1);
 
-const categories = computed(() => 
-// получаем массив уникальных (set) категорий статей
+const categories = computed(() =>
+  // получаем массив уникальных (set) категорий статей
   [...new Set(articles.value.map(article => article.category))]
 );
 // категории, кот. выбрал пользователь
@@ -172,26 +181,32 @@ const selectedCategories = ref([]);
 
 const filteredArticles = computed(() => {
   if (!selectedCategories.value.length) return articles.value;
-  return articles.value.filter(article => selectedCategories.value.includes(article.category));
+  return articles.value.filter(article =>
+    selectedCategories.value.includes(article.category)
+  );
 });
 
 const sortedArticles = computed(() =>
-  [...filteredArticles.value].sort((a, b) => new Date(b.date) - new Date(a.date))
+  [...filteredArticles.value].sort(
+    (a, b) => new Date(b.date) - new Date(a.date)
+  )
 );
 
 const visibleArticles = computed(() =>
   sortedArticles.value.slice(0, currentPage.value * pageSize)
 );
-const hasMore = computed(() => visibleArticles.value.length < sortedArticles.value.length);
+const hasMore = computed(
+  () => visibleArticles.value.length < sortedArticles.value.length
+);
 
 function filterByCategory(category) {
   const index = selectedCategories.value.indexOf(category);
   if (index > -1) {
-    selectedCategories.value.splice(index, 1)
+    selectedCategories.value.splice(index, 1);
   } else {
-    selectedCategories.value.push(category)
+    selectedCategories.value.push(category);
   }
-};
+}
 
 function clearFilters() {
   selectedCategories.value = [];
@@ -199,12 +214,12 @@ function clearFilters() {
 }
 
 function loadMore() {
-  currentPage.value++
-};
+  currentPage.value++;
+}
 
 function goToArticle(id) {
-  router.push(`/articles/${id}`)
-};
+  router.push(`/articles/${id}`);
+}
 </script>
 
 <style scoped>
@@ -266,16 +281,16 @@ function goToArticle(id) {
   display: block;
   padding: 10px 20px;
   font-size: 16px;
-  color:  #2AAEA2;
+  color: #2aaea2;
   background-color: transparent;
-  border: 1px solid #2AAEA2;
+  border: 1px solid #2aaea2;
   border-radius: 6px;
   cursor: pointer;
 }
 
 .load-more:hover {
-  background-color: #2AAEA2;
-  border: 1px solid #2AAEA2;
+  background-color: #2aaea2;
+  border: 1px solid #2aaea2;
   color: #fff;
 }
 
@@ -302,7 +317,7 @@ function goToArticle(id) {
   cursor: pointer;
 }
 .filter-buttons .active {
-  background: #2AAEA2;
+  background: #2aaea2;
   color: #fff;
 }
 

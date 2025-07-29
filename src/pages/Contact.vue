@@ -2,38 +2,56 @@
   <div class="standard-page">
     <h1>Обратиться в сообщество</h1>
     <StandardContent
-      :paragraphs="[
-        'Здесь будет гайд как обратиться в сообщество'
-        ]"
-      :imageSrc="symptomsImg"
-      :imageSrcModal="symptomsImg"
-      imageAlt="Схема симптомов Ретта"
-      imageAltModal="Схема симптомов Ретта"
-      downloadLink="/files/rett-info-brochure.pdf"
-      downloadLabel="Скачать памятку по заболеванию: "
-      captionText="Изображение: основные проявления синдрома Ретта"
-      downloadLinkName="Гайд-заглушка (1.2 МБ)"
-      videoUrl="https://rutube.ru/play/embed/someVideoId/"
-      >
+      :paragraphs="['Здесь будет гайд как обратиться в сообщество']"
+      :image-src="symptomsImg"
+      :image-src-modal="symptomsImg"
+      image-alt="Схема симптомов Ретта"
+      image-alt-modal="Схема симптомов Ретта"
+      download-link="/files/rett-info-brochure.pdf"
+      download-label="Скачать памятку по заболеванию: "
+      caption-text="Изображение: основные проявления синдрома Ретта"
+      download-link-name="Гайд-заглушка (1.2 МБ)"
+      video-url="https://rutube.ru/play/embed/someVideoId/"
+    >
     </StandardContent>
     <section class="feedback-form">
       <h2 class="feedback-form-title">Форма обратной связи</h2>
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
           <label for="name" class="form-label">Имя</label>
-          <input class="form-input" type="text" id="name" v-model="form.name" required />
+          <input
+            id="name"
+            v-model="form.name"
+            class="form-input"
+            type="text"
+            required
+          />
         </div>
         <div class="form-group">
           <label for="email" class="form-label">Email</label>
-          <input class="form-input" type="email" id="email" v-model="form.email" required />
+          <input
+            id="email"
+            v-model="form.email"
+            class="form-input"
+            type="email"
+            required
+          />
         </div>
 
         <div class="form-group">
           <label for="message" class="form-label">Сообщение</label>
-          <textarea class="form-textarea" id="message" v-model="form.message" rows="5" required></textarea>
+          <textarea
+            id="message"
+            v-model="form.message"
+            class="form-textarea"
+            rows="5"
+            required
+          ></textarea>
         </div>
         <button class="form-button" type="submit">Отправить</button>
-        <p v-if="isSubmitted" class="success-message">Спасибо! Ваше сообщение отправлено.</p>
+        <p v-if="isSubmitted" class="success-message">
+          Спасибо! Ваше сообщение отправлено.
+        </p>
       </form>
     </section>
   </div>
@@ -61,15 +79,13 @@ function handleSubmit() {
     name: '',
     email: '',
     message: '',
-  }
+  };
 
   // убираем сообщение об успешной отправке формы
   setTimeout(() => {
     isSubmitted.value = false;
   }, 5000);
-
-};
-
+}
 </script>
 
 <style scoped>
@@ -106,7 +122,8 @@ function handleSubmit() {
   font-weight: 500;
 }
 
-.form-input, .form-textarea {
+.form-input,
+.form-textarea {
   width: 100%;
   padding: 8px 12px;
   font-size: 16px;
@@ -114,12 +131,13 @@ function handleSubmit() {
   border-radius: 6px;
 }
 
-.form-input:focus, .form-textarea:focus {
-  outline: 1px solid rgba(129, 50, 173, .8);
+.form-input:focus,
+.form-textarea:focus {
+  outline: 1px solid rgba(129, 50, 173, 0.8);
 }
 
 .form-button {
-  background-color: rgba(43, 174, 162, .8);
+  background-color: rgba(43, 174, 162, 0.8);
   color: white;
   padding: 10px 20px;
   font-size: 16px;
@@ -136,5 +154,4 @@ function handleSubmit() {
   margin-top: 12px;
   color: green;
 }
-
 </style>

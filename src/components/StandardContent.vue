@@ -1,20 +1,36 @@
 <template>
   <section class="standard-content">
-    <p v-for="(paragraph, index) in paragraphs" :key="index" class="standard-text">
+    <p
+      v-for="(paragraph, index) in paragraphs"
+      :key="index"
+      class="standard-text"
+    >
       {{ paragraph }}
     </p>
 
     <div class="media-section">
-        <img :src="imageSrc" :alt="imageAlt" @click="openModal" class="media-section__symptoms"/>
-        <p class="caption">{{ captionText }}</p>
-        <div class="media-modal" v-if="modalOpen" @click="closeModal">
-            <img :src="imageSrcModal" :alt="imageAltModal" @click="openModal" class="media-section__modal-image"/>
-        </div>
+      <img
+        :src="imageSrc"
+        :alt="imageAlt"
+        class="media-section__symptoms"
+        @click="openModal"
+      />
+      <p class="caption">{{ captionText }}</p>
+      <div v-if="modalOpen" class="media-modal" @click="closeModal">
+        <img
+          :src="imageSrcModal"
+          :alt="imageAltModal"
+          class="media-section__modal-image"
+          @click="openModal"
+        />
+      </div>
     </div>
 
     <p v-if="downloadLink" class="file-download">
-        <strong>{{ downloadLabel }}</strong>
-        <a class="download-link" :href="downloadLink" download>{{ downloadLinkName }}</a>
+      <strong>{{ downloadLabel }}</strong>
+      <a class="download-link" :href="downloadLink" download>{{
+        downloadLinkName
+      }}</a>
     </p>
 
     <div class="video-section">
@@ -34,7 +50,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 
 const props = defineProps({
   paragraphs: Array,
@@ -47,22 +63,22 @@ const props = defineProps({
   imageAltModal: String,
   captionText: String,
   videoUrl: String,
-})
+});
 
-const modalOpen = ref(false)
+const modalOpen = ref(false);
 
 const openModal = () => {
-  modalOpen.value = true
-}
+  modalOpen.value = true;
+};
 const closeModal = () => {
-  modalOpen.value = false
-}
-const handleEsc = (e) => {
-  if (e.key === 'Escape' || e.keyCode === 27) closeModal()
-}
+  modalOpen.value = false;
+};
+const handleEsc = e => {
+  if (e.key === 'Escape' || e.keyCode === 27) closeModal();
+};
 
-onMounted(() => window.addEventListener('keydown', handleEsc))
-onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc))
+onMounted(() => window.addEventListener('keydown', handleEsc));
+onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
 </script>
 
 <style scoped>
@@ -85,7 +101,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc))
 .media-section__symptoms {
   max-width: 100%;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .media-section__symptoms:hover {
@@ -102,7 +118,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc))
   height: 100%;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, .4);
+  background-color: rgba(0, 0, 0, 0.4);
   z-index: 9999;
 }
 
@@ -110,7 +126,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc))
   max-width: 80%;
   max-height: 80%;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: zoom-out;
 }
 
@@ -141,8 +157,10 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc))
 
 .video-section iframe {
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border: none;
   border-radius: 8px;
 }

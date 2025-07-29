@@ -1,9 +1,3 @@
-<script setup>
-import Header from './components/Header.vue'
-import Footer from './components/Footer.vue'
-
-</script>
-
 <template>
   <div class="app-container">
     <Header />
@@ -13,7 +7,11 @@ import Footer from './components/Footer.vue'
     <Footer />
   </div>
 </template>
-  
+
+<script setup>
+import Header from './components/Header.vue';
+import Footer from './components/Footer.vue';
+</script>
 
 <style scoped>
 .app-container {

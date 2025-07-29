@@ -1,0 +1,11 @@
+{
+  "port": 3001,
+  "watch": true,
+  "static": "./public",
+  "delay": 500,
+  "middlewares": [],
+  "quiet": false,
+  "noCors": false,
+  "noGzip": false,
+  "routes": "routes.json"
+}

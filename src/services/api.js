@@ -73,10 +73,26 @@ const apiService = new ApiService();
 
 // Специфичные методы для работы с данными приложения
 export const api = {
+  // Пользователи
+  users: {
+    getAll: () => apiService.get('/users'),
+    getById: id => apiService.get(`/users/${id}`),
+    getByEmail: email =>
+      apiService.get(`/users?email=${encodeURIComponent(email)}`),
+    getByEmailAndPassword: (email, password) =>
+      apiService.get(
+        `/users?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+      ),
+    create: data => apiService.post('/users', data),
+    update: (id, data) => apiService.put(`/users/${id}`, data),
+    delete: id => apiService.delete(`/users/${id}`),
+  },
+
   // Дети
   children: {
     getAll: () => apiService.get('/children'),
     getById: id => apiService.get(`/children/${id}`),
+    getByUserId: userId => apiService.get(`/children?userId=${userId}`),
     create: data => apiService.post('/children', data),
     update: (id, data) => apiService.put(`/children/${id}`, data),
     delete: id => apiService.delete(`/children/${id}`),

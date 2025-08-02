@@ -1,30 +1,110 @@
 {
+  "users": [
+    {
+      "id": "1",
+      "email": "admin@rett.ru",
+      "password": "admin123",
+      "firstName": "Администратор",
+      "lastName": "Системы",
+      "role": "admin",
+      "phone": "+7 999 123-45-67",
+      "region": "Москва",
+      "registeredAt": "2025-01-01T00:00:00.000Z",
+      "isEmailVerified": true,
+      "isActive": true,
+      "hasConsentToDataProcessing": true,
+      "profile": {
+        "organization": "Фонд РЕТТкие жизни",
+        "position": "Администратор",
+        "specialization": "Администрирование"
+      }
+    },
+    {
+      "id": "2",
+      "email": "parent@example.com",
+      "password": "parent123",
+      "firstName": "Мария",
+      "lastName": "Иванова",
+      "role": "parent",
+      "phone": "+7 999 234-56-78",
+      "region": "Москва",
+      "registeredAt": "2025-01-15T10:30:00.000Z",
+      "isEmailVerified": true,
+      "isActive": true,
+      "hasConsentToDataProcessing": true,
+      "profile": {
+        "childrenCount": 1,
+        "aboutFamily": "Воспитываем дочку с синдромом Ретта"
+      }
+    },
+    {
+      "id": "9e7f",
+      "firstName": "111",
+      "lastName": "111",
+      "email": "kjasd@ya.tu",
+      "phone": "+79999999999",
+      "region": "Москва",
+      "role": "parent",
+      "password": "123123",
+      "hasConsentToDataProcessing": true,
+      "registeredAt": "2025-08-01T21:56:15.444Z",
+      "isEmailVerified": false,
+      "isActive": true
+    }
+  ],
   "children": [
     {
-      "id": 1,
-      "lastName": "Иванов",
-      "firstName": "Александр",
-      "gender": "м",
-      "birthDate": "2015-03-15"
-    },
-    {
-      "id": 2,
-      "lastName": "Петрова",
+      "id": "1",
+      "userId": 2,
+      "lastName": "Иванова",
       "firstName": "Анна",
       "gender": "ж",
-      "birthDate": "2018-07-22"
+      "birthDate": "2018-03-15",
+      "diagnosis": "Синдром Ретта",
+      "diagnosisDate": "2020-01-15",
+      "mutation": "MECP2",
+      "mutationType": "p.Arg106Trp",
+      "region": "Москва",
+      "createdAt": "2025-01-15T10:45:00.000Z",
+      "updatedAt": "2025-01-15T10:45:00.000Z",
+      "isPublic": true
     },
     {
-      "id": 3,
+      "id": "2",
+      "userId": 2,
+      "lastName": "Петрова",
+      "firstName": "София",
+      "gender": "ж",
+      "birthDate": "2019-07-22",
+      "diagnosis": "Синдром Ретта",
+      "diagnosisDate": "2021-03-10",
+      "mutation": "MECP2",
+      "mutationType": "p.Arg270X",
+      "region": "Санкт-Петербург",
+      "createdAt": "2025-01-10T14:20:00.000Z",
+      "updatedAt": "2025-01-10T14:20:00.000Z",
+      "isPublic": true
+    },
+    {
+      "id": "3",
+      "userId": null,
       "lastName": "Сидоров",
       "firstName": "Михаил",
       "gender": "м",
-      "birthDate": "2016-11-08"
+      "birthDate": "2016-11-08",
+      "diagnosis": "Синдром Ретта",
+      "diagnosisDate": "2018-05-20",
+      "mutation": "MECP2",
+      "mutationType": "p.Thr158Met",
+      "region": "Екатеринбург",
+      "createdAt": "2025-01-05T09:15:00.000Z",
+      "updatedAt": "2025-01-05T09:15:00.000Z",
+      "isPublic": true
     }
   ],
   "news": [
     {
-      "id": 1,
+      "id": "1",
       "title": "Новые методы реабилитации",
       "excerpt": "Исследователи разработали инновационные подходы к реабилитации детей с синдромом Ретта",
       "content": "Полное содержание новости о новых методах реабилитации...",
@@ -33,7 +113,7 @@
       "image": "/src/assets/news.jpeg"
     },
     {
-      "id": 2,
+      "id": "2",
       "title": "Научный прорыв в лечении",
       "excerpt": "Учёные сделали важное открытие в понимании механизмов синдрома Ретта",
       "content": "Подробности научного открытия...",
@@ -44,7 +124,7 @@
   ],
   "articles": [
     {
-      "id": 1,
+      "id": "1",
       "title": "Руководство для родителей",
       "excerpt": "Практические советы для семей, воспитывающих детей с синдромом Ретта",
       "content": "Полное содержание статьи с практическими советами...",
@@ -53,7 +133,7 @@
       "category": "Образование"
     },
     {
-      "id": 2,
+      "id": "2",
       "title": "Развитие коммуникативных навыков",
       "excerpt": "Методики развития общения у детей с особенностями развития",
       "content": "Подробное описание методик...",
@@ -64,7 +144,7 @@
   ],
   "events": [
     {
-      "id": 1,
+      "id": "1",
       "title": "Конференция «Будущее терапии»",
       "description": "Международная конференция по инновационным методам лечения",
       "date": "2025-03-15",
@@ -73,7 +153,7 @@
       "type": "Конференция"
     },
     {
-      "id": 2,
+      "id": "2",
       "title": "Семинар для родителей",
       "description": "Практический семинар по уходу и развитию детей",
       "date": "2025-02-20",
@@ -84,7 +164,7 @@
   ],
   "stories": [
     {
-      "id": 1,
+      "id": "1",
       "title": "История Маши",
       "excerpt": "Как семья справляется с вызовами и находит радость в каждом дне",
       "content": "Полная история семьи...",
@@ -93,7 +173,7 @@
       "childAge": "7 лет"
     },
     {
-      "id": 2,
+      "id": "2",
       "title": "Путь к независимости",
       "excerpt": "История о том, как правильная поддержка помогает развиваться",
       "content": "Подробный рассказ о пути развития...",
@@ -104,7 +184,7 @@
   ],
   "doctors": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Доктор Анна Петровна Смирнова",
       "specialization": "Невролог",
       "experience": "15 лет",
@@ -114,7 +194,7 @@
       "email": "smirnova@clinic.ru"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Доктор Михаил Сергеевич Волков",
       "specialization": "Реабилитолог",
       "experience": "12 лет",
@@ -126,34 +206,34 @@
   ],
   "regions": [
     {
-      "id": 1,
+      "id": "1",
       "region": "Москва",
       "count": 45
     },
     {
-      "id": 2,
+      "id": "2",
       "region": "Санкт-Петербург",
       "count": 32
     },
     {
-      "id": 3,
+      "id": "3",
       "region": "Екатеринбург",
       "count": 18
     },
     {
-      "id": 4,
+      "id": "4",
       "region": "Новосибирск",
       "count": 15
     },
     {
-      "id": 5,
+      "id": "5",
       "region": "Краснодар",
       "count": 12
     }
   ],
   "contacts": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Иван Петров",
       "email": "ivan@example.com",
       "message": "Интересует информация о диагностике",

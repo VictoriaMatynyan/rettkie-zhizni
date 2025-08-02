@@ -1,26 +1,28 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomePage from '../pages/HomePage.vue';
+import LoginForm from '../components/LoginForm.vue';
+import RegisterForm from '../components/RegisterForm.vue';
 import AboutRett from '../pages/AboutRett.vue';
-import Doctors from '../pages/Doctors.vue';
-import Newbie from '../pages/Newbie.vue';
-import DrugDevelopment from '../pages/DrugDevelopment.vue';
-import Support from '../pages/Support.vue';
-import Stories from '../pages/Stories.vue';
-import StoryPage from '../pages/StoryPage.vue';
-import Articles from '../pages/Articles.vue';
+import AboutUs from '../pages/AboutUs.vue';
 import ArticlePage from '../pages/ArticlePage.vue';
+import Articles from '../pages/Articles.vue';
 import Contact from '../pages/Contact.vue';
-import Rehab from '../pages/Rehab.vue';
+import Doctors from '../pages/Doctors.vue';
+import Donate from '../pages/Donate.vue';
+import DrugDevelopment from '../pages/DrugDevelopment.vue';
+import EventPage from '../pages/EventPage.vue';
+import Events from '../pages/Events.vue';
+import HomePage from '../pages/HomePage.vue';
+import Newbie from '../pages/Newbie.vue';
 import News from '../pages/News.vue';
 import NewsPage from '../pages/NewsPage.vue';
-import Events from '../pages/Events.vue';
-import EventPage from '../pages/EventPage.vue';
-import AboutUs from '../pages/AboutUs.vue';
+import PatientMap from '../pages/PatientMap.vue';
 import PatientRegistry from '../pages/PatientRegistry.vue';
 import PersonalAccount from '../pages/PersonalAccount.vue';
-import PatientMap from '../pages/PatientMap.vue';
 import PrivacyPolicy from '../pages/PrivacyPolicy.vue';
-import Donate from '../pages/Donate.vue';
+import Rehab from '../pages/Rehab.vue';
+import Stories from '../pages/Stories.vue';
+import StoryPage from '../pages/StoryPage.vue';
+import Support from '../pages/Support.vue';
 
 const routes = [
   { path: '/rettkie-zhizni', name: 'Home', component: HomePage },
@@ -65,9 +67,18 @@ const routes = [
     component: PrivacyPolicy,
   },
   { path: '/donate', name: 'Donate', component: Donate },
+
+  // Аутентификация
+  { path: '/login', name: 'Login', component: LoginForm },
+  { path: '/register', name: 'Register', component: RegisterForm },
+
+  // Перенаправления
+  { path: '/', redirect: '/rettkie-zhizni' },
+  { path: '/personal-account', redirect: '/patient-registry/personal-account' },
 ];
 
-export default createRouter({
+// Создание роутера
+const router = createRouter({
   history: createWebHistory(),
   routes,
   // автоматически прокручивает страницу вверх после перехода на другую
@@ -75,3 +86,11 @@ export default createRouter({
     return { top: 0 };
   },
 });
+
+// Охранники маршрутов
+router.beforeEach((to, from, next) => {
+  // Здесь можно добавить проверки авторизации
+  next();
+});
+
+export default router;

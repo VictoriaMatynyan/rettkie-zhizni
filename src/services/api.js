@@ -1,160 +1,184 @@
+import axios from 'axios';
+
 // API базовый URL
 const API_BASE_URL = 'http://localhost:3001';
 
-// Базовый класс для работы с API
-class ApiService {
-  constructor(baseURL = API_BASE_URL) {
-    this.baseURL = baseURL;
-  }
+// Axios instance
+export const httpClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: { 'Content-Type': 'application/json' },
+});
 
-  async request(endpoint, options = {}) {
-    const url = `${this.baseURL}${endpoint}`;
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      ...options,
-    };
-
-    try {
-      const response = await fetch(url, config);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('API request failed:', error);
-      throw error;
-    }
-  }
-
-  // GET запрос
-  async get(endpoint) {
-    return this.request(endpoint);
-  }
-
-  // POST запрос
-  async post(endpoint, data) {
-    return this.request(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  // PUT запрос
-  async put(endpoint, data) {
-    return this.request(endpoint, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
-  }
-
-  // PATCH запрос
-  async patch(endpoint, data) {
-    return this.request(endpoint, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    });
-  }
-
-  // DELETE запрос
-  async delete(endpoint) {
-    return this.request(endpoint, {
-      method: 'DELETE',
-    });
-  }
+function getAccessToken() {
+  return localStorage.getItem('accessToken');
+}
+function setAccessToken(token) {
+  if (!token) localStorage.removeItem('accessToken');
+  else localStorage.setItem('accessToken', token);
+}
+function getRefreshToken() {
+  return localStorage.getItem('refreshToken');
+}
+function setRefreshToken(token) {
+  if (!token) localStorage.removeItem('refreshToken');
+  else localStorage.setItem('refreshToken', token);
 }
 
-// Создаем экземпляр API сервиса
-const apiService = new ApiService();
+// Attach token
+httpClient.interceptors.request.use(config => {
+  const token = getAccessToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+let isRefreshing = false;
+let queue = [];
+
+httpClient.interceptors.response.use(
+  r => r,
+  async err => {
+    const original = err.config || {};
+    if (err.response && err.response.status === 401 && !original._retry) {
+      original._retry = true;
+      const rt = getRefreshToken();
+      if (!rt) return Promise.reject(err);
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          queue.push({ resolve, reject });
+        })
+          .then(token => {
+            original.headers = original.headers || {};
+            original.headers.Authorization = `Bearer ${token}`;
+            return httpClient(original);
+          })
+          .catch(e => Promise.reject(e));
+      }
+
+      try {
+        isRefreshing = true;
+        const { data } = await httpClient.post('/auth/refresh', {
+          refreshToken: rt,
+        });
+        setAccessToken(data.accessToken);
+        setRefreshToken(data.refreshToken);
+        queue.forEach(p => p.resolve(data.accessToken));
+        queue = [];
+        isRefreshing = false;
+        original.headers = original.headers || {};
+        original.headers.Authorization = `Bearer ${data.accessToken}`;
+        return httpClient(original);
+      } catch (e) {
+        isRefreshing = false;
+        setAccessToken(null);
+        setRefreshToken(null);
+        queue.forEach(p => p.reject(e));
+        queue = [];
+        return Promise.reject(e);
+      }
+    }
+    return Promise.reject(err);
+  }
+);
 
 // Специфичные методы для работы с данными приложения
 export const api = {
+  auth: {
+    register: payload =>
+      httpClient.post('/auth/register', payload).then(r => r.data),
+    login: payload => httpClient.post('/auth/login', payload).then(r => r.data),
+    refresh: refreshToken =>
+      httpClient.post('/auth/refresh', { refreshToken }).then(r => r.data),
+    me: () => httpClient.get('/auth/me').then(r => r.data),
+  },
   // Пользователи
   users: {
-    getAll: () => apiService.get('/users'),
-    getById: id => apiService.get(`/users/${id}`),
+    getAll: () => httpClient.get('/users').then(r => r.data),
+    getById: id => httpClient.get(`/users/${id}`).then(r => r.data),
     getByEmail: email =>
-      apiService.get(`/users?email=${encodeURIComponent(email)}`),
-    getByEmailAndPassword: (email, password) =>
-      apiService.get(
-        `/users?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
-      ),
-    create: data => apiService.post('/users', data),
-    update: (id, data) => apiService.put(`/users/${id}`, data),
-    delete: id => apiService.delete(`/users/${id}`),
+      httpClient
+        .get(`/users?email=${encodeURIComponent(email)}`)
+        .then(r => r.data),
+    create: data => httpClient.post('/users', data).then(r => r.data),
+    update: (id, data) =>
+      httpClient.put(`/users/${id}`, data).then(r => r.data),
+    delete: id => httpClient.delete(`/users/${id}`).then(r => r.data),
   },
 
   // Дети
   children: {
-    getAll: () => apiService.get('/children'),
-    getById: id => apiService.get(`/children/${id}`),
-    getByUserId: userId => apiService.get(`/children?userId=${userId}`),
-    create: data => apiService.post('/children', data),
-    update: (id, data) => apiService.put(`/children/${id}`, data),
-    delete: id => apiService.delete(`/children/${id}`),
+    getAll: () => httpClient.get('/children').then(r => r.data),
+    getById: id => httpClient.get(`/children/${id}`).then(r => r.data),
+    getByUserId: userId =>
+      httpClient.get(`/children?userId=${userId}`).then(r => r.data),
+    create: data => httpClient.post('/children', data).then(r => r.data),
+    update: (id, data) =>
+      httpClient.put(`/children/${id}`, data).then(r => r.data),
+    delete: id => httpClient.delete(`/children/${id}`).then(r => r.data),
   },
 
   // Новости
   news: {
-    getAll: () => apiService.get('/news'),
-    getById: id => apiService.get(`/news/${id}`),
-    create: data => apiService.post('/news', data),
-    update: (id, data) => apiService.put(`/news/${id}`, data),
-    delete: id => apiService.delete(`/news/${id}`),
+    getAll: () => httpClient.get('/news').then(r => r.data),
+    getById: id => httpClient.get(`/news/${id}`).then(r => r.data),
+    create: data => httpClient.post('/news', data).then(r => r.data),
+    update: (id, data) => httpClient.put(`/news/${id}`, data).then(r => r.data),
+    delete: id => httpClient.delete(`/news/${id}`).then(r => r.data),
   },
 
   // Статьи
   articles: {
-    getAll: () => apiService.get('/articles'),
-    getById: id => apiService.get(`/articles/${id}`),
-    create: data => apiService.post('/articles', data),
-    update: (id, data) => apiService.put(`/articles/${id}`, data),
-    delete: id => apiService.delete(`/articles/${id}`),
+    getAll: () => httpClient.get('/articles').then(r => r.data),
+    getById: id => httpClient.get(`/articles/${id}`).then(r => r.data),
+    create: data => httpClient.post('/articles', data).then(r => r.data),
+    update: (id, data) =>
+      httpClient.put(`/articles/${id}`, data).then(r => r.data),
+    delete: id => httpClient.delete(`/articles/${id}`).then(r => r.data),
   },
 
   // События
   events: {
-    getAll: () => apiService.get('/events'),
-    getById: id => apiService.get(`/events/${id}`),
-    create: data => apiService.post('/events', data),
-    update: (id, data) => apiService.put(`/events/${id}`, data),
-    delete: id => apiService.delete(`/events/${id}`),
+    getAll: () => httpClient.get('/events').then(r => r.data),
+    getById: id => httpClient.get(`/events/${id}`).then(r => r.data),
+    create: data => httpClient.post('/events', data).then(r => r.data),
+    update: (id, data) =>
+      httpClient.put(`/events/${id}`, data).then(r => r.data),
+    delete: id => httpClient.delete(`/events/${id}`).then(r => r.data),
   },
 
   // Истории
   stories: {
-    getAll: () => apiService.get('/stories'),
-    getById: id => apiService.get(`/stories/${id}`),
-    create: data => apiService.post('/stories', data),
-    update: (id, data) => apiService.put(`/stories/${id}`, data),
-    delete: id => apiService.delete(`/stories/${id}`),
+    getAll: () => httpClient.get('/stories').then(r => r.data),
+    getById: id => httpClient.get(`/stories/${id}`).then(r => r.data),
+    create: data => httpClient.post('/stories', data).then(r => r.data),
+    update: (id, data) =>
+      httpClient.put(`/stories/${id}`, data).then(r => r.data),
+    delete: id => httpClient.delete(`/stories/${id}`).then(r => r.data),
   },
 
   // Врачи
   doctors: {
-    getAll: () => apiService.get('/doctors'),
-    getById: id => apiService.get(`/doctors/${id}`),
-    create: data => apiService.post('/doctors', data),
-    update: (id, data) => apiService.put(`/doctors/${id}`, data),
-    delete: id => apiService.delete(`/doctors/${id}`),
+    getAll: () => httpClient.get('/doctors').then(r => r.data),
+    getById: id => httpClient.get(`/doctors/${id}`).then(r => r.data),
+    create: data => httpClient.post('/doctors', data).then(r => r.data),
+    update: (id, data) =>
+      httpClient.put(`/doctors/${id}`, data).then(r => r.data),
+    delete: id => httpClient.delete(`/doctors/${id}`).then(r => r.data),
   },
 
   // Регионы
   regions: {
-    getAll: () => apiService.get('/regions'),
+    getAll: () => httpClient.get('/regions').then(r => r.data),
   },
 
   // Контакты
   contacts: {
-    getAll: () => apiService.get('/contacts'),
-    create: data => apiService.post('/contacts', data),
-    update: (id, data) => apiService.put(`/contacts/${id}`, data),
-    delete: id => apiService.delete(`/contacts/${id}`),
+    getAll: () => httpClient.get('/contacts').then(r => r.data),
+    create: data => httpClient.post('/contacts', data).then(r => r.data),
+    update: (id, data) =>
+      httpClient.put(`/contacts/${id}`, data).then(r => r.data),
+    delete: id => httpClient.delete(`/contacts/${id}`).then(r => r.data),
   },
 };
 
-export default apiService;
+export default httpClient;

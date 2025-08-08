@@ -50,6 +50,20 @@
       "registeredAt": "2025-08-01T21:56:15.444Z",
       "isEmailVerified": false,
       "isActive": true
+    },
+    {
+      "id": 1754678471069,
+      "email": "df@ya.ru",
+      "password": "$2a$10$c9psTHe7SOg.VpWEOMT2Pu3XIdXN5h4wcASWxhBS.rlYMFnr03i26",
+      "firstName": "name",
+      "lastName": "sirname",
+      "role": "doctor",
+      "isActive": true,
+      "isEmailVerified": false,
+      "registeredAt": "2025-08-08T18:41:11.069Z",
+      "hasConsentToDataProcessing": true,
+      "phone": "",
+      "region": "Екатеринбург"
     }
   ],
   "children": [

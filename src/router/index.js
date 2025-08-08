@@ -55,6 +55,7 @@ const routes = [
     path: '/patient-registry/personal-account',
     name: 'PersonalAccount',
     component: PersonalAccount,
+    meta: { requiresAuth: true },
   },
   {
     path: '/patient-registry/patient-map',
@@ -88,8 +89,15 @@ const router = createRouter({
 });
 
 // Охранники маршрутов
-router.beforeEach((to, from, next) => {
-  // Здесь можно добавить проверки авторизации
+import { useAuthStore } from '../stores/auth.js';
+router.beforeEach(async (to, from, next) => {
+  const auth = useAuthStore();
+  if (!auth.isAuthenticated) {
+    await auth.initAuth();
+  }
+  if (to.meta?.requiresAuth && !auth.isAuthenticated) {
+    return next({ path: '/login', query: { redirect: to.fullPath } });
+  }
   next();
 });
 

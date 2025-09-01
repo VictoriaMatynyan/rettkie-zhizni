@@ -64,6 +64,34 @@
       "hasConsentToDataProcessing": true,
       "phone": "",
       "region": "Екатеринбург"
+    },
+    {
+      "id": 1756734281042,
+      "email": "asd@ya.ru",
+      "password": "$2a$10$rpsaq0./1BuWWWaOgDk9U.emBbZDGHrVGg2YLPQLv9pQVV0/GjAhi",
+      "firstName": "qqqq",
+      "lastName": "qqqq",
+      "role": "researcher",
+      "isActive": true,
+      "isEmailVerified": false,
+      "registeredAt": "2025-09-01T13:44:41.042Z",
+      "hasConsentToDataProcessing": true,
+      "phone": "89999999999",
+      "region": "Москва"
+    },
+    {
+      "id": 1756734562530,
+      "email": "aa@ya.ru",
+      "password": "$2a$10$2RrarU8z2B09Mbfem70hqOlQndCNkVFlNrxfnL4pFuE5RvS1PoAPm",
+      "firstName": "aaa",
+      "lastName": "aaa",
+      "role": "doctor",
+      "isActive": true,
+      "isEmailVerified": false,
+      "registeredAt": "2025-09-01T13:49:22.530Z",
+      "hasConsentToDataProcessing": true,
+      "phone": "7777777777",
+      "region": "Санкт-Петербург"
     }
   ],
   "children": [
@@ -114,6 +142,16 @@
       "createdAt": "2025-01-05T09:15:00.000Z",
       "updatedAt": "2025-01-05T09:15:00.000Z",
       "isPublic": true
+    },
+    {
+      "lastName": "rrr",
+      "firstName": "rrr",
+      "gender": "м",
+      "birthDate": "2025-08-31",
+      "userId": 1756734562530,
+      "createdAt": "2025-09-01T14:29:59.342Z",
+      "updatedAt": "2025-09-01T14:29:59.342Z",
+      "id": "FRx_Ct-"
     }
   ],
   "news": [

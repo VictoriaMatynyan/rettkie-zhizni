@@ -40,15 +40,19 @@
 
 <script>
 import ChildForm from './ChildForm.vue';
+import { api } from '../services/api.js';
+import { useAuthStore } from '../stores/auth.js';
 
 export default {
   name: 'ChildrenProfiles',
   components: { ChildForm },
   data() {
     return {
-      children: [], // Здесь будет список анкет
+      children: [], // список анкет текущего пользователя
       showForm: false,
       editedIndex: null,
+      loading: false,
+      error: null,
     };
   },
   computed: {
@@ -57,20 +61,89 @@ export default {
         ? { ...this.children[this.editedIndex] }
         : null;
     },
+    authStore() {
+      return useAuthStore();
+    },
+  },
+  async mounted() {
+    await this.loadChildren();
   },
   methods: {
-    saveChild(data) {
-      if (this.editedIndex !== null) {
-        this.children.splice(this.editedIndex, 1, data);
-      } else {
-        data.id = Date.now();
-        this.children.push(data);
+    async loadChildren() {
+      this.loading = true;
+      this.error = null;
+      try {
+        // Убедимся, что авторизация и пользователь доступны
+        if (!this.authStore.isAuthenticated || !this.authStore.user) {
+          await this.authStore.initAuth();
+        }
+        const userId = this.authStore.user?.id;
+        if (!userId) {
+          this.children = [];
+          return;
+        }
+
+        // Основной запрос по userId
+        let list = await api.children.getByUserId(userId);
+
+        // Фолбэк: если id строковый и массив пуст — пробуем числовое значение
+        if (Array.isArray(list) && list.length === 0 && typeof userId === 'string' && !Number.isNaN(Number(userId))) {
+          list = await api.children.getByUserId(Number(userId));
+        }
+
+        // На всякий случай фильтруем по совпадению userId (строгая или приведенная)
+        const idStr = String(userId);
+        this.children = (list || []).filter(c => String(c.userId) === idStr);
+      } catch (e) {
+        this.error = e?.response?.data?.message || e.message || 'Не удалось загрузить анкеты';
+        this.children = [];
+      } finally {
+        this.loading = false;
       }
-      this.cancelEdit();
     },
-    deleteChild(index) {
-      if (confirm('Удалить эту анкету?')) {
+
+    async saveChild(data) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const userId = this.authStore.user?.id;
+        if (!userId) throw new Error('Пользователь не найден');
+
+        if (this.editedIndex !== null) {
+          const current = this.children[this.editedIndex];
+          const payload = { ...current, ...data, userId, updatedAt: new Date().toISOString() };
+          const updated = await api.children.update(current.id, payload);
+          this.children.splice(this.editedIndex, 1, updated);
+        } else {
+          const payload = {
+            ...data,
+            userId,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+          const created = await api.children.create(payload);
+          this.children.push(created);
+        }
+        this.cancelEdit();
+      } catch (e) {
+        this.error = e?.response?.data?.message || e.message || 'Не удалось сохранить анкету';
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async deleteChild(index) {
+      if (!confirm('Удалить эту анкету?')) return;
+      this.loading = true;
+      this.error = null;
+      try {
+        const child = this.children[index];
+        await api.children.delete(child.id);
         this.children.splice(index, 1);
+      } catch (e) {
+        this.error = e?.response?.data?.message || e.message || 'Не удалось удалить анкету';
+      } finally {
+        this.loading = false;
       }
     },
     editChild(index) {

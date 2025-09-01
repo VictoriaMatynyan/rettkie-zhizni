@@ -57,17 +57,64 @@
         <router-link to="/patients/newbie" class="btn-help"
           >Что делать</router-link
         >
+
+        <!-- Блок авторизации -->
+        <div class="auth-block">
+          <div v-if="authStore.isAuthenticated" class="user-menu">
+            <div class="user-info">
+              <span class="user-avatar">{{ authStore.userInitials }}</span>
+              <span class="user-name">{{ authStore.userFullName }}</span>
+            </div>
+            <div class="user-dropdown">
+              <router-link
+                to="/patient-registry/personal-account"
+                class="dropdown-item"
+              >
+                Личный кабинет
+              </router-link>
+              <button class="dropdown-item logout-btn" @click="handleLogout">
+                Выйти
+              </button>
+            </div>
+          </div>
+          <div v-else class="auth-buttons">
+            <router-link to="/login" class="auth-btn login-btn"
+              >Вход</router-link
+            >
+            <router-link to="/register" class="auth-btn register-btn"
+              >Регистрация</router-link
+            >
+          </div>
+        </div>
       </nav>
     </div>
   </header>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/auth.js';
 
 const menuOpen = ref(false);
 const menuRef = ref(null);
 const burgerRef = ref(null);
+
+// Подключаем store и router
+const authStore = useAuthStore();
+const router = useRouter();
+
+// Инициализируем авторизацию при загрузке
+onMounted(async () => {
+  await authStore.initAuth();
+  document.addEventListener('click', handleClickOutside);
+});
+
+// Функция выхода
+const handleLogout = () => {
+  authStore.logout();
+  router.push('/');
+};
 
 function handleClickOutside(event) {
   const clickedOutsideMenu =
@@ -222,6 +269,163 @@ onBeforeUnmount(() => {
 
 .dropdown-content a:hover span:hover {
   background-color: #f1f1f1;
+}
+
+/* Блок авторизации */
+.auth-block {
+  margin-left: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.auth-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.login-btn {
+  color: #8132ad;
+  border: 1px solid #8132ad;
+  background: transparent;
+}
+
+.login-btn:hover {
+  background-color: #8132ad;
+  color: white;
+}
+
+.register-btn {
+  background-color: #8132ad;
+  color: white;
+  border: 1px solid #8132ad;
+}
+
+.register-btn:hover {
+  background-color: #6b2a91;
+}
+
+/* Меню пользователя */
+.user-menu {
+  position: relative;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.user-info:hover {
+  background-color: #f8f9fa;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #8132ad;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 8px 0;
+  min-width: 180px;
+  z-index: 1000;
+}
+
+.user-menu:hover .user-dropdown {
+  display: block;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 8px 16px;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.logout-btn {
+  color: #dc3545;
+  border-top: 1px solid #eee;
+}
+
+.logout-btn:hover {
+  background-color: #fee;
+}
+
+@media (max-width: 768px) {
+  .auth-block {
+    margin-left: 0;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+  }
+
+  .auth-buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .auth-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .user-info {
+    justify-content: flex-start;
+  }
+
+  .user-name {
+    max-width: none;
+  }
 }
 
 .dropdown:hover .dropdown-content {

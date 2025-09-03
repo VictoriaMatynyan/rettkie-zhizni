@@ -1,15 +1,25 @@
 <template>
   <div class="contact-form">
-    <h2>Контактные данные</h2>
+    <h2>Изменить контактные данные</h2>
 
     <form @submit.prevent="handleSubmit">
       <div class="form-group">
         <label>
           Имя
-          <span v-if="showHelp.name" class="help-text"
-            >Введите ваше полное имя</span
+          <span v-if="showHelp.first_name" class="help-text"
+            >Изменить ваше имя</span
           >
-          <input v-model="form.name" type="text" required />
+          <input v-model="form.first_name" type="text" required />
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label>
+          Фамилия
+          <span v-if="showHelp.last_name" class="help-text"
+            >Изменить вашу фамилию</span
+          >
+          <input v-model="form.last_name" type="text" required />
         </label>
       </div>
 
@@ -67,11 +77,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
+import { useAuthStore } from '../stores/auth.js';
+
+const authStore = useAuthStore();
 
 const form = ref({
   notifications: true,
-  name: '',
+  first_name: '',
+  last_name: '',
   email: '',
   phone: '',
 });
@@ -80,10 +94,36 @@ const submitted = ref(false);
 
 const showHelp = {
   notifications: true,
-  name: true,
+  first_name: true,
+  last_name: true,
   email: true,
   phone: true,
 };
+
+function syncFormFromUser() {
+  const u = authStore.user || {};
+  form.value.first_name = u.first_name ?? u.firstName ?? '';
+  form.value.last_name = u.last_name ?? u.lastName ?? '';
+  form.value.email = u.email || '';
+  form.value.phone = u.phone || '';
+}
+
+// Обновляем поля, когда меняется пользователь
+watch(
+  () => authStore.user,
+  () => syncFormFromUser(),
+  { immediate: true }
+);
+
+onMounted(async () => {
+  // На всякий случай подтягиваем профиль, если есть токен, а пользователя ещё нет
+  if (authStore.isAuthenticated && !authStore.user) {
+    try {
+      await authStore.fetchUserProfile();
+    } catch {}
+  }
+  syncFormFromUser();
+});
 
 function handleSubmit() {
   // здесь будет API-запрос на POST/UPDATE

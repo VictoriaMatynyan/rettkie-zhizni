@@ -78,7 +78,6 @@ import StandardContent from '../components/StandardContent.vue';
 import symptomsImg from '../assets/symptoms.png';
 import YandexMap from '../components/YandexMap.vue';
 // import MutationBarChart from '@/components/MutationBarChart.vue';
-console.log('symptomsImg', symptomsImg);
 
 export default {
   name: 'PersonalStats',

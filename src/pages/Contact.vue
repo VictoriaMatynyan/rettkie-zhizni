@@ -72,8 +72,6 @@ const isSubmitted = ref(false);
 
 function handleSubmit() {
   // здесь будет post-запрос на сервер
-
-  console.log('Form submitted:', form.value);
   isSubmitted.value = true;
   form.value = {
     name: '',

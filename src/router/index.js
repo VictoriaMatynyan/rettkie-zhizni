@@ -51,6 +51,8 @@ const routes = [
     name: 'PatientRegistry',
     component: PatientRegistry,
   },
+  // Поддержка ссылок с префиксом "/rettkie-zhizni" для реестра
+  { path: '/rettkie-zhizni/patient-registry', redirect: '/patient-registry' },
   {
     path: '/patient-registry/personal-account',
     name: 'PersonalAccount',
@@ -67,6 +69,7 @@ const routes = [
     name: 'PrivacyPolicy',
     component: PrivacyPolicy,
   },
+  { path: '/privacy-policy', redirect: '/patient-registry/privacy-policy' },
   { path: '/donate', name: 'Donate', component: Donate },
 
   // Аутентификация

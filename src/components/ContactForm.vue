@@ -129,7 +129,6 @@ function handleSubmit() {
   // здесь будет API-запрос на POST/UPDATE
   submitted.value = true;
   setTimeout(() => {
-    console.log('Form submitted:', form.value);
     submitted.value = false;
   }, 5000);
 }

@@ -35,15 +35,16 @@
 
     <div class="video-section">
       <iframe
-        v-if="videoUrl"
+        v-if="videoUrl && showVideo"
         width="720"
         height="405"
         :src="videoUrl"
         frameborder="0"
-        allow="clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allow="autoplay; fullscreen"
         allowfullscreen
         mozallowfullscreen
         webkitAllowFullScreen
+        title="Видеоплеер"
       ></iframe>
     </div>
   </section>
@@ -66,6 +67,7 @@ const props = defineProps({
 });
 
 const modalOpen = ref(false);
+const showVideo = import.meta.env.PROD;
 
 const openModal = () => {
   modalOpen.value = true;

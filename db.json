@@ -92,6 +92,20 @@
       "hasConsentToDataProcessing": true,
       "phone": "7777777777",
       "region": "Санкт-Петербург"
+    },
+    {
+      "id": 1756795055362,
+      "email": "sdf@sdf.er",
+      "password": "$2a$10$U5.t5p091mpVI3rdnPhkAe2yx8MFDg.q/hA7zTwLobgRLbNa5pktS",
+      "firstName": "фыв",
+      "lastName": "фыв",
+      "role": "parent",
+      "isActive": true,
+      "isEmailVerified": false,
+      "registeredAt": "2025-09-02T06:37:35.362Z",
+      "hasConsentToDataProcessing": true,
+      "phone": "9999999999",
+      "region": "Москва"
     }
   ],
   "children": [

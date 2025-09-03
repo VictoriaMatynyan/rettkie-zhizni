@@ -6,10 +6,10 @@
       <form @submit.prevent="handleRegister">
         <div class="form-row">
           <div class="form-group">
-            <label for="firstName" class="form-label">Имя *</label>
+            <label for="first_name" class="form-label">Имя *</label>
             <input
-              id="firstName"
-              v-model="form.firstName"
+              id="first_name"
+              v-model="form.first_name"
               type="text"
               class="form-input"
               required
@@ -19,10 +19,10 @@
           </div>
 
           <div class="form-group">
-            <label for="lastName" class="form-label">Фамилия *</label>
+            <label for="last_name" class="form-label">Фамилия *</label>
             <input
-              id="lastName"
-              v-model="form.lastName"
+              id="last_name"
+              v-model="form.last_name"
               type="text"
               class="form-input"
               required
@@ -59,37 +59,38 @@
         </div>
 
         <div class="form-group">
-          <label for="region" class="form-label">Регион *</label>
+          <label for="region_id" class="form-label">Регион *</label>
           <select
-            id="region"
-            v-model="form.region"
+            id="region_id"
+            v-model.number="form.region_id"
             class="form-input"
             required
-            :disabled="loading"
+            :disabled="loading || dictLoading"
           >
             <option value="">Выберите регион</option>
-            <option value="Москва">Москва</option>
-            <option value="Санкт-Петербург">Санкт-Петербург</option>
-            <option value="Екатеринбург">Екатеринбург</option>
-            <option value="Новосибирск">Новосибирск</option>
-            <option value="Краснодар">Краснодар</option>
-            <option value="Другой">Другой регион</option>
+            <option
+              v-for="region in regions"
+              :key="region.id"
+              :value="region.id"
+            >
+              {{ region.name }}
+            </option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="role" class="form-label">Кто вы? *</label>
+          <label for="user_type_id" class="form-label">Кто вы? *</label>
           <select
-            id="role"
-            v-model="form.role"
+            id="user_type_id"
+            v-model.number="form.user_type_id"
             class="form-input"
             required
-            :disabled="loading"
+            :disabled="loading || dictLoading"
           >
             <option value="">Выберите роль</option>
-            <option value="parent">Родитель/Опекун</option>
-            <option value="doctor">Врач/Специалист</option>
-            <option value="researcher">Исследователь</option>
+            <option v-for="type in userTypes" :key="type.id" :value="type.id">
+              {{ type.name }}
+            </option>
           </select>
         </div>
 
@@ -114,7 +115,7 @@
             >
             <input
               id="confirmPassword"
-              v-model="form.confirmPassword"
+              v-model="form.password_confirm"
               type="password"
               class="form-input"
               required
@@ -127,7 +128,7 @@
         <div class="form-group">
           <label class="checkbox-label">
             <input
-              v-model="form.hasConsentToDataProcessing"
+              v-model="form.consent"
               type="checkbox"
               required
               :disabled="loading"
@@ -139,6 +140,11 @@
               >
             </span>
           </label>
+        </div>
+
+        <div v-if="registrationSuccess" class="success-message">
+          Регистрация прошла успешно! Пожалуйста, проверьте вашу электронную
+          почту для подтверждения аккаунта.
         </div>
 
         <div v-if="error" class="error-message">
@@ -165,22 +171,28 @@
 
 <script>
 import { useAuthStore } from '../stores/auth.js';
+import { api } from '../services/api.js';
 
 export default {
   name: 'RegisterForm',
   data() {
     return {
       form: {
-        firstName: '',
-        lastName: '',
+        first_name: '',
+        last_name: '',
         email: '',
         phone: '',
-        region: '',
-        role: '',
+        region_id: '',
+        user_type_id: '',
         password: '',
-        confirmPassword: '',
-        hasConsentToDataProcessing: false,
+        password_confirm: '',
+        consent: false,
       },
+      regions: [],
+      userTypes: [],
+      dictLoading: false,
+      dictError: '',
+      registrationSuccess: false,
     };
   },
   computed: {
@@ -195,44 +207,82 @@ export default {
     },
     isFormValid() {
       return (
-        this.form.firstName &&
-        this.form.lastName &&
+        this.form.first_name &&
+        this.form.last_name &&
         this.form.email &&
-        this.form.region &&
-        this.form.role &&
+        this.form.region_id &&
+        this.form.user_type_id &&
         this.form.password &&
-        this.form.confirmPassword &&
-        this.form.password === this.form.confirmPassword &&
-        this.form.hasConsentToDataProcessing
+        this.form.password_confirm &&
+        this.form.password === this.form.password_confirm &&
+        this.form.consent
       );
     },
+    registrationComplete() {
+      return this.authStore.registrationSuccess;
+    },
   },
-  mounted() {
-    // Очищаем ошибки при монтировании компонента
+  async mounted() {
     this.authStore.clearError();
+    await this.loadDictionaries();
   },
   methods: {
+    async loadDictionaries() {
+      this.dictError = '';
+      this.dictLoading = true;
+      try {
+        const [regionsRes, userTypesRes] = await Promise.all([
+          api.accounts.getRegions(),
+          api.accounts.getUserTypes(),
+        ]);
+        this.regions = Array.isArray(regionsRes?.items) ? regionsRes.items : [];
+        this.userTypes = Array.isArray(userTypesRes?.items)
+          ? userTypesRes.items
+          : [];
+      } catch (e) {
+        this.dictError = e?.response?.data?.message || e.message || 'Ошибка загрузки списков';
+      } finally {
+        this.dictLoading = false;
+      }
+    },
+    resetForm() {
+      this.form = {
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        region_id: '',
+        user_type_id: '',
+        password: '',
+        password_confirm: '',
+        consent: false,
+      };
+    },
     async handleRegister() {
       if (!this.isFormValid) {
         return;
       }
 
-      if (this.form.password !== this.form.confirmPassword) {
+      if (this.form.password !== this.form.password_confirm) {
         this.authStore.error = 'Пароли не совпадают';
         return;
       }
 
       try {
-        // Создаем объект пользователя без confirmPassword
-        const userData = { ...this.form };
-        delete userData.confirmPassword;
+        await this.authStore.register(this.form);
 
-        await this.authStore.register(userData);
+        // Показываем сообщение об успешной регистрации
+        this.registrationSuccess = true;
 
-        // Перенаправляем в личный кабинет
-        this.$router.push('/personal-account');
+        // Очищаем поля формы
+        this.resetForm();
+
+        // Перенаправляем на страницу подтверждения email
+        this.$router.push({
+          name: 'registration-success',
+          query: { email: this.form.email },
+        });
       } catch (error) {
-        // Ошибка уже обработана в store
         console.error('Registration failed:', error);
       }
     },

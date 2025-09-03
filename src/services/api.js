@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // API базовый URL
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = 'http://127.0.0.1:8000';
 
 // Axios instance
 export const httpClient = axios.create({
@@ -38,10 +38,14 @@ httpClient.interceptors.response.use(
   r => r,
   async err => {
     const original = err.config || {};
-    if (err.response && err.response.status === 401 && !original._retry) {
+    if (err.response?.status === 401 && !original._retry) {
       original._retry = true;
       const rt = getRefreshToken();
-      if (!rt) return Promise.reject(err);
+      if (!rt) {
+        setAccessToken(null);
+        setRefreshToken(null);
+        return Promise.reject(err);
+      }
 
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -57,17 +61,20 @@ httpClient.interceptors.response.use(
 
       try {
         isRefreshing = true;
-        const { data } = await httpClient.post('/auth/refresh', {
-          refreshToken: rt,
+        const { data } = await httpClient.post('/accounts/refresh/', {
+          refresh: rt,
         });
-        setAccessToken(data.accessToken);
-        setRefreshToken(data.refreshToken);
-        queue.forEach(p => p.resolve(data.accessToken));
-        queue = [];
-        isRefreshing = false;
-        original.headers = original.headers || {};
-        original.headers.Authorization = `Bearer ${data.accessToken}`;
-        return httpClient(original);
+        if (data.ok && data.access) {
+          setAccessToken(data.access);
+          setRefreshToken(data.refresh);
+          queue.forEach(p => p.resolve(data.access));
+          queue = [];
+          isRefreshing = false;
+          original.headers = original.headers || {};
+          original.headers.Authorization = `Bearer ${data.access}`;
+          return httpClient(original);
+        }
+        throw new Error('Refresh failed');
       } catch (e) {
         isRefreshing = false;
         setAccessToken(null);
@@ -81,16 +88,27 @@ httpClient.interceptors.response.use(
   }
 );
 
-// Специфичные методы для работы с данными приложения
+// API Methods
 export const api = {
   auth: {
     register: payload =>
-      httpClient.post('/auth/register', payload).then(r => r.data),
-    login: payload => httpClient.post('/auth/login', payload).then(r => r.data),
+      httpClient.post('/accounts/register/', payload).then(r => r.data),
+    login: payload =>
+      httpClient.post('/accounts/login/', payload).then(r => r.data),
     refresh: refreshToken =>
-      httpClient.post('/auth/refresh', { refreshToken }).then(r => r.data),
-    me: () => httpClient.get('/auth/me').then(r => r.data),
+      httpClient
+        .post('/accounts/refresh/', { refresh: refreshToken })
+        .then(r => r.data),
+    me: () => httpClient.get('/accounts/me/').then(r => r.data),
   },
+
+  // Справочники аккаунтов
+  accounts: {
+    getRegions: () => httpClient.get('/accounts/regions/').then(r => r.data),
+    getUserTypes: () =>
+      httpClient.get('/accounts/user-types/').then(r => r.data),
+  },
+
   // Пользователи
   users: {
     getAll: () => httpClient.get('/users').then(r => r.data),

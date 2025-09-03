@@ -1,6 +1,23 @@
 import { defineStore } from 'pinia';
 import { api } from '../services/api.js';
 
+// Приводим объект пользователя к единому формату
+function normalizeUser(user) {
+  if (!user || typeof user !== 'object') return user;
+  const firstName = user.first_name ?? user.firstName ?? (user.name ? String(user.name).split(' ')[0] : undefined);
+  const lastName = user.last_name ?? user.lastName ?? (user.name ? String(user.name).split(' ').slice(1).join(' ') || undefined : undefined);
+  const userType = user.user_type ?? user.role ?? undefined;
+  const isVerified = user.is_verified ?? user.isEmailVerified ?? undefined;
+
+  return {
+    ...user,
+    first_name: firstName,
+    last_name: lastName,
+    user_type: userType,
+    is_verified: isVerified,
+  };
+}
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
@@ -9,26 +26,46 @@ export const useAuthStore = defineStore('auth', {
     isAuthenticated: !!localStorage.getItem('accessToken'),
     loading: false,
     error: null,
+    registrationSuccess: false,
   }),
 
   getters: {
-    isAdmin: state => state.user?.role === 'admin',
-    isParent: state => state.user?.role === 'parent',
-    isDoctor: state => state.user?.role === 'doctor',
-    userFullName: state =>
-      state.user ? `${state.user.firstName} ${state.user.lastName}` : '',
-    userInitials: state =>
-      state.user
-        ? `${state.user.firstName?.[0] || ''}${state.user.lastName?.[0] || ''}`
-        : '',
+    isAdmin: state => state.user?.user_type === 'admin',
+    isParent: state => state.user?.user_type === 'parent',
+    isDoctor: state => state.user?.user_type === 'doctor',
+    isVerified: state => state.user?.is_verified,
+    userFullName: state => {
+      if (!state.user) return '';
+      const first = state.user.first_name ?? state.user.firstName ?? '';
+      const last = state.user.last_name ?? state.user.lastName ?? '';
+      return [first, last].filter(Boolean).join(' ');
+    },
+    userInitials: state => {
+      if (!state.user) return '';
+      const first = state.user.first_name ?? state.user.firstName ?? '';
+      const last = state.user.last_name ?? state.user.lastName ?? '';
+      return `${first?.[0] || ''}${last?.[0] || ''}`.toUpperCase();
+    },
   },
 
   actions: {
+    async fetchUserProfile() {
+      try {
+        const user = await api.auth.me();
+        this.user = normalizeUser(user);
+        return user;
+      } catch (e) {
+        if (e.response?.status === 401) {
+          this.logout();
+        }
+        throw e;
+      }
+    },
+
     async initAuth() {
       if (!this.accessToken) return;
       try {
-        const { user } = await api.auth.me();
-        this.user = user;
+        await this.fetchUserProfile();
         this.isAuthenticated = true;
       } catch {
         this.logout();
@@ -40,15 +77,15 @@ export const useAuthStore = defineStore('auth', {
       this.error = null;
       try {
         const data = await api.auth.register(payload);
-        this.user = data.user;
-        this.accessToken = data.accessToken;
-        this.refreshToken = data.refreshToken;
-        this.isAuthenticated = true;
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        return data.user;
+        this.registrationSuccess = true;
+        return data;
       } catch (e) {
-        this.error = e?.response?.data?.message || e.message;
+        // Go API может вернуть ошибки валидации в виде объекта
+        if (e.response?.data?.errors) {
+          this.error = Object.values(e.response.data.errors).flat().join(', ');
+        } else {
+          this.error = e?.response?.data?.message || e.message;
+        }
         throw e;
       } finally {
         this.loading = false;
@@ -60,15 +97,22 @@ export const useAuthStore = defineStore('auth', {
       this.error = null;
       try {
         const data = await api.auth.login(credentials);
-        this.user = data.user;
-        this.accessToken = data.accessToken;
-        this.refreshToken = data.refreshToken;
+        this.accessToken = data.access;
+        this.refreshToken = data.refresh;
         this.isAuthenticated = true;
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        return data.user;
+        localStorage.setItem('accessToken', data.access);
+        localStorage.setItem('refreshToken', data.refresh);
+
+        // После успешного логина получаем данные пользователя
+        await this.fetchUserProfile();
+        return this.user;
       } catch (e) {
-        this.error = e?.response?.data?.message || e.message;
+        // Обработка ошибок аутентификации
+        if (e.response?.data?.detail) {
+          this.error = e.response.data.detail;
+        } else {
+          this.error = e?.response?.data?.message || e.message;
+        }
         throw e;
       } finally {
         this.loading = false;
@@ -93,7 +137,7 @@ export const useAuthStore = defineStore('auth', {
           ...this.user,
           ...profileData,
         });
-        this.user = updatedUser;
+        this.user = normalizeUser(updatedUser);
         return updatedUser;
       } catch (e) {
         this.error = e?.response?.data?.message || e.message;

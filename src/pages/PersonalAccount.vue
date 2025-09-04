@@ -23,7 +23,7 @@
       >
         Статистика
       </button>
-      <button class="button logout" @click="logout">Выйти</button>
+      <button class="button logout" @click="handleLogout">Выйти</button>
     </nav>
     <component :is="currentTabComponent" />
   </div>
@@ -31,11 +31,16 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/auth.js';
+
 import ContactForm from '../components/ContactForm.vue';
 import ChildrenProfiles from '../components/ChildrenProfiles.vue';
 import PersonalStats from '../components/PersonalStats.vue';
 
 const tab = ref('contact');
+const router = useRouter();
+const authStore = useAuthStore();
 
 const currentTabComponent = computed(() => {
   switch (tab.value) {
@@ -50,9 +55,9 @@ const currentTabComponent = computed(() => {
   }
 });
 
-function logout() {
-  // заглушка: тут будет удаление токена, редирект и т.д.
-  alert('Выход из аккаунта...');
+function handleLogout() {
+  authStore.logout();
+  router.push('/');
 }
 </script>
 
@@ -87,23 +92,29 @@ function logout() {
   border: none;
   border-bottom: 1px solid rgba(42, 174, 162, 0.5);
   font-size: 14px;
+  transition: background-color 0.2s ease, color 0.2s ease,
+              border-color 0.2s ease, transform 0.2s ease;
 }
 
 .tab:hover {
   background-color: rgba(42, 174, 162, 0.4);
   border-bottom: 1px solid rgba(42, 174, 162, 0.1);
+  transform: translateY(0);
 }
 
 .logout {
   margin-left: auto;
-  background-color: #f44336;
+  background-color: #d4392e;
   border: none;
   border-bottom: 1px solid rgba(244, 67, 54, 0.5);
   font-size: 14px;
+  transition: background-color 0.2s ease, color 0.2s ease,
+              border-color 0.2s ease, transform 0.2s ease;
 }
 
 .logout:hover {
   background-color: #f44336;
   color: white;
+  transform: translateY(0);
 }
 </style>

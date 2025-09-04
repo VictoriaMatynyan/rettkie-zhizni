@@ -95,6 +95,16 @@ export const api = {
       httpClient.post('/accounts/register/', payload).then(r => r.data),
     login: payload =>
       httpClient.post('/accounts/login/', payload).then(r => r.data),
+    // Запрос на отправку письма для восстановления пароля
+    requestPasswordReset: ({ email }) =>
+      httpClient
+        .post('/accounts/password/reset/', { email })
+        .then(r => r.data),
+    // Подтверждение сброса пароля (если будет отдельная страница/форма)
+    confirmPasswordReset: payload =>
+      httpClient
+        .post('/accounts/password/reset/confirm/', payload)
+        .then(r => r.data),
     refresh: refreshToken =>
       httpClient
         .post('/accounts/refresh/', { refresh: refreshToken })

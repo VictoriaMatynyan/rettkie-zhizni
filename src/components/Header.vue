@@ -32,60 +32,39 @@
             <router-link to="/patients/rehab">Реабилитация</router-link>
           </div>
         </div>
-
-        <!-- <router-link to="/articles">Статьи</router-link> -->
-
         <router-link to="/news">Новости</router-link>
         <router-link to="/events">Мероприятия</router-link>
         <router-link to="/about-us">О нас</router-link>
         <div class="dropdown">
-          <!-- <span class="dropdown-trigger">Реестр пациентов</span> -->
           <router-link to="/patient-registry">Реестр пациентов</router-link>
           <div class="dropdown-content">
-            <router-link to="/patient-registry/personal-account"
-              >Личный кабинет</router-link
-            >
-            <router-link to="/patient-registry/patient-map"
-              >Карта пациентов</router-link
-            >
+            <router-link to="/patient-registry/personal-account">Личный кабинет</router-link>
+             <!-- Блок авторизации -->
+            <div>
+              <div v-if="authStore.isAuthenticated" class="user-menu">
+                <div class="user-info">
+                  <span class="user-avatar">{{ authStore.userInitials }}</span>
+                  <span class="user-name">{{ authStore.userFullName }}</span>
+                </div>
+                  <button class="dropdown-item logout-btn" @click="handleLogout">
+                    Выйти
+                  </button>
+                </div>
+              <div v-else class="auth-buttons">
+                <router-link to="/login">Вход</router-link>
+              </div>
+            </div>
+            <!-- Блок авторизации -->
+            <router-link to="/patient-registry/patient-map">
+              Карта пациентов
+            </router-link>
             <router-link to="/patient-registry/privacy-policy"
-              >Политика обработки персональных данных</router-link
-            >
+              >Политика обработки персональных данных</router-link>
           </div>
         </div>
         <router-link to="/donate" class="btn-donate">Помочь</router-link>
         <router-link to="/patients/newbie" class="btn-help"
-          >Что делать</router-link
-        >
-
-        <!-- Блок авторизации -->
-        <div class="auth-block">
-          <div v-if="authStore.isAuthenticated" class="user-menu">
-            <div class="user-info">
-              <span class="user-avatar">{{ authStore.userInitials }}</span>
-              <span class="user-name">{{ authStore.userFullName }}</span>
-            </div>
-            <div class="user-dropdown">
-              <router-link
-                to="/patient-registry/personal-account"
-                class="dropdown-item"
-              >
-                Личный кабинет
-              </router-link>
-              <button class="dropdown-item logout-btn" @click="handleLogout">
-                Выйти
-              </button>
-            </div>
-          </div>
-          <div v-else class="auth-buttons">
-            <router-link to="/login" class="auth-btn login-btn"
-              >Вход</router-link
-            >
-            <router-link to="/register" class="auth-btn register-btn"
-              >Регистрация</router-link
-            >
-          </div>
-        </div>
+          >Что делать</router-link>
       </nav>
     </div>
   </header>

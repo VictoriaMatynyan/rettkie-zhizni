@@ -15,15 +15,6 @@
       download-link-name="Презентация (1.3 МБ)"
       video-url="https://rutube.ru/play/embed/someVideoId/"
     />
-    <div class="registry-button">
-      <router-link
-        to="/patient-registry/personal-account"
-        class="btn-register"
-        target="_blank"
-      >
-        Зарегистрироваться
-      </router-link>
-    </div>
     <div class="map-section">
       <h3 class="block-title">География пациентов</h3>
       <YandexMap :points="regionData" />
@@ -68,27 +59,5 @@ onMounted(() => {
   font-size: 22px;
   margin-top: 40px;
   margin-bottom: 20px;
-}
-
-.registry-button {
-  text-align: center;
-  margin-top: 32px;
-}
-
-.btn-register {
-  display: inline-block;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 600;
-  background-color: transparent;
-  border: 1px solid #2aaea2;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background-color 0.3s ease;
-}
-
-.btn-register:hover {
-  background-color: #2aaea2;
-  color: #fff;
 }
 </style>

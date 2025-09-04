@@ -103,7 +103,7 @@ export default {
     },
 
     handleForgotPassword() {
-      alert('Функция восстановления пароля будет добавлена позже');
+      this.$router.push('/password-reset');
     },
 
     fillTestAdmin() {

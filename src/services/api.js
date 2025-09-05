@@ -97,9 +97,7 @@ export const api = {
       httpClient.post('/accounts/login/', payload).then(r => r.data),
     // Запрос на отправку письма для восстановления пароля
     requestPasswordReset: ({ email }) =>
-      httpClient
-        .post('/accounts/password/reset/', { email })
-        .then(r => r.data),
+      httpClient.post('/accounts/password/reset/', { email }).then(r => r.data),
     // Подтверждение сброса пароля (если будет отдельная страница/форма)
     confirmPasswordReset: payload =>
       httpClient
@@ -117,6 +115,79 @@ export const api = {
     getRegions: () => httpClient.get('/accounts/regions/').then(r => r.data),
     getUserTypes: () =>
       httpClient.get('/accounts/user-types/').then(r => r.data),
+    // Создание анкеты подопечного
+    createQuestionnaire: payload => {
+      const fd = new FormData();
+      // Поля ФИО
+      if (payload.lastName) fd.append('last_name', payload.lastName);
+      if (payload.firstName) fd.append('first_name', payload.firstName);
+      if (payload.middleName) fd.append('middle_name', payload.middleName);
+
+      // Пол: преобразуем м/ж в мужской/женский при необходимости
+      if (payload.gender) {
+        const g = payload.gender;
+        const gender = g === 'м' ? 'мужской' : g === 'ж' ? 'женский' : g;
+        fd.append('gender', gender);
+      }
+
+      // Дата рождения (YYYY-MM-DD)
+      if (payload.birthDate) fd.append('birth_date', payload.birthDate);
+
+      // Гражданство и страна проживания
+      if (payload.citizenship) {
+        const c = payload.citizenship;
+        const citizenship = c === 'РФ' ? 'Россия' : c;
+        fd.append('citizenship', citizenship);
+      }
+      if (payload.countryOfResidence) {
+        fd.append('country_of_residence', payload.countryOfResidence);
+      }
+
+      // Город: используем id из формы (без хардкода)
+      const cityId =
+        payload.city_id ??
+        payload.cityId ??
+        (payload.city && typeof payload.city === 'object'
+          ? payload.city.id
+          : null);
+      if (cityId !== null) fd.append('city_id', String(cityId));
+
+      // Подтверждение Ретта и детали диагноза
+      if (payload.geneticTestConfirmed)
+        fd.append('rett_confirmed', payload.geneticTestConfirmed);
+      if (payload.diagnosisDescription)
+        fd.append('diagnosis_details', payload.diagnosisDescription);
+
+      // Ген мутации: сопоставляем известные гены к id, иначе используем other
+      if (payload.gene) {
+        const geneMap = { MECP2: 1, CDKL5: 2, FOXG1: 3 };
+        const geneId = geneMap[payload.gene];
+        if (geneId) fd.append('mutation_gene_id', String(geneId));
+        if (payload.gene === 'другой' && payload.geneOther) {
+          fd.append('mutation_gene_other', payload.geneOther);
+        }
+      }
+
+      // Законный представитель
+      if (typeof payload.isLegalRepresentative === 'boolean') {
+        fd.append(
+          'is_legal_representative',
+          String(payload.isLegalRepresentative)
+        );
+      }
+
+      // Файл генетического анализа
+      const fileObj = payload.geneticTestFile?.file || payload.geneticTestFile;
+      if (fileObj instanceof File) {
+        fd.append('genetic_scan', fileObj, fileObj.name);
+      }
+
+      return httpClient
+        .post('/accounts/questionnaires/', fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        .then(r => r.data);
+    },
   },
 
   // Пользователи

@@ -106,9 +106,17 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        const userId = this.authStore.user?.id;
-        if (!userId) throw new Error('Пользователь не найден');
+        // 1) Всегда пытаемся отправить на реальный backend
+        try {
+          await api.accounts.createQuestionnaire({
+            ...data,
+            city_id: data.cityId ?? data.city_id,
+          });
+        } catch (e) {
+          console.warn('Не удалось отправить анкету на backend:', e?.response?.data || e);
+        }
 
+        const userId = this.authStore.user?.id;
         if (this.editedIndex !== null) {
           const current = this.children[this.editedIndex];
           const payload = { ...current, ...data, userId, updatedAt: new Date().toISOString() };
@@ -121,8 +129,11 @@ export default {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           };
-          const created = await api.children.create(payload);
-          this.children.push(created);
+          // Сохраняем локальную копию для UI (json-server/dev), только если есть userId
+          if (userId) {
+            const created = await api.children.create(payload);
+            this.children.push(created);
+          }
         }
         this.cancelEdit();
       } catch (e) {

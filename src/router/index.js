@@ -76,6 +76,7 @@ const routes = [
   { path: '/login', name: 'Login', component: LoginForm },
   { path: '/register', name: 'Register', component: RegisterForm },
   { path: '/password-reset', name: 'PasswordReset', component: () => import('../pages/PasswordReset.vue') },
+  { path: '/password-reset/confirm/:uid/:token', name: 'PasswordResetConfirm', component: () => import('../pages/PasswordResetConfirm.vue') },
 
   // Перенаправления
   { path: '/', redirect: '/rettkie-zhizni' },

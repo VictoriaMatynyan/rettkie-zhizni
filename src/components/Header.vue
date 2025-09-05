@@ -40,20 +40,10 @@
           <div class="dropdown-content">
             <router-link to="/patient-registry/personal-account">Личный кабинет</router-link>
              <!-- Блок авторизации -->
-            <div>
-              <div v-if="authStore.isAuthenticated" class="user-menu">
-                <div class="user-info">
-                  <span class="user-avatar">{{ authStore.userInitials }}</span>
-                  <span class="user-name">{{ authStore.userFullName }}</span>
-                </div>
-                  <button class="dropdown-item logout-btn" @click="handleLogout">
-                    Выйти
-                  </button>
-                </div>
-              <div v-else class="auth-buttons">
+            
+              <div v-if="!authStore.isAuthenticated" class="auth-buttons">
                 <router-link to="/login">Вход</router-link>
               </div>
-            </div>
             <!-- Блок авторизации -->
             <router-link to="/patient-registry/patient-map">
               Карта пациентов
@@ -88,12 +78,6 @@ onMounted(async () => {
   await authStore.initAuth();
   document.addEventListener('click', handleClickOutside);
 });
-
-// Функция выхода
-const handleLogout = () => {
-  authStore.logout();
-  router.push('/');
-};
 
 function handleClickOutside(event) {
   const clickedOutsideMenu =

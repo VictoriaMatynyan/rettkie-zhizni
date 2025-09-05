@@ -4,8 +4,16 @@ import { api } from '../services/api.js';
 // Приводим объект пользователя к единому формату
 function normalizeUser(user) {
   if (!user || typeof user !== 'object') return user;
-  const firstName = user.first_name ?? user.firstName ?? (user.name ? String(user.name).split(' ')[0] : undefined);
-  const lastName = user.last_name ?? user.lastName ?? (user.name ? String(user.name).split(' ').slice(1).join(' ') || undefined : undefined);
+  const firstName =
+    user.first_name ??
+    user.firstName ??
+    (user.name ? String(user.name).split(' ')[0] : undefined);
+  const lastName =
+    user.last_name ??
+    user.lastName ??
+    (user.name
+      ? String(user.name).split(' ').slice(1).join(' ') || undefined
+      : undefined);
   const userType = user.user_type ?? user.role ?? undefined;
   const isVerified = user.is_verified ?? user.isEmailVerified ?? undefined;
 
@@ -127,6 +135,23 @@ export const useAuthStore = defineStore('auth', {
       this.error = null;
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+    },
+
+    async logoutRemote() {
+      try {
+        const rt = this.refreshToken || localStorage.getItem('refreshToken');
+        if (rt) {
+          await api.auth.logout(rt);
+        }
+      } catch (e) {
+        // Не блокируем локальный выход, даже если сервер вернул ошибку
+        console.warn(
+          'Не удалось выйти из аккаунта:',
+          e?.response?.data || e.message || e
+        );
+      } finally {
+        this.logout();
+      }
     },
 
     async updateProfile(profileData) {

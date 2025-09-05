@@ -138,20 +138,34 @@
       <div v-if="isGeneticConfirmed" class="form-group">
         <label class="form-label"
           >Ген с мутацией
-          <select v-model="form.gene" class="form-select" required>
-            <option disabled value="">Выберите</option>
-            <option value="MECP2">MECP2</option>
-            <option value="CDKL5">CDKL5</option>
-            <option value="FOXG1">FOXG1</option>
-            <option value="другой">другой</option>
+          <select
+            v-model="form.geneId"
+            class="form-select"
+            :disabled="mutationGenesLoading || !!mutationGenesError"
+            required
+          >
+            <option disabled value="">
+              {{
+                mutationGenesLoading
+                  ? 'Загрузка…'
+                  : mutationGenesError
+                    ? 'Не удалось загрузить'
+                    : 'Выберите'
+              }}
+            </option>
+            <option
+              v-for="g in mutationGenes"
+              :key="g.id"
+              :value="g.id"
+            >
+              {{ g.name }}
+            </option>
           </select>
         </label>
+        <p v-if="mutationGenesError" class="alert alert-error">{{ mutationGenesError }}</p>
       </div>
 
-      <div
-        v-if="isGeneticConfirmed && form.gene === 'другой'"
-        class="form-group"
-      >
+      <div v-if="isGeneticConfirmed && isGeneOther" class="form-group">
         <label class="form-label"
           >Укажите ген
           <input
@@ -249,7 +263,7 @@ export default {
         countryOfResidence: '', // Россия / Другая страна
         cityId: '',
         geneticTestConfirmed: '', // да / нет
-        gene: '',
+        geneId: '',
         geneOther: '',
         geneticTestFile: null, // { name, type, size, dataUrl }
         diagnosisDescription: '',
@@ -258,6 +272,9 @@ export default {
       regions: [],
       regionsLoading: false,
       regionsError: '',
+      mutationGenes: [],
+      mutationGenesLoading: false,
+      mutationGenesError: '',
       triedSubmit: false,
       formError: '',
       fileError: '',
@@ -276,6 +293,12 @@ export default {
     isGeneticNotConfirmed() {
       return this.form.geneticTestConfirmed === 'нет';
     },
+    isGeneOther() {
+      if (!this.form.geneId) return false;
+      const g = this.mutationGenes.find(x => String(x.id) === String(this.form.geneId));
+      const name = (g?.name || '').toLowerCase();
+      return name === 'другое' || name === 'другой';
+    },
     canSubmit() {
       // Базовая блокировка кнопки, чтобы UX был понятен
       if (this.isCitizenshipOther) return false;
@@ -291,8 +314,8 @@ export default {
       if (this.isRussia && !this.form.cityId) return false;
       if (!this.form.geneticTestConfirmed) return false;
       if (this.isGeneticConfirmed) {
-        if (!this.form.gene) return false;
-        if (this.form.gene === 'другой' && !this.form.geneOther) return false;
+        if (!this.form.geneId) return false;
+        if (this.isGeneOther && !this.form.geneOther) return false;
       }
       if (this.isGeneticNotConfirmed && !this.form.diagnosisDescription)
         return false;
@@ -306,6 +329,7 @@ export default {
       this.form = { ...this.form, ...this.child };
     }
     this.fetchRegions();
+    this.fetchMutationGenes();
   },
   methods: {
     async fetchRegions() {
@@ -322,6 +346,28 @@ export default {
         this.regions = [];
       } finally {
         this.regionsLoading = false;
+      }
+    },
+    async fetchMutationGenes() {
+      this.mutationGenesLoading = true;
+      this.mutationGenesError = '';
+      try {
+        const res = await api.accounts.getMutationGenes();
+        this.mutationGenes = Array.isArray(res?.items) ? res.items : [];
+        // Автосопоставление ранее сохраненного текстового поля gene к id
+        if (!this.form.geneId && this.child && this.child.gene) {
+          const childGene = String(this.child.gene).toLowerCase();
+          const match = this.mutationGenes.find(
+            g => String(g.name).toLowerCase() === childGene
+          );
+          if (match) this.form.geneId = match.id;
+        }
+      } catch (e) {
+        this.mutationGenesError =
+          e?.response?.data?.message || e.message || 'Не удалось загрузить список генов';
+        this.mutationGenes = [];
+      } finally {
+        this.mutationGenesLoading = false;
       }
     },
     async onFileChange(e) {
@@ -405,11 +451,11 @@ export default {
         return false;
       }
       if (this.isGeneticConfirmed) {
-        if (!this.form.gene) {
+        if (!this.form.geneId) {
           this.formError = 'Укажите ген';
           return false;
         }
-        if (this.form.gene === 'другой' && !this.form.geneOther) {
+        if (this.isGeneOther && !this.form.geneOther) {
           this.formError = 'Укажите название гена';
           return false;
         }

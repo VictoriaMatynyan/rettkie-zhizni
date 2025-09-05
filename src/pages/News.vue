@@ -1,24 +1,11 @@
 <template>
   <div class="standard-page">
     <h1>Новости</h1>
-    <StandardContent
-      :paragraphs="[
-        'Добро пожаловать в раздел новостей, где вы найдёте последние события, связанные с синдромом Ретта, нововведения в лечении, а также мероприятия сообщества.',
-      ]"
-      :image-src="symptomsImg"
-      :image-src-modal="symptomsImg"
-      image-alt="Схема симптомов Ретта"
-      image-alt-modal="Схема симптомов Ретта"
-      download-link="/files/rett-info-brochure.pdf"
-      download-label="Скачать памятку по заболеванию: "
-      caption-text="Изображение: основные проявления синдрома Ретта"
-      download-link-name="Гайд-заглушка (1.2 МБ)"
-      video-url="https://rutube.ru/play/embed/someVideoId/"
-    >
-    </StandardContent>
 
     <section class="news-block">
       <h2 class="block-title">Последние новости</h2>
+      <p v-if="loading" class="status muted">Загрузка новостей…</p>
+      <p v-else-if="error" class="status error">{{ error }}</p>
       <div class="news-list">
         <div
           v-for="news in visibleNews"
@@ -40,94 +27,26 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { api } from '../services/api.js';
 import symptomsImg from '../assets/symptoms.png';
 import newsImg from '../assets/news.jpeg';
 import StandardContent from '../components/StandardContent.vue';
 
 const router = useRouter();
 
-// массив статей - заглушки; позже будут загружаться с сервера)
-const newsArr = [
-  {
-    id: 1,
-    title: 'Новость 1',
-    image: newsImg,
-    preview: 'Анонс новости',
-    date: '2025-06-01',
-  },
-  {
-    id: 2,
-    title: 'Новость 2',
-    image: newsImg,
-    preview: 'Анонс новости',
-    date: '2025-05-20',
-  },
-  {
-    id: 3,
-    title: 'Новость 3',
-    image: newsImg,
-    preview: 'Анонс новости',
-    date: '2025-05-21',
-  },
-  {
-    id: 4,
-    title: 'Новость 4',
-    image: newsImg,
-    preview: 'Анонс новости',
-    date: '2025-05-20',
-  },
-  {
-    id: 5,
-    title: 'Новость 5',
-    image: newsImg,
-    preview: 'Анонс новости',
-    date: '2025-05-20',
-  },
-  {
-    id: 6,
-    title: 'Новость 6',
-    image: newsImg,
-    preview: 'Анонс новости',
-    date: '2025-05-20',
-  },
-  {
-    id: 7,
-    title: 'Новость 7',
-    image: newsImg,
-    preview: 'Анонс новости',
-    date: '2025-05-20',
-  },
-  {
-    id: 8,
-    title: 'Новость 8',
-    image: newsImg,
-    preview: 'Анонс новости',
-    date: '2025-05-20',
-  },
-  {
-    id: 9,
-    title: 'Новость 9',
-    image: newsImg,
-    preview: 'Анонс новости',
-    date: '2025-05-20',
-  },
-  {
-    id: 10,
-    title: 'Новость 10',
-    image: newsImg,
-    preview: 'Анонс новости',
-    date: '2025-05-20',
-  },
-];
+// Данные новостей с backend
+const newsArr = ref([]);
+const loading = ref(false);
+const error = ref('');
 
-// кол-во отображаемых историй
+// пагинация на клиенте
 const pageSize = 9;
 const currentPage = ref(1);
 
 const sortedNews = computed(() =>
-  [...newsArr].sort((a, b) => new Date(b.date) - new Date(a.date))
+  [...newsArr.value].sort((a, b) => new Date(b.date) - new Date(a.date))
 );
 
 const visibleNews = computed(() =>
@@ -150,6 +69,30 @@ function formatDate(dateString) {
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
   return new Date(dateString).toLocaleDateString('ru-RU', options);
 }
+
+async function fetchNews() {
+  loading.value = true;
+  error.value = '';
+  try {
+    const res = await api.accounts.getNews();
+    const items = Array.isArray(res?.items) ? res.items : [];
+    newsArr.value = items.map(n => ({
+      id: n.id,
+      title: n.title,
+      image: n.photo || newsImg,
+      date: n.created_at,
+      preview: '',
+    }));
+  } catch (e) {
+    error.value =
+      e?.response?.data?.message || e.message || 'Не удалось загрузить новости';
+    newsArr.value = [];
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(fetchNews);
 </script>
 
 <style scoped>
@@ -236,6 +179,21 @@ function formatDate(dateString) {
 .load-more:hover {
   background-color: #2aaea2;
   color: #fff;
+}
+
+.status {
+  margin: 10px 0 16px;
+  font-size: 14px;
+}
+.status.muted {
+  color: #666;
+}
+.status.error {
+  color: #721c24;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 8px 10px;
+  border-radius: 6px;
 }
 
 .no-news {

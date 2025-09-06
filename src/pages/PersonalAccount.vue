@@ -55,8 +55,8 @@ const currentTabComponent = computed(() => {
   }
 });
 
-function handleLogout() {
-  authStore.logout();
+async function handleLogout() {
+  await authStore.logoutRemote();
   router.push('/');
 }
 </script>

@@ -33,11 +33,7 @@
       <div class="form-group">
         <label class="form-label"
           >Отчество
-          <input
-            v-model="form.middleName"
-            class="form-input"
-            type="text"
-          />
+          <input v-model="form.middleName" class="form-input" type="text" />
         </label>
       </div>
 
@@ -85,7 +81,11 @@
       <div class="form-group">
         <label class="form-label"
           >Страна проживания
-          <select v-model="form.countryOfResidence" class="form-select" required>
+          <select
+            v-model="form.countryOfResidence"
+            class="form-select"
+            required
+          >
             <option disabled value="">Выберите</option>
             <option value="Россия">Россия</option>
             <option value="Другая страна">Другая страна</option>
@@ -96,18 +96,38 @@
       <div v-if="isRussia" class="form-group">
         <label class="form-label"
           >Город / Населенный пункт
-          <select v-model="form.city" class="form-select" required>
-            <option disabled value="">Выберите город</option>
-            <option v-for="c in russianCities" :key="c" :value="c">{{ c }}</option>
+          <select
+            v-model="form.cityId"
+            class="form-select"
+            :disabled="regionsLoading || !!regionsError"
+            required
+          >
+            <option disabled value="">
+              {{
+                regionsLoading
+                  ? 'Загрузка городов…'
+                  : regionsError
+                    ? 'Не удалось загрузить'
+                    : 'Выберите город'
+              }}
+            </option>
+            <option v-for="c in regions" :key="c.id" :value="c.id">
+              {{ c.name }}
+            </option>
           </select>
         </label>
+        <p v-if="regionsError" class="alert alert-error">{{ regionsError }}</p>
       </div>
 
       <!-- Генетический анализ -->
       <div class="form-group">
         <label class="form-label"
           >Синдром Ретта подтвержден генетическим тестом?
-          <select v-model="form.geneticTestConfirmed" class="form-select" required>
+          <select
+            v-model="form.geneticTestConfirmed"
+            class="form-select"
+            required
+          >
             <option disabled value="">Выберите</option>
             <option value="да">да</option>
             <option value="нет">нет</option>
@@ -118,20 +138,42 @@
       <div v-if="isGeneticConfirmed" class="form-group">
         <label class="form-label"
           >Ген с мутацией
-          <select v-model="form.gene" class="form-select" required>
-            <option disabled value="">Выберите</option>
-            <option value="MECP2">MECP2</option>
-            <option value="CDKL5">CDKL5</option>
-            <option value="FOXG1">FOXG1</option>
-            <option value="другой">другой</option>
+          <select
+            v-model="form.geneId"
+            class="form-select"
+            :disabled="mutationGenesLoading || !!mutationGenesError"
+            required
+          >
+            <option disabled value="">
+              {{
+                mutationGenesLoading
+                  ? 'Загрузка…'
+                  : mutationGenesError
+                    ? 'Не удалось загрузить'
+                    : 'Выберите'
+              }}
+            </option>
+            <option
+              v-for="g in mutationGenes"
+              :key="g.id"
+              :value="g.id"
+            >
+              {{ g.name }}
+            </option>
           </select>
         </label>
+        <p v-if="mutationGenesError" class="alert alert-error">{{ mutationGenesError }}</p>
       </div>
 
-      <div v-if="isGeneticConfirmed && form.gene === 'другой'" class="form-group">
+      <div v-if="isGeneticConfirmed && isGeneOther" class="form-group">
         <label class="form-label"
           >Укажите ген
-          <input v-model="form.geneOther" class="form-input" type="text" required />
+          <input
+            v-model="form.geneOther"
+            class="form-input"
+            type="text"
+            required
+          />
         </label>
       </div>
 
@@ -145,8 +187,13 @@
             @change="onFileChange"
           />
         </label>
-        <p v-if="form.geneticTestFile && form.geneticTestFile.name" class="file-info">
-          Файл: {{ form.geneticTestFile.name }} ({{ prettySize(form.geneticTestFile.size) }})
+        <p
+          v-if="form.geneticTestFile && form.geneticTestFile.name"
+          class="file-info"
+        >
+          Файл: {{ form.geneticTestFile.name }} ({{
+            prettySize(form.geneticTestFile.size)
+          }})
         </p>
         <p v-if="fileError" class="alert alert-error">{{ fileError }}</p>
       </div>
@@ -161,16 +208,25 @@
             required
           />
         </label>
-        <div class="muted">Осталось символов: {{ 2000 - (form.diagnosisDescription?.length || 0) }}</div>
+        <div class="muted">
+          Осталось символов:
+          {{ 2000 - (form.diagnosisDescription?.length || 0) }}
+        </div>
       </div>
 
       <!-- Законный представитель -->
       <div class="form-group">
         <label class="checkbox-label">
-          <input type="checkbox" v-model="form.isLegalRepresentative" />
-          <span class="checkbox-text">Я являюсь законным представителем несовершеннолетнего ребенка/подопечного (родитель, опекун, попечитель)</span>
+          <input v-model="form.isLegalRepresentative" type="checkbox" />
+          <span class="checkbox-text"
+            >Я являюсь законным представителем несовершеннолетнего
+            ребенка/подопечного (родитель, опекун, попечитель)</span
+          >
         </label>
-        <p v-if="!form.isLegalRepresentative && triedSubmit" class="alert alert-error">
+        <p
+          v-if="!form.isLegalRepresentative && triedSubmit"
+          class="alert alert-error"
+        >
           Подтверждение законного представителя обязательно.
         </p>
       </div>
@@ -178,7 +234,7 @@
       <p v-if="formError" class="alert alert-error">{{ formError }}</p>
 
       <div class="form-buttons">
-        <button class="btn submit" type="submit" :disabled="!canSubmit">Сохранить</button>
+        <button class="btn submit" type="submit">Сохранить</button>
         <button class="btn cancel" type="button" @click="$emit('cancel')">
           Отмена
         </button>
@@ -188,6 +244,7 @@
 </template>
 
 <script>
+import { api } from '../services/api.js';
 export default {
   name: 'ChildForm',
   props: {
@@ -204,32 +261,20 @@ export default {
         birthDate: '',
         citizenship: '', // РФ / Другое
         countryOfResidence: '', // Россия / Другая страна
-        city: '',
+        cityId: '',
         geneticTestConfirmed: '', // да / нет
-        gene: '',
+        geneId: '',
         geneOther: '',
         geneticTestFile: null, // { name, type, size, dataUrl }
         diagnosisDescription: '',
         isLegalRepresentative: false,
       },
-      russianCities: [
-        'Москва',
-        'Санкт-Петербург',
-        'Новосибирск',
-        'Екатеринбург',
-        'Нижний Новгород',
-        'Казань',
-        'Челябинск',
-        'Самара',
-        'Омск',
-        'Ростов-на-Дону',
-        'Уфа',
-        'Красноярск',
-        'Воронеж',
-        'Пермь',
-        'Волгоград',
-        'Краснодар',
-      ],
+      regions: [],
+      regionsLoading: false,
+      regionsError: '',
+      mutationGenes: [],
+      mutationGenesLoading: false,
+      mutationGenesError: '',
       triedSubmit: false,
       formError: '',
       fileError: '',
@@ -248,19 +293,32 @@ export default {
     isGeneticNotConfirmed() {
       return this.form.geneticTestConfirmed === 'нет';
     },
+    isGeneOther() {
+      if (!this.form.geneId) return false;
+      const g = this.mutationGenes.find(x => String(x.id) === String(this.form.geneId));
+      const name = (g?.name || '').toLowerCase();
+      return name === 'другое' || name === 'другой';
+    },
     canSubmit() {
       // Базовая блокировка кнопки, чтобы UX был понятен
       if (this.isCitizenshipOther) return false;
       if (!this.form.isLegalRepresentative) return false;
-      if (!this.form.lastName || !this.form.firstName || !this.form.gender || !this.form.birthDate) return false;
+      if (
+        !this.form.lastName ||
+        !this.form.firstName ||
+        !this.form.gender ||
+        !this.form.birthDate
+      )
+        return false;
       if (!this.form.citizenship || !this.form.countryOfResidence) return false;
-      if (this.isRussia && !this.form.city) return false;
+      if (this.isRussia && !this.form.cityId) return false;
       if (!this.form.geneticTestConfirmed) return false;
       if (this.isGeneticConfirmed) {
-        if (!this.form.gene) return false;
-        if (this.form.gene === 'другой' && !this.form.geneOther) return false;
+        if (!this.form.geneId) return false;
+        if (this.isGeneOther && !this.form.geneOther) return false;
       }
-      if (this.isGeneticNotConfirmed && !this.form.diagnosisDescription) return false;
+      if (this.isGeneticNotConfirmed && !this.form.diagnosisDescription)
+        return false;
       if ((this.form.diagnosisDescription || '').length > 2000) return false;
       return true;
     },
@@ -270,8 +328,48 @@ export default {
       // Заполняем форму, сохраняя значения по умолчанию для новых полей
       this.form = { ...this.form, ...this.child };
     }
+    this.fetchRegions();
+    this.fetchMutationGenes();
   },
   methods: {
+    async fetchRegions() {
+      this.regionsLoading = true;
+      this.regionsError = '';
+      try {
+        const res = await api.accounts.getRegions();
+        this.regions = Array.isArray(res?.items) ? res.items : [];
+      } catch (e) {
+        this.regionsError =
+          e?.response?.data?.message ||
+          e.message ||
+          'Не удалось загрузить список городов';
+        this.regions = [];
+      } finally {
+        this.regionsLoading = false;
+      }
+    },
+    async fetchMutationGenes() {
+      this.mutationGenesLoading = true;
+      this.mutationGenesError = '';
+      try {
+        const res = await api.accounts.getMutationGenes();
+        this.mutationGenes = Array.isArray(res?.items) ? res.items : [];
+        // Автосопоставление ранее сохраненного текстового поля gene к id
+        if (!this.form.geneId && this.child && this.child.gene) {
+          const childGene = String(this.child.gene).toLowerCase();
+          const match = this.mutationGenes.find(
+            g => String(g.name).toLowerCase() === childGene
+          );
+          if (match) this.form.geneId = match.id;
+        }
+      } catch (e) {
+        this.mutationGenesError =
+          e?.response?.data?.message || e.message || 'Не удалось загрузить список генов';
+        this.mutationGenes = [];
+      } finally {
+        this.mutationGenesLoading = false;
+      }
+    },
     async onFileChange(e) {
       this.fileError = '';
       const file = e.target.files?.[0];
@@ -293,6 +391,7 @@ export default {
       }
       const dataUrl = await this.readAsDataURL(file);
       this.form.geneticTestFile = {
+        file,
         name: file.name,
         type: file.type,
         size: file.size,
@@ -326,10 +425,16 @@ export default {
         return false;
       }
       if (!this.form.isLegalRepresentative) {
-        this.formError = 'Необходимо подтвердить, что вы законный представитель';
+        this.formError =
+          'Необходимо подтвердить, что вы законный представитель';
         return false;
       }
-      if (!this.form.lastName || !this.form.firstName || !this.form.gender || !this.form.birthDate) {
+      if (
+        !this.form.lastName ||
+        !this.form.firstName ||
+        !this.form.gender ||
+        !this.form.birthDate
+      ) {
         this.formError = 'Заполните все обязательные поля';
         return false;
       }
@@ -337,7 +442,7 @@ export default {
         this.formError = 'Укажите гражданство и страну проживания';
         return false;
       }
-      if (this.isRussia && !this.form.city) {
+      if (this.isRussia && !this.form.cityId) {
         this.formError = 'Выберите город проживания';
         return false;
       }
@@ -346,11 +451,11 @@ export default {
         return false;
       }
       if (this.isGeneticConfirmed) {
-        if (!this.form.gene) {
+        if (!this.form.geneId) {
           this.formError = 'Укажите ген';
           return false;
         }
-        if (this.form.gene === 'другой' && !this.form.geneOther) {
+        if (this.isGeneOther && !this.form.geneOther) {
           this.formError = 'Укажите название гена';
           return false;
         }

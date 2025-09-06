@@ -95,11 +95,14 @@ export const api = {
       httpClient.post('/accounts/register/', payload).then(r => r.data),
     login: payload =>
       httpClient.post('/accounts/login/', payload).then(r => r.data),
+    // Выход с отзывом refresh токена
+    logout: refreshToken =>
+      httpClient
+        .post('/accounts/logout/', { refresh: refreshToken })
+        .then(r => r.data),
     // Запрос на отправку письма для восстановления пароля
     requestPasswordReset: ({ email }) =>
-      httpClient
-        .post('/accounts/password/reset/', { email })
-        .then(r => r.data),
+      httpClient.post('/accounts/password/reset/', { email }).then(r => r.data),
     // Подтверждение сброса пароля (если будет отдельная страница/форма)
     confirmPasswordReset: payload =>
       httpClient
@@ -117,6 +120,178 @@ export const api = {
     getRegions: () => httpClient.get('/accounts/regions/').then(r => r.data),
     getUserTypes: () =>
       httpClient.get('/accounts/user-types/').then(r => r.data),
+    // Типы генов мутации
+    getMutationGenes: () =>
+      httpClient.get('/accounts/mutation-genes/').then(r => r.data),
+    // Новости
+    getNews: () => httpClient.get('/accounts/news/').then(r => r.data),
+    getNewsById: id => httpClient.get(`/accounts/news/${id}`).then(r => r.data),
+
+    // Статистика анкет по городам
+    getQuestionnaireStatsByCity: () =>
+      httpClient.get('/accounts/questionnaires/stats/by-city/').then(r => r.data),
+    // Мои анкеты подопечных
+    getMyQuestionnaires: () =>
+      httpClient.get('/accounts/questionnaires/my/').then(r => r.data),
+    // Создание анкеты подопечного
+    createQuestionnaire: payload => {
+      const fd = new FormData();
+      // Поля ФИО
+      if (payload.lastName) fd.append('last_name', payload.lastName);
+      if (payload.firstName) fd.append('first_name', payload.firstName);
+      if (payload.middleName) fd.append('middle_name', payload.middleName);
+
+      // Пол: преобразуем м/ж в мужской/женский при необходимости
+      if (payload.gender) {
+        const g = payload.gender;
+        const gender = g === 'м' ? 'мужской' : g === 'ж' ? 'женский' : g;
+        fd.append('gender', gender);
+      }
+
+      // Дата рождения (YYYY-MM-DD)
+      if (payload.birthDate) fd.append('birth_date', payload.birthDate);
+
+      // Гражданство и страна проживания
+      if (payload.citizenship) {
+        const c = payload.citizenship;
+        const citizenship = c === 'РФ' ? 'Россия' : c;
+        fd.append('citizenship', citizenship);
+      }
+      if (payload.countryOfResidence) {
+        fd.append('country_of_residence', payload.countryOfResidence);
+      }
+
+      // Город: используем id из формы (без хардкода)
+      const cityId =
+        payload.city_id ??
+        payload.cityId ??
+        (payload.city && typeof payload.city === 'object'
+          ? payload.city.id
+          : null);
+      if (cityId !== null) fd.append('city_id', String(cityId));
+
+      // Подтверждение Ретта и детали диагноза
+      if (payload.geneticTestConfirmed)
+        fd.append('rett_confirmed', payload.geneticTestConfirmed);
+      if (payload.diagnosisDescription)
+        fd.append('diagnosis_details', payload.diagnosisDescription);
+
+      // Ген мутации: предпочтительно использовать явный geneId
+      if (payload.geneId) {
+        fd.append('mutation_gene_id', String(payload.geneId));
+      } else if (payload.gene) {
+        // Фолбэк: сопоставляем по названию для обратной совместимости
+        const geneMap = { MECP2: 1, CDKL5: 2, FOXG1: 3, Другое: 4, другой: 4 };
+        const geneId = geneMap[payload.gene];
+        if (geneId) fd.append('mutation_gene_id', String(geneId));
+      }
+      if (payload.geneOther) {
+        fd.append('mutation_gene_other', payload.geneOther);
+      }
+
+      // Законный представитель
+      if (typeof payload.isLegalRepresentative === 'boolean') {
+        fd.append(
+          'is_legal_representative',
+          String(payload.isLegalRepresentative)
+        );
+      }
+
+      // Файл генетического анализа
+      const fileObj = payload.geneticTestFile?.file || payload.geneticTestFile;
+      if (fileObj instanceof File) {
+        fd.append('genetic_scan', fileObj, fileObj.name);
+      }
+
+      return httpClient
+        .post('/accounts/questionnaires/', fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        .then(r => r.data);
+    },
+
+    // Обновление анкеты подопечного: отправляем только изменённые поля
+    updateQuestionnaire: (id, payload) => {
+      const fd = new FormData();
+
+      // Поля ФИО
+      if ('lastName' in payload && payload.lastName)
+        fd.append('last_name', payload.lastName);
+      if ('firstName' in payload && payload.firstName)
+        fd.append('first_name', payload.firstName);
+      if ('middleName' in payload)
+        fd.append('middle_name', payload.middleName || '');
+
+      // Пол
+      if ('gender' in payload && payload.gender) {
+        const g = payload.gender;
+        const gender = g === 'м' ? 'мужской' : g === 'ж' ? 'женский' : g;
+        fd.append('gender', gender);
+      }
+
+      // Дата рождения
+      if ('birthDate' in payload && payload.birthDate)
+        fd.append('birth_date', payload.birthDate);
+
+      // Гражданство / страна
+      if ('citizenship' in payload) {
+        const c = payload.citizenship;
+        const citizenship = c === 'РФ' ? 'Россия' : c || '';
+        fd.append('citizenship', citizenship);
+      }
+      if ('countryOfResidence' in payload)
+        fd.append('country_of_residence', payload.countryOfResidence || '');
+
+      // Город ID
+      if ('city_id' in payload && payload.city_id !== null) {
+        fd.append('city_id', String(payload.city_id));
+      } else if ('cityId' in payload && payload.cityId) {
+        fd.append('city_id', String(payload.cityId));
+      }
+
+      // Подтверждение Ретта и детали
+      if ('geneticTestConfirmed' in payload && payload.geneticTestConfirmed)
+        fd.append('rett_confirmed', payload.geneticTestConfirmed);
+      if ('diagnosisDescription' in payload)
+        fd.append('diagnosis_details', payload.diagnosisDescription || '');
+
+      // Ген мутации
+      if ('geneId' in payload && payload.geneId)
+        fd.append('mutation_gene_id', String(payload.geneId));
+      else if ('gene' in payload && payload.gene) {
+        const geneMap = { MECP2: 1, CDKL5: 2, FOXG1: 3, Другое: 4, другой: 4 };
+        const geneId = geneMap[payload.gene];
+        if (geneId) fd.append('mutation_gene_id', String(geneId));
+      }
+      if ('geneOther' in payload)
+        fd.append('mutation_gene_other', payload.geneOther || '');
+
+      // Законный представитель
+      if ('isLegalRepresentative' in payload) {
+        fd.append(
+          'is_legal_representative',
+          String(!!payload.isLegalRepresentative)
+        );
+      }
+
+      // Файл генетического анализа (только если новый файл)
+      const fileObj = payload.geneticTestFile?.file || payload.geneticTestFile;
+      if (fileObj instanceof File) {
+        fd.append('genetic_scan', fileObj, fileObj.name);
+      }
+
+      return httpClient
+        .post(`/accounts/questionnaires/${id}/update/`, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        .then(r => r.data);
+    },
+
+    // Удаление анкеты подопечного (POST с токеном)
+    deleteQuestionnaire: id =>
+      httpClient
+        .post(`/accounts/questionnaires/${id}/delete/`)
+        .then(r => r.data),
   },
 
   // Пользователи

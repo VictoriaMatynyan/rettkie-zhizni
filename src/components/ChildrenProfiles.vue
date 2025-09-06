@@ -73,27 +73,48 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        // Убедимся, что авторизация и пользователь доступны
+        // Обеспечим наличие токена/пользователя
         if (!this.authStore.isAuthenticated || !this.authStore.user) {
           await this.authStore.initAuth();
         }
-        const userId = this.authStore.user?.id;
-        if (!userId) {
-          this.children = [];
-          return;
-        }
-
-        // Основной запрос по userId
-        let list = await api.children.getByUserId(userId);
-
-        // Фолбэк: если id строковый и массив пуст — пробуем числовое значение
-        if (Array.isArray(list) && list.length === 0 && typeof userId === 'string' && !Number.isNaN(Number(userId))) {
-          list = await api.children.getByUserId(Number(userId));
-        }
-
-        // На всякий случай фильтруем по совпадению userId (строгая или приведенная)
-        const idStr = String(userId);
-        this.children = (list || []).filter(c => String(c.userId) === idStr);
+        // Загружаем анкеты текущего пользователя с backend
+        const res = await api.accounts.getMyQuestionnaires();
+        const items = Array.isArray(res?.items) ? res.items : [];
+        // Приводим к внутреннему формату полей, совместимому с ChildForm
+        this.children = items.map(item => ({
+          id: item.id,
+          userId: item.user_id,
+          lastName: item.last_name || '',
+          firstName: item.first_name || '',
+          middleName: item.middle_name || '',
+          gender: item.gender === 'женский' ? 'ж' : item.gender === 'мужской' ? 'м' : (item.gender || ''),
+          birthDate: item.birth_date || '',
+          citizenship: item.citizenship === 'Россия' ? 'РФ' : (item.citizenship || ''),
+          countryOfResidence: item.country_of_residence || '',
+          cityId: item.city?.id ?? '',
+          geneticTestConfirmed: item.rett_confirmed || '',
+          diagnosisDescription: item.diagnosis_details || '',
+          geneId: item.mutation_gene?.id ?? '',
+          geneOther: item.mutation_gene_other || '',
+          isLegalRepresentative: !!item.is_legal_representative,
+          // Показываем в плейсхолдере название файла, если пришёл URL
+          geneticTestFile: (() => {
+            const url = item.genetic_scan || '';
+            if (!url) return null;
+            try {
+              const name = decodeURIComponent(url.split('/').pop() || '');
+              return name ? { name, url } : null;
+            } catch (_) {
+              const name = (url.split('/').pop() || '').replace(/\?.*$/, '');
+              return name ? { name, url } : null;
+            }
+          })(),
+          // Дополнительно сохраняем для потенциального отображения
+          city: item.city || null,
+          mutationGene: item.mutation_gene || null,
+          createdAt: item.created_at,
+          updatedAt: item.updated_at,
+        }));
       } catch (e) {
         this.error = e?.response?.data?.message || e.message || 'Не удалось загрузить анкеты';
         this.children = [];
@@ -106,27 +127,71 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        const userId = this.authStore.user?.id;
-        if (!userId) throw new Error('Пользователь не найден');
-
+        let res;
         if (this.editedIndex !== null) {
-          const current = this.children[this.editedIndex];
-          const payload = { ...current, ...data, userId, updatedAt: new Date().toISOString() };
-          const updated = await api.children.update(current.id, payload);
-          this.children.splice(this.editedIndex, 1, updated);
+          // Редактирование: отправляем только изменённые поля
+          const original = this.children[this.editedIndex] || {};
+          const updated = data || {};
+          const diff = {};
+
+          const keys = [
+            'lastName',
+            'firstName',
+            'middleName',
+            'gender',
+            'birthDate',
+            'citizenship',
+            'countryOfResidence',
+            'cityId',
+            'geneticTestConfirmed',
+            'diagnosisDescription',
+            'geneId',
+            'geneOther',
+            'isLegalRepresentative',
+          ];
+
+          for (const k of keys) {
+            const a = original?.[k];
+            const b = updated?.[k];
+            if ((a ?? '') !== (b ?? '')) diff[k] = b;
+          }
+          // Обработка файла: если выбран новый файл — отправляем
+          if (updated?.geneticTestFile?.file instanceof File) {
+            diff.geneticTestFile = updated.geneticTestFile;
+          }
+          // city_id алиас для API
+          if ('cityId' in diff && diff.cityId != null) {
+            diff.city_id = diff.cityId;
+          }
+
+          // Если нет изменений — просто закрываем форму
+          const hasChanges =
+            Object.keys(diff).length > 0 ||
+            updated?.geneticTestFile?.file instanceof File;
+          if (!hasChanges) {
+            this.cancelEdit();
+            return;
+          }
+
+          const id = original.id;
+          res = await api.accounts.updateQuestionnaire(id, diff);
         } else {
-          const payload = {
+          // Создание
+          res = await api.accounts.createQuestionnaire({
             ...data,
-            userId,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
-          const created = await api.children.create(payload);
-          this.children.push(created);
+            city_id: data.cityId ?? data.city_id,
+          });
         }
+
+        // Успех
         this.cancelEdit();
+        await this.loadChildren();
+        try { alert('Анкета успешно сохранена'); } catch (_) {}
+        return res;
       } catch (e) {
-        this.error = e?.response?.data?.message || e.message || 'Не удалось сохранить анкету';
+        this.error =
+          e?.response?.data?.message || e.message || 'Не удалось сохранить анкету';
+        throw e;
       } finally {
         this.loading = false;
       }
@@ -138,8 +203,9 @@ export default {
       this.error = null;
       try {
         const child = this.children[index];
-        await api.children.delete(child.id);
-        this.children.splice(index, 1);
+        await api.accounts.deleteQuestionnaire(child.id);
+        // После успешного удаления — обновим список с сервера
+        await this.loadChildren();
       } catch (e) {
         this.error = e?.response?.data?.message || e.message || 'Не удалось удалить анкету';
       } finally {

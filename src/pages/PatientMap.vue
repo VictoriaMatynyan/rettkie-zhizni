@@ -1,52 +1,56 @@
 <template>
   <div class="patient-registry">
-    <h1 class="registry-title">Карта пациентов</h1>
-    <StandardContent
-      :paragraphs="[
-        'На этой карте отображено примерное распределение пациентов с синдромом Ретта по регионам России. Эти данные помогают специалистам и исследователям лучше понимать географию заболевания и разрабатывать более точные меры поддержки.',
-        'Количество пациентов отображается на основе данных, внесённых в реестр через Личный кабинет. Чем больше регистраций — тем точнее карта.',
-        'Если вы — родитель или опекун ребёнка с синдромом Ретта, зарегистрируйтесь в реестре, чтобы внести вклад в развитие сообщества.',
-      ]"
-      :image-src="symptomsImg"
-      :image-src-modal="symptomsImg"
-      image-alt="Карта пациентов"
-      image-alt-modal="Карта пациентов(увеличено)"
-      download-link="/files/rett-about.pdf"
-      download-label="Скачать презентацию о сообществе: "
-      caption-text="Фотография с мероприятия сообщества"
-      download-link-name="Презентация (1.3 МБ)"
-      video-url="https://rutube.ru/play/embed/someVideoId/"
-    />
     <div class="map-section">
       <h3 class="block-title">География пациентов</h3>
-      <YandexMap :points="regionData" />
+      <p v-if="loading" class="status muted">Загрузка карты…</p>
+      <p v-else-if="error" class="status error">{{ error }}</p>
+      <OSMMap v-else :points="points" />
     </div>
   </div>
 </template>
 
 <script setup>
 import StandardContent from '../components/StandardContent.vue';
-import symptomsImg from '../assets/symptoms.png';
-import YandexMap from '../components/YandexMap.vue';
+import OSMMap from '../components/OSMMap.vue';
 import { ref, onMounted } from 'vue';
-const regionData = ref([]);
+import { api } from '../services/api.js';
 
-onMounted(() => {
-  // симуляция получения данных из БД
-  regionData.value = [
-    { region: 'Москва', count: 25 },
-    { region: 'Московская область', count: 18 },
-    { region: 'Санкт-Петербург', count: 22 },
-    { region: 'Новосибирская область', count: 10 },
-    { region: 'Краснодарский край', count: 15 },
-    { region: 'Татарстан', count: 9 },
-  ];
-});
+const loading = ref(false);
+const error = ref('');
+const points = ref([]);
+
+async function fetchStats() {
+  loading.value = true;
+  error.value = '';
+  points.value = [];
+  try {
+    const res = await api.accounts.getQuestionnaireStatsByCity();
+    const items = Array.isArray(res?.items) ? res.items : [];
+    points.value = items
+      .filter(i => i && (i.count || i.count === 0))
+      .map(i => ({
+        id: i.id,
+        name: i.name,
+        lat: Number(i.lat),
+        lon: Number(i.lon),
+        count: Number(i.count) || 0,
+      }));
+  } catch (e) {
+    error.value =
+      e?.response?.data?.message ||
+      e.message ||
+      'Не удалось загрузить статистику по городам';
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(fetchStats);
 </script>
 
 <style scoped>
 .patient-registry {
-  max-width: 1050px;
+  width: 100%;
   margin: 0 auto;
   padding: 32px 16px;
 }
@@ -92,5 +96,20 @@ onMounted(() => {
 .btn-register:hover {
   background-color: #2aaea2;
   color: #fff;
+}
+
+.status {
+  margin: 10px 0 16px;
+  font-size: 14px;
+}
+.status.muted {
+  color: #666;
+}
+.status.error {
+  color: #721c24;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 8px 10px;
+  border-radius: 6px;
 }
 </style>

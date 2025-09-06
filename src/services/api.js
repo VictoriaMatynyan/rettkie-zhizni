@@ -126,6 +126,10 @@ export const api = {
     // Новости
     getNews: () => httpClient.get('/accounts/news/').then(r => r.data),
     getNewsById: id => httpClient.get(`/accounts/news/${id}`).then(r => r.data),
+
+    // Статистика анкет по городам
+    getQuestionnaireStatsByCity: () =>
+      httpClient.get('/accounts/questionnaires/stats/by-city/').then(r => r.data),
     // Мои анкеты подопечных
     getMyQuestionnaires: () =>
       httpClient.get('/accounts/questionnaires/my/').then(r => r.data),

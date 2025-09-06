@@ -64,6 +64,8 @@ const routes = [
     name: 'PatientMap',
     component: PatientMap,
   },
+  // Поддержка префикса "/rettkie-zhizni" для карты пациентов
+  { path: '/rettkie-zhizni/patient-registry/patient-map', redirect: '/patient-registry/patient-map' },
   {
     path: '/patient-registry/privacy-policy',
     name: 'PrivacyPolicy',

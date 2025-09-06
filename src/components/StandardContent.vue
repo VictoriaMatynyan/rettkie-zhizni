@@ -33,9 +33,8 @@
       }}</a>
     </p>
 
-    <div class="video-section">
+    <div v-if="videoUrl && finalShowVideo" class="video-section">
       <iframe
-        v-if="videoUrl && showVideo"
         width="720"
         height="405"
         :src="videoUrl"
@@ -51,7 +50,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+import { useRoute } from 'vue-router';
 
 const props = defineProps({
   paragraphs: Array,
@@ -64,10 +64,22 @@ const props = defineProps({
   imageAltModal: String,
   captionText: String,
   videoUrl: String,
+  showVideo: { type: Boolean, default: undefined },
+  hideVideoOnRoutes: { type: Array, default: () => [] },
 });
 
+const route = useRoute();
 const modalOpen = ref(false);
-const showVideo = import.meta.env.PROD;
+const envShow = import.meta.env.PROD;
+const hiddenByRoute = computed(() => {
+  const list = props.hideVideoOnRoutes || [];
+  return list.some(r => r === route.name || r === route.path);
+});
+const finalShowVideo = computed(() => {
+  if (hiddenByRoute.value) return false;
+  if (typeof props.showVideo === 'boolean') return props.showVideo;
+  return envShow;
+});
 
 const openModal = () => {
   modalOpen.value = true;

@@ -148,6 +148,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-wrap: nowrap;
 }
 
 .main-nav a {
@@ -155,6 +156,7 @@ onBeforeUnmount(() => {
   color: #333;
   padding: 0;
   transition: color 0.2s;
+  white-space: nowrap; /* не переносим пункты меню на 2 строки */
 }
 
 .main-nav a:hover {
@@ -205,6 +207,7 @@ onBeforeUnmount(() => {
 .dropdown-trigger {
   cursor: pointer;
   padding: 0;
+  white-space: nowrap; /* не ломаемся на две строки */
 }
 
 .dropdown-trigger:hover {
@@ -427,6 +430,39 @@ onBeforeUnmount(() => {
   .main-nav a,
   .dropdown {
     width: 100%;
+  }
+  /* На мобильном позволяем перенос строк для длинных пунктов */
+  .main-nav a,
+  .dropdown-trigger {
+    white-space: normal;
+  }
+}
+
+/* Сглаживаем сжатие меню между 1216px и бургером */
+@media (max-width: 1216px) and (min-width: 1191px) {
+  .header-container {
+    padding: 0 12px;
+  }
+
+  .logo-img {
+    height: 30px;
+  }
+  .site-title {
+    font-size: 16px;
+  }
+
+  .main-nav {
+    gap: 12px;
+  }
+
+  .main-nav a {
+    font-size: 15px;
+  }
+
+  .main-nav > .btn-donate,
+  .main-nav > .btn-help {
+    padding: 6px 10px;
+    font-size: 13px;
   }
 }
 </style>

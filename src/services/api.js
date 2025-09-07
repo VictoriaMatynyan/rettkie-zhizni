@@ -113,6 +113,19 @@ export const api = {
         .post('/accounts/refresh/', { refresh: refreshToken })
         .then(r => r.data),
     me: () => httpClient.get('/accounts/me/').then(r => r.data),
+    // Обновление профиля текущего пользователя
+    updateMe: async payload => {
+      try {
+        const r = await httpClient.post('/accounts/me/update/', payload);
+        return r.data;
+      } catch (e) {
+        if (e?.response?.status === 405) {
+          const r2 = await httpClient.patch('/accounts/me/update/', payload);
+          return r2.data;
+        }
+        throw e;
+      }
+    },
   },
 
   // Справочники аккаунтов

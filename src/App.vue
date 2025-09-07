@@ -20,6 +20,7 @@ import Footer from './components/Footer.vue';
   height: 100vh;
 }
 .main-content {
+  width: 100%;
   flex: 1;
   align-self: center;
 }

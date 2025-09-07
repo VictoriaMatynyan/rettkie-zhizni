@@ -25,7 +25,7 @@ import StoryPage from '../pages/StoryPage.vue';
 import Support from '../pages/Support.vue';
 
 const routes = [
-  { path: '/rettkie-zhizni', name: 'Home', component: HomePage },
+  { path: '/', name: 'Home', component: HomePage },
   { path: '/about-rett', name: 'AboutRett', component: AboutRett },
   { path: '/doctors', name: 'Doctors', component: Doctors },
   { path: '/patients/newbie', name: 'Newbie', component: Newbie },
@@ -51,8 +51,7 @@ const routes = [
     name: 'PatientRegistry',
     component: PatientRegistry,
   },
-  // Поддержка ссылок с префиксом "/rettkie-zhizni" для реестра
-  { path: '/rettkie-zhizni/patient-registry', redirect: '/patient-registry' },
+  // Ранее поддерживался префикс "/rettkie-zhizni" — убрано
   {
     path: '/patient-registry/personal-account',
     name: 'PersonalAccount',
@@ -64,8 +63,7 @@ const routes = [
     name: 'PatientMap',
     component: PatientMap,
   },
-  // Поддержка префикса "/rettkie-zhizni" для карты пациентов
-  { path: '/rettkie-zhizni/patient-registry/patient-map', redirect: '/patient-registry/patient-map' },
+  // Ранее поддерживался префикс "/rettkie-zhizni" — убрано
   {
     path: '/patient-registry/privacy-policy',
     name: 'PrivacyPolicy',
@@ -81,13 +79,12 @@ const routes = [
   { path: '/password-reset/confirm/:uid/:token', name: 'PasswordResetConfirm', component: () => import('../pages/PasswordResetConfirm.vue') },
 
   // Перенаправления
-  { path: '/', redirect: '/rettkie-zhizni' },
   { path: '/personal-account', redirect: '/patient-registry/personal-account' },
 ];
 
 // Создание роутера
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   // автоматически прокручивает страницу вверх после перехода на другую
   scrollBehavior() {

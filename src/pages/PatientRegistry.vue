@@ -15,18 +15,15 @@
       download-link-name="Презентация (1.3 МБ)"
       video-url="https://rutube.ru/play/embed/someVideoId/"
     />
-    <div class="map-section">
-      <h3 class="block-title">География пациентов</h3>
-      <YandexMap :points="regionData" />
-    </div>
+    <OSMMap :points="points" />
   </div>
 </template>
 
 <script setup>
 import StandardContent from '../components/StandardContent.vue';
 import symptomsImg from '../assets/symptoms.png';
-import YandexMap from '../components/YandexMap.vue';
 import { ref, onMounted } from 'vue';
+import OSMMap from '../components/OSMMap.vue';
 const regionData = ref([]);
 
 onMounted(() => {
@@ -44,9 +41,10 @@ onMounted(() => {
 
 <style scoped>
 .patient-registry {
-  max-width: 1050px;
+  /* max-width: 1050px; */
   margin: 0 auto;
   padding: 32px 16px;
+  box-sizing: border-box;
 }
 
 .registry-title {

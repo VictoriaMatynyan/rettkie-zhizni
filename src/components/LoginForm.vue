@@ -47,16 +47,6 @@
           Забыли пароль?
         </a>
       </div>
-
-      <div class="test-accounts">
-        <h4>Тестовые аккаунты:</h4>
-        <div class="test-account" @click="fillTestAdmin">
-          <strong>Администратор:</strong> admin@rett.ru / admin123
-        </div>
-        <div class="test-account" @click="fillTestParent">
-          <strong>Родитель:</strong> parent@example.com / parent123
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -104,16 +94,6 @@ export default {
 
     handleForgotPassword() {
       this.$router.push('/password-reset');
-    },
-
-    fillTestAdmin() {
-      this.form.email = 'admin@rett.ru';
-      this.form.password = 'admin123';
-    },
-
-    fillTestParent() {
-      this.form.email = 'parent@example.com';
-      this.form.password = 'parent123';
     },
   },
 };
@@ -223,34 +203,6 @@ export default {
 
 .auth-link:hover {
   text-decoration: underline;
-}
-
-.test-accounts {
-  margin-top: 30px;
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
-}
-
-.test-accounts h4 {
-  margin: 0 0 15px 0;
-  color: #495057;
-  font-size: 14px;
-}
-
-.test-account {
-  margin: 8px 0;
-  padding: 8px;
-  background-color: white;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-  transition: background-color 0.2s ease;
-}
-
-.test-account:hover {
-  background-color: #e9ecef;
 }
 
 @media (max-width: 480px) {

@@ -55,13 +55,13 @@
       <div class="form-group notications">
         <label>
           <input
-            id="notifications"
-            v-model="form.notifications"
+            id="email_notifications"
+            v-model="form.email_notifications"
             type="checkbox"
-            name="notifications"
+            name="email_notifications"
           />
 
-          <span v-if="showHelp.notifications" class="label-text">
+          <span v-if="showHelp.email_notifications" class="label-text">
             Получать важные новости на почту
           </span>
         </label>
@@ -83,7 +83,7 @@ import { useAuthStore } from '../stores/auth.js';
 const authStore = useAuthStore();
 
 const form = ref({
-  notifications: true,
+  email_notifications: true,
   first_name: '',
   last_name: '',
   email: '',
@@ -93,7 +93,7 @@ const form = ref({
 const submitted = ref(false);
 
 const showHelp = {
-  notifications: true,
+  email_notifications: true,
   first_name: true,
   last_name: true,
   email: true,
@@ -106,6 +106,10 @@ function syncFormFromUser() {
   form.value.last_name = u.last_name ?? u.lastName ?? '';
   form.value.email = u.email || '';
   form.value.phone = u.phone || '';
+  // Настройка уведомлений: используем только email_notifications с бэкенда
+  if (typeof u.email_notifications === 'boolean') {
+    form.value.email_notifications = u.email_notifications;
+  }
 }
 
 // Обновляем поля, когда меняется пользователь
@@ -125,12 +129,21 @@ onMounted(async () => {
   syncFormFromUser();
 });
 
-function handleSubmit() {
-  // здесь будет API-запрос на POST/UPDATE
-  submitted.value = true;
-  setTimeout(() => {
-    submitted.value = false;
-  }, 5000);
+async function handleSubmit() {
+  try {
+    authStore.clearError();
+    await authStore.updateProfile({
+      first_name: form.value.first_name,
+      last_name: form.value.last_name,
+      email: form.value.email,
+      phone: form.value.phone,
+      email_notifications: !!form.value.email_notifications,
+    });
+    submitted.value = true;
+    setTimeout(() => (submitted.value = false), 5000);
+  } catch (e) {
+    // Ошибка уже хранится в authStore.error, можно дополнительно показать alert
+  }
 }
 </script>
 

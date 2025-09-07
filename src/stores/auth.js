@@ -158,10 +158,17 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true;
       this.error = null;
       try {
-        const updatedUser = await api.users.update(this.user.id, {
-          ...this.user,
-          ...profileData,
-        });
+        // Отправляем только поддерживаемые поля профиля
+        const data = {
+          first_name: profileData.first_name ?? this.user?.first_name ?? '',
+          last_name: profileData.last_name ?? this.user?.last_name ?? '',
+          email: profileData.email ?? this.user?.email ?? '',
+          phone: profileData.phone ?? this.user?.phone ?? '',
+        };
+        if ('email_notifications' in profileData) {
+          data.email_notifications = !!profileData.email_notifications;
+        }
+        const updatedUser = await api.auth.updateMe(data);
         this.user = normalizeUser(updatedUser);
         return updatedUser;
       } catch (e) {

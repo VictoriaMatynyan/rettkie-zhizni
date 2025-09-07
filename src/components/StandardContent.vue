@@ -46,12 +46,18 @@
         title="Видеоплеер"
       ></iframe>
     </div>
+    <!-- Optional OSM Map section -->
+    <div v-if="showMap" class="map-section">
+      <h3 v-if="mapTitle" class="map-title">{{ mapTitle }}</h3>
+      <OSMMap :points="mapPoints" />
+    </div>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useRoute } from 'vue-router';
+import OSMMap from './OSMMap.vue';
 
 const props = defineProps({
   paragraphs: Array,
@@ -66,6 +72,10 @@ const props = defineProps({
   videoUrl: String,
   showVideo: { type: Boolean, default: undefined },
   hideVideoOnRoutes: { type: Array, default: () => [] },
+  // OSM Map integration
+  showMap: { type: Boolean, default: false },
+  mapPoints: { type: Array, default: () => [] },
+  mapTitle: { type: String, default: '' },
 });
 
 const route = useRoute();
@@ -133,7 +143,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
   justify-content: center;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.4);
-  z-index: 9999;
+  z-index: 10;
 }
 
 .media-section__modal-image {
@@ -177,5 +187,14 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
   height: 100%;
   border: none;
   border-radius: 8px;
+}
+
+.map-section {
+  margin-top: 32px;
+}
+.map-title {
+  font-size: 22px;
+  margin-bottom: 16px;
+  text-align: left;
 }
 </style>

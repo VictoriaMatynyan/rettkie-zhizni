@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import StandardContent from '../components/StandardContent.vue';
+// import StandardContent from '../components/StandardContent.vue';
 import OSMMap from '../components/OSMMap.vue';
 import { ref, onMounted } from 'vue';
 import { api } from '../services/api.js';
@@ -53,6 +53,7 @@ onMounted(fetchStats);
   width: 100%;
   margin: 0 auto;
   padding: 32px 16px;
+  box-sizing: border-box;
 }
 
 .registry-title {

@@ -1,7 +1,7 @@
 <template>
   <header class="site-header">
     <div class="header-container">
-      <router-link to="/rettkie-zhizni" class="logo-block">
+      <router-link to="/" class="logo-block">
         <img src="/src/assets/logo_square.png" alt="Логотип" class="logo-img" />
         <span class="site-title">РЕТТкие Жизни</span>
       </router-link>
@@ -38,23 +38,27 @@
         <div class="dropdown">
           <router-link to="/patient-registry">Реестр пациентов</router-link>
           <div class="dropdown-content">
-            <router-link to="/patient-registry/personal-account">Личный кабинет</router-link>
-             <!-- Блок авторизации -->
-            
-              <div v-if="!authStore.isAuthenticated" class="auth-buttons">
-                <router-link to="/login">Вход</router-link>
-              </div>
+            <router-link to="/patient-registry/personal-account"
+              >Личный кабинет</router-link
+            >
+            <!-- Блок авторизации -->
+
+            <div v-if="!authStore.isAuthenticated" class="auth-buttons">
+              <router-link to="/login">Вход</router-link>
+            </div>
             <!-- Блок авторизации -->
             <router-link to="/patient-registry/patient-map">
               Карта пациентов
             </router-link>
             <router-link to="/patient-registry/privacy-policy"
-              >Политика обработки персональных данных</router-link>
+              >Политика обработки персональных данных</router-link
+            >
           </div>
         </div>
         <router-link to="/donate" class="btn-donate">Помочь</router-link>
         <router-link to="/patients/newbie" class="btn-help"
-          >Что делать</router-link>
+          >Что делать</router-link
+        >
       </nav>
     </div>
   </header>
@@ -105,7 +109,7 @@ onBeforeUnmount(() => {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 10;
 }
 
 .header-container {
@@ -219,7 +223,7 @@ onBeforeUnmount(() => {
   padding: 8px 0;
   top: 100%;
   left: 0;
-  z-index: 10;
+  z-index: 20;
   min-width: 160px;
 }
 
@@ -329,7 +333,7 @@ onBeforeUnmount(() => {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   padding: 8px 0;
   min-width: 180px;
-  z-index: 1000;
+  z-index: 30;
 }
 
 .user-menu:hover .user-dropdown {

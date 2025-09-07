@@ -31,8 +31,7 @@ export default [
         process: 'readonly',
         __dirname: 'readonly',
         __filename: 'readonly',
-        // Yandex Maps API
-        ymaps: 'readonly',
+        
       },
     },
     rules: {
@@ -74,8 +73,7 @@ export default [
         window: 'readonly',
         document: 'readonly',
         console: 'readonly',
-        // Yandex Maps API
-        ymaps: 'readonly',
+        
       },
     },
     rules: {

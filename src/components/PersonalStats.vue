@@ -26,7 +26,7 @@
         </label>
       </div>
 
-      <div class="bar-chart" v-if="chartItems.length">
+      <div v-if="chartItems.length" class="bar-chart">
         <div
           v-for="bar in chartItems"
           :key="bar.key"

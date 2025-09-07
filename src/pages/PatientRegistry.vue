@@ -14,8 +14,10 @@
       caption-text="Фотография с мероприятия сообщества"
       download-link-name="Презентация (1.3 МБ)"
       video-url="https://rutube.ru/play/embed/someVideoId/"
+      :show-map="true"
+      :map-points="points"
     />
-    <OSMMap :points="points" />
+    
   </div>
 </template>
 
@@ -23,8 +25,27 @@
 import StandardContent from '../components/StandardContent.vue';
 import symptomsImg from '../assets/symptoms.png';
 import { ref, onMounted } from 'vue';
-import OSMMap from '../components/OSMMap.vue';
+import { api } from '../services/api.js';
 const regionData = ref([]);
+const points = ref([]);
+
+async function fetchCityStats() {
+  try {
+    const res = await api.accounts.getQuestionnaireStatsByCity();
+    const items = Array.isArray(res?.items) ? res.items : [];
+    points.value = items
+      .filter(i => i && (i.count || i.count === 0))
+      .map(i => ({
+        id: i.id,
+        name: i.name,
+        lat: Number(i.lat),
+        lon: Number(i.lon),
+        count: Number(i.count) || 0,
+      }));
+  } catch (e) {
+    points.value = [];
+  }
+}
 
 onMounted(() => {
   // симуляция получения данных из БД
@@ -36,6 +57,7 @@ onMounted(() => {
     { region: 'Краснодарский край', count: 15 },
     { region: 'Татарстан', count: 9 },
   ];
+  fetchCityStats();
 });
 </script>
 

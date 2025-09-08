@@ -2,7 +2,6 @@
   <div class="auth-form-container">
     <div class="auth-form">
       <h2 class="auth-title">Регистрация</h2>
-
       <form @submit.prevent="handleRegister">
         <div class="form-row">
           <div class="form-group">
@@ -57,7 +56,6 @@
             placeholder="+7 999 123-45-67"
           />
         </div>
-
         <div class="form-group">
           <label for="region_id" class="form-label">Регион *</label>
           <select
@@ -77,7 +75,6 @@
             </option>
           </select>
         </div>
-
         <div class="form-group">
           <label for="user_type_id" class="form-label">Кто вы? *</label>
           <select
@@ -93,7 +90,6 @@
             </option>
           </select>
         </div>
-
         <div class="form-row">
           <div class="form-group">
             <label for="password" class="form-label">Пароль *</label>
@@ -108,7 +104,6 @@
               minlength="6"
             />
           </div>
-
           <div class="form-group">
             <label for="confirmPassword" class="form-label"
               >Повторите пароль *</label
@@ -124,7 +119,6 @@
             />
           </div>
         </div>
-
         <div class="form-group">
           <label class="checkbox-label">
             <input
@@ -141,16 +135,18 @@
             </span>
           </label>
         </div>
-
         <div v-if="registrationSuccess" class="success-message">
           Регистрация прошла успешно! Пожалуйста, проверьте вашу электронную
           почту для подтверждения аккаунта.
+          <div v-if="emailServiceUrl" class="go-to-email">
+            <a :href="emailServiceUrl" target="_blank" rel="noopener" class="email-link">
+              Перейти к почте {{ submittedEmail }}
+            </a>
+          </div>
         </div>
-
         <div v-if="error" class="error-message">
           {{ error }}
         </div>
-
         <button
           type="submit"
           class="auth-button"
@@ -159,7 +155,6 @@
           {{ loading ? 'Регистрация...' : 'Зарегистрироваться' }}
         </button>
       </form>
-
       <div class="auth-links">
         <router-link to="/login" class="auth-link">
           Уже есть аккаунт? Войти
@@ -188,6 +183,8 @@ export default {
         password_confirm: '',
         consent: false,
       },
+      // Сохраняем email, использованный при регистрации, для ссылки на почту
+      submittedEmail: '',
       regions: [],
       userTypes: [],
       dictLoading: false,
@@ -204,6 +201,15 @@ export default {
     },
     error() {
       return this.authStore.error;
+    },
+    // домен email для построения ссылки на почтовый сервис
+    emailDomain() {
+      const e = this.submittedEmail || this.form.email || '';
+      const m = e.match(/@([\w.-]+)/);
+      return m ? m[1].toLowerCase() : '';
+    },
+    emailServiceUrl() {
+      return this.resolveMailUrl(this.emailDomain);
     },
     isFormValid() {
       return (
@@ -227,6 +233,54 @@ export default {
     await this.loadDictionaries();
   },
   methods: {
+    // Определяем ссылку на почтовый сервис по домену
+    resolveMailUrl(domain) {
+      if (!domain) return null;
+      const MAP = {
+        'ya.ru': 'https://mail.yandex.ru/',
+        'yandex.ru': 'https://mail.yandex.ru/',
+        'yandex.com': 'https://mail.yandex.com/',
+        'yandex.kz': 'https://mail.yandex.kz/',
+        'yandex.by': 'https://mail.yandex.by/',
+        'yandex.ua': 'https://mail.yandex.ua/',
+        'mail.ru': 'https://e.mail.ru/inbox/',
+        'bk.ru': 'https://e.mail.ru/inbox/',
+        'inbox.ru': 'https://e.mail.ru/inbox/',
+        'list.ru': 'https://e.mail.ru/inbox/',
+        'gmail.com': 'https://mail.google.com/',
+        'googlemail.com': 'https://mail.google.com/',
+        'outlook.com': 'https://outlook.live.com/',
+        'hotmail.com': 'https://outlook.live.com/',
+        'live.com': 'https://outlook.live.com/',
+        'msn.com': 'https://outlook.live.com/',
+        'icloud.com': 'https://www.icloud.com/mail',
+        'me.com': 'https://www.icloud.com/mail',
+        'mac.com': 'https://www.icloud.com/mail',
+        'rambler.ru': 'https://mail.rambler.ru/',
+        'autorambler.ru': 'https://mail.rambler.ru/',
+        'lenta.ru': 'https://mail.rambler.ru/',
+        'myrambler.ru': 'https://mail.rambler.ru/',
+        'ro.ru': 'https://mail.rambler.ru/',
+        'yahoo.com': 'https://mail.yahoo.com/',
+        'proton.me': 'https://mail.proton.me/',
+        'protonmail.com': 'https://mail.proton.me/',
+        'zoho.com': 'https://mail.zoho.com/',
+        'gmx.com': 'https://www.gmx.com/',
+        'gmx.net': 'https://www.gmx.net/',
+        'fastmail.com': 'https://app.fastmail.com/',
+      };
+      if (MAP[domain]) return MAP[domain];
+      if (domain.includes('yandex')) return 'https://mail.yandex.ru/';
+      if (domain.includes('mail.ru')) return 'https://e.mail.ru/inbox/';
+      if (domain.includes('gmail') || domain.includes('googlemail')) return 'https://mail.google.com/';
+      if (domain.includes('outlook') || domain.includes('hotmail') || domain.includes('live') || domain.includes('msn')) {
+        return 'https://outlook.live.com/';
+      }
+      if (domain.includes('rambler')) return 'https://mail.rambler.ru/';
+      if (domain.includes('yahoo')) return 'https://mail.yahoo.com/';
+      if (domain.includes('proton')) return 'https://mail.proton.me/';
+      return null;
+    },
     async loadDictionaries() {
       this.dictError = '';
       this.dictLoading = true;
@@ -270,18 +324,12 @@ export default {
 
       try {
         await this.authStore.register(this.form);
-
+        // Сохраняем email для ссылки на почту
+        this.submittedEmail = this.form.email;
         // Показываем сообщение об успешной регистрации
         this.registrationSuccess = true;
-
-        // Очищаем поля формы
+        // Очищаем поля формы (email уже сохранен отдельно)
         this.resetForm();
-
-        // Перенаправляем на страницу подтверждения email
-        this.$router.push({
-          name: 'registration-success',
-          query: { email: this.form.email },
-        });
       } catch (error) {
         console.error('Registration failed:', error);
       }
@@ -423,6 +471,30 @@ export default {
 
 .auth-link:hover {
   text-decoration: underline;
+}
+
+.go-to-email {
+  margin-top: 12px;
+}
+
+.email-link {
+  color: #23938c;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.email-link:hover {
+  text-decoration: underline;
+}
+
+.success-message {
+  background-color: #e8f8f2;
+  color: #0f8a66;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  text-align: center;
+  border: 1px solid #bde9dc;
 }
 
 @media (max-width: 768px) {

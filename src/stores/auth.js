@@ -16,6 +16,11 @@ function normalizeUser(user) {
       : undefined);
   const userType = user.user_type ?? user.role ?? undefined;
   const isVerified = user.is_verified ?? user.isEmailVerified ?? undefined;
+  // Флаг подписки приходит как receive_news (boolean)
+  const emailNotificationsRaw = user.receive_news ?? user.email_notifications;
+  const emailNotifications = typeof emailNotificationsRaw === 'boolean'
+    ? emailNotificationsRaw
+    : undefined;
 
   return {
     ...user,
@@ -23,6 +28,7 @@ function normalizeUser(user) {
     last_name: lastName,
     user_type: userType,
     is_verified: isVerified,
+    email_notifications: emailNotifications,
   };
 }
 
@@ -154,23 +160,52 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    async updateProfile(profileData) {
+    async updateProfile(profileData, options = {}) {
       this.loading = true;
       this.error = null;
       try {
-        // Отправляем только поддерживаемые поля профиля
-        const data = {
-          first_name: profileData.first_name ?? this.user?.first_name ?? '',
-          last_name: profileData.last_name ?? this.user?.last_name ?? '',
-          email: profileData.email ?? this.user?.email ?? '',
-          phone: profileData.phone ?? this.user?.phone ?? '',
-        };
-        if ('email_notifications' in profileData) {
-          data.email_notifications = !!profileData.email_notifications;
+        // Вычисляем изменённые поля относительно текущего пользователя,
+        // либо отправляем как есть, если включён режим force.
+        const allowedKeys = [
+          'first_name',
+          'last_name',
+          'email',
+          'phone',
+          'email_notifications',
+        ];
+
+        const current = this.user ? normalizeUser(this.user) : {};
+        const changed = {};
+
+        if (options.force) {
+          for (const key of allowedKeys) {
+            if (!(key in profileData)) continue;
+            if (key === 'email_notifications') changed.receive_news = !!profileData[key];
+            else changed[key] = profileData[key];
+          }
+        } else {
+          for (const key of allowedKeys) {
+            if (!(key in profileData)) continue;
+            const newVal = key === 'email_notifications' ? !!profileData[key] : profileData[key];
+            const curVal = current?.[key];
+            // Отправляем только реально изменившиеся значения (включая пустые строки)
+            if (newVal !== curVal) {
+              if (key === 'email_notifications') changed.receive_news = newVal;
+              else changed[key] = newVal;
+            }
+          }
         }
-        const updatedUser = await api.auth.updateMe(data);
-        this.user = normalizeUser(updatedUser);
-        return updatedUser;
+
+        // Если изменений нет — возвращаем текущего пользователя без запроса
+        if (Object.keys(changed).length === 0) {
+          return this.user;
+        }
+
+        // Делаем запрос обновления и мёрджим частичный ответ с текущим пользователем
+        const updatedUser = await api.auth.updateMe(changed);
+        const merged = normalizeUser({ ...(this.user || {}), ...(updatedUser || {}) });
+        this.user = merged;
+        return merged;
       } catch (e) {
         this.error = e?.response?.data?.message || e.message;
         throw e;

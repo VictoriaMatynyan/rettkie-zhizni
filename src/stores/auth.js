@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from '../services/api.js';
 
-// Приводим объект пользователя к единому формату
 function normalizeUser(user) {
   if (!user || typeof user !== 'object') return user;
   const firstName =
@@ -16,11 +15,11 @@ function normalizeUser(user) {
       : undefined);
   const userType = user.user_type ?? user.role ?? undefined;
   const isVerified = user.is_verified ?? user.isEmailVerified ?? undefined;
-  // Флаг подписки приходит как receive_news (boolean)
   const emailNotificationsRaw = user.receive_news ?? user.email_notifications;
-  const emailNotifications = typeof emailNotificationsRaw === 'boolean'
-    ? emailNotificationsRaw
-    : undefined;
+  const emailNotifications =
+    typeof emailNotificationsRaw === 'boolean'
+      ? emailNotificationsRaw
+      : undefined;
 
   return {
     ...user,
@@ -94,7 +93,6 @@ export const useAuthStore = defineStore('auth', {
         this.registrationSuccess = true;
         return data;
       } catch (e) {
-        // Go API может вернуть ошибки валидации в виде объекта
         if (e.response?.data?.errors) {
           this.error = Object.values(e.response.data.errors).flat().join(', ');
         } else {
@@ -117,11 +115,9 @@ export const useAuthStore = defineStore('auth', {
         localStorage.setItem('accessToken', data.access);
         localStorage.setItem('refreshToken', data.refresh);
 
-        // После успешного логина получаем данные пользователя
         await this.fetchUserProfile();
         return this.user;
       } catch (e) {
-        // Обработка ошибок аутентификации
         if (e.response?.data?.detail) {
           this.error = e.response.data.detail;
         } else {
@@ -150,7 +146,6 @@ export const useAuthStore = defineStore('auth', {
           await api.auth.logout(rt);
         }
       } catch (e) {
-        // Не блокируем локальный выход, даже если сервер вернул ошибку
         console.warn(
           'Не удалось выйти из аккаунта:',
           e?.response?.data || e.message || e
@@ -164,8 +159,6 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true;
       this.error = null;
       try {
-        // Вычисляем изменённые поля относительно текущего пользователя,
-        // либо отправляем как есть, если включён режим force.
         const allowedKeys = [
           'first_name',
           'last_name',
@@ -180,15 +173,18 @@ export const useAuthStore = defineStore('auth', {
         if (options.force) {
           for (const key of allowedKeys) {
             if (!(key in profileData)) continue;
-            if (key === 'email_notifications') changed.receive_news = !!profileData[key];
+            if (key === 'email_notifications')
+              changed.receive_news = !!profileData[key];
             else changed[key] = profileData[key];
           }
         } else {
           for (const key of allowedKeys) {
             if (!(key in profileData)) continue;
-            const newVal = key === 'email_notifications' ? !!profileData[key] : profileData[key];
+            const newVal =
+              key === 'email_notifications'
+                ? !!profileData[key]
+                : profileData[key];
             const curVal = current?.[key];
-            // Отправляем только реально изменившиеся значения (включая пустые строки)
             if (newVal !== curVal) {
               if (key === 'email_notifications') changed.receive_news = newVal;
               else changed[key] = newVal;
@@ -196,14 +192,15 @@ export const useAuthStore = defineStore('auth', {
           }
         }
 
-        // Если изменений нет — возвращаем текущего пользователя без запроса
         if (Object.keys(changed).length === 0) {
           return this.user;
         }
 
-        // Делаем запрос обновления и мёрджим частичный ответ с текущим пользователем
         const updatedUser = await api.auth.updateMe(changed);
-        const merged = normalizeUser({ ...(this.user || {}), ...(updatedUser || {}) });
+        const merged = normalizeUser({
+          ...(this.user || {}),
+          ...(updatedUser || {}),
+        });
         this.user = merged;
         return merged;
       } catch (e) {

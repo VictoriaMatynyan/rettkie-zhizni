@@ -38,6 +38,12 @@ httpClient.interceptors.response.use(
   r => r,
   async err => {
     const original = err.config || {};
+    const isRefreshCall =
+      typeof original?.url === 'string' &&
+      original.url.includes('/accounts/token/refresh/');
+    if (isRefreshCall) {
+      return Promise.reject(err);
+    }
     if (err.response?.status === 401 && !original._retry) {
       original._retry = true;
       const rt = getRefreshToken();
@@ -61,12 +67,12 @@ httpClient.interceptors.response.use(
 
       try {
         isRefreshing = true;
-        const { data } = await httpClient.post('/accounts/refresh/', {
+        const { data } = await httpClient.post('/accounts/token/refresh/', {
           refresh: rt,
         });
-        if (data.ok && data.access) {
+        if (data && data.access) {
           setAccessToken(data.access);
-          setRefreshToken(data.refresh);
+          if (data.refresh) setRefreshToken(data.refresh);
           queue.forEach(p => p.resolve(data.access));
           queue = [];
           isRefreshing = false;
@@ -95,7 +101,6 @@ export const api = {
       httpClient.post('/accounts/register/', payload).then(r => r.data),
     login: payload =>
       httpClient.post('/accounts/login/', payload).then(r => r.data),
-    // Выход с отзывом refresh токена
     logout: refreshToken =>
       httpClient
         .post('/accounts/logout/', { refresh: refreshToken })
@@ -110,7 +115,7 @@ export const api = {
         .then(r => r.data),
     refresh: refreshToken =>
       httpClient
-        .post('/accounts/refresh/', { refresh: refreshToken })
+        .post('/accounts/token/refresh/', { refresh: refreshToken })
         .then(r => r.data),
     me: () => httpClient.get('/accounts/me/').then(r => r.data),
     // Обновление профиля текущего пользователя

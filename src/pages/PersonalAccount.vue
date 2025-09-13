@@ -66,7 +66,7 @@ async function handleLogout() {
   max-width: 1050px;
   width: 100vw;
   margin: 0 auto;
-  padding: 0;
+  padding: 0 0 20px 0;
 }
 
 .tabs {

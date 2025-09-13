@@ -115,12 +115,47 @@ export const useAuthStore = defineStore('auth', {
         await this.fetchUserProfile();
         return this.user;
       } catch (e) {
-        // Обработка ошибок аутентификации
-        if (e.response?.data?.detail) {
-          this.error = e.response.data.detail;
-        } else {
-          this.error = e?.response?.data?.message || e.message;
+        // обработка ошибок аутентификации
+        const status = e?.response?.status;
+        const data = e?.response?.data || {};
+        const tryExtract = () => {
+          const candidates = [
+            data.detail,
+            data.error,
+            data.message,
+            Array.isArray(data.non_field_errors)
+              ? data.non_field_errors.join(', ')
+              : undefined,
+          ].filter(Boolean);
+          return candidates[0];
+        };
+        let msg = tryExtract();
+        const lower = String(msg || '').toLowerCase();
+
+        if (status === 401) {
+          if (
+            lower.includes('no active account') ||
+            lower.includes('inactive') ||
+            lower.includes('not active') ||
+            lower.includes('invalid credentials')
+          ) {
+            msg = 'Неверный e-mail или пароль. Проверьте данные и попробуйте ещё раз';
+          } else if (lower.includes('not verified') || lower.includes('unverified')) {
+            msg = 'Аккаунт не активирован. Проверьте почту и подтвердите e-mail';
+          } else {
+            msg = 'Неверный e-mail или пароль';
+          }
+        } else if (status === 400) {
+          const fieldMsgs = Object.values(data || {})
+            .map(v => (Array.isArray(v) ? v.join(', ') : v))
+            .filter(Boolean)
+            .join(', ');
+          msg = fieldMsgs || msg || 'Проверьте введённые данные';
+        } else if (status === 429) {
+          msg = 'Слишком много попыток входа. Попробуйте чуть позже';
         }
+
+        this.error = msg || 'Не удалось выполнить вход. Попробуйте ещё раз позже';
         throw e;
       } finally {
         this.loading = false;
@@ -158,16 +193,10 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true;
       this.error = null;
       try {
-        // Отправляем только поддерживаемые поля профиля
-        const data = {
-          first_name: profileData.first_name ?? this.user?.first_name ?? '',
-          last_name: profileData.last_name ?? this.user?.last_name ?? '',
-          email: profileData.email ?? this.user?.email ?? '',
-          phone: profileData.phone ?? this.user?.phone ?? '',
-        };
-        if ('email_notifications' in profileData) {
-          data.email_notifications = !!profileData.email_notifications;
-        }
+        // Отправляем только переданные поля (частичное обновление)
+        const allowed = ['first_name', 'last_name', 'email', 'phone', 'email_notifications'];
+        const data = {};
+        for (const k of allowed) if (k in profileData) data[k] = profileData[k];
         const updatedUser = await api.auth.updateMe(data);
         this.user = normalizeUser(updatedUser);
         return updatedUser;

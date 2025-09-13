@@ -11,10 +11,20 @@
             v-model="form.email"
             type="email"
             class="form-input"
+            :class="{ invalid: emailTouched && !!emailError }"
             required
             :disabled="loading"
             placeholder="Введите ваш email"
+            @input="onEmailInput"
+            @blur="emailTouched = true; trimEmail()"
           />
+          <p
+            class="field-error"
+            :class="{ visible: emailTouched && !!emailError }"
+            :aria-hidden="!(emailTouched && !!emailError)"
+          >
+            {{ emailError }}
+          </p>
         </div>
 
         <div class="form-group">
@@ -24,17 +34,31 @@
             v-model="form.password"
             type="password"
             class="form-input"
+            :class="{ invalid: passwordTouched && !!passwordError }"
             required
             :disabled="loading"
             placeholder="Введите пароль"
+            @input="onPasswordInput"
+            @blur="passwordTouched = true"
           />
+          <p
+            class="field-error"
+            :class="{ visible: passwordTouched && !!passwordError }"
+            :aria-hidden="!(passwordTouched && !!passwordError)"
+          >
+            {{ passwordError }}
+          </p>
         </div>
 
         <div v-if="error" class="error-message">
           {{ error }}
         </div>
 
-        <button type="submit" class="auth-button" :disabled="loading">
+        <button
+          type="submit"
+          class="auth-button"
+          :disabled="loading || !!emailError || !!passwordError"
+        >
           {{ loading ? 'Вход...' : 'Войти' }}
         </button>
       </form>
@@ -62,6 +86,8 @@ export default {
         email: '',
         password: '',
       },
+      emailTouched: false,
+      passwordTouched: false,
     };
   },
   computed: {
@@ -74,15 +100,44 @@ export default {
     error() {
       return this.authStore.error;
     },
+    trimmedEmail() {
+      return (this.form.email || '').trim();
+    },
+    emailError() {
+      const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+      if (!this.trimmedEmail) return 'Введите e-mail';
+      if (!EMAIL_RE.test(this.trimmedEmail)) return 'Укажите корректный e-mail (например, ivan@example.com)';
+      return '';
+    },
+    passwordError() {
+      if (!this.form.password) return 'Введите пароль';
+      if (this.form.password.length < 6) return 'Минимум 6 символов';
+      return '';
+    },
   },
   mounted() {
     // Очищаем ошибки при монтировании компонента
     this.authStore.clearError();
   },
   methods: {
+    onEmailInput(e) {
+      this.form.email = String(e.target.value).replace(/\s+/g, '');
+    },
+    onPasswordInput(e) {
+      this.form.password = String(e.target.value);
+    },
+    trimEmail() {
+      this.form.email = this.trimmedEmail;
+    },
     async handleLogin() {
+      this.emailTouched = true;
+      this.passwordTouched = true;
+      if (this.emailError || this.passwordError) return;
       try {
-        await this.authStore.login(this.form);
+        await this.authStore.login({
+          email: this.trimmedEmail,
+          password: this.form.password,
+        });
 
         // Перенаправляем в личный кабинет
         this.$router.push('/personal-account');
@@ -155,6 +210,21 @@ export default {
   background-color: #f5f5f5;
   cursor: not-allowed;
 }
+
+.form-input.invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.08);
+}
+
+.field-error {
+  color: #dc3545;
+  font-size: 13px;
+  margin-top: 6px;
+  min-height: 18px; /* фиксируем место под сообщение */
+  line-height: 18px;
+  visibility: hidden;
+}
+.field-error.visible { visibility: visible; }
 
 .auth-button {
   width: 100%;

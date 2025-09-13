@@ -118,11 +118,53 @@ export const useAuthStore = defineStore('auth', {
         await this.fetchUserProfile();
         return this.user;
       } catch (e) {
-        if (e.response?.data?.detail) {
-          this.error = e.response.data.detail;
-        } else {
-          this.error = e?.response?.data?.message || e.message;
+        // обработка ошибок аутентификации
+        const status = e?.response?.status;
+        const data = e?.response?.data || {};
+        const tryExtract = () => {
+          const candidates = [
+            data.detail,
+            data.error,
+            data.message,
+            Array.isArray(data.non_field_errors)
+              ? data.non_field_errors.join(', ')
+              : undefined,
+          ].filter(Boolean);
+          return candidates[0];
+        };
+        let msg = tryExtract();
+        const lower = String(msg || '').toLowerCase();
+
+        if (status === 401) {
+          if (
+            lower.includes('no active account') ||
+            lower.includes('inactive') ||
+            lower.includes('not active') ||
+            lower.includes('invalid credentials')
+          ) {
+            msg =
+              'Неверный e-mail или пароль. Проверьте данные и попробуйте ещё раз';
+          } else if (
+            lower.includes('not verified') ||
+            lower.includes('unverified')
+          ) {
+            msg =
+              'Аккаунт не активирован. Проверьте почту и подтвердите e-mail';
+          } else {
+            msg = 'Неверный e-mail или пароль';
+          }
+        } else if (status === 400) {
+          const fieldMsgs = Object.values(data || {})
+            .map(v => (Array.isArray(v) ? v.join(', ') : v))
+            .filter(Boolean)
+            .join(', ');
+          msg = fieldMsgs || msg || 'Проверьте введённые данные';
+        } else if (status === 429) {
+          msg = 'Слишком много попыток входа. Попробуйте чуть позже';
         }
+
+        this.error =
+          msg || 'Не удалось выполнить вход. Попробуйте ещё раз позже';
         throw e;
       } finally {
         this.loading = false;
@@ -159,50 +201,19 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true;
       this.error = null;
       try {
-        const allowedKeys = [
+        // Отправляем только переданные поля (частичное обновление)
+        const allowed = [
           'first_name',
           'last_name',
           'email',
           'phone',
           'email_notifications',
         ];
-
-        const current = this.user ? normalizeUser(this.user) : {};
-        const changed = {};
-
-        if (options.force) {
-          for (const key of allowedKeys) {
-            if (!(key in profileData)) continue;
-            if (key === 'email_notifications')
-              changed.receive_news = !!profileData[key];
-            else changed[key] = profileData[key];
-          }
-        } else {
-          for (const key of allowedKeys) {
-            if (!(key in profileData)) continue;
-            const newVal =
-              key === 'email_notifications'
-                ? !!profileData[key]
-                : profileData[key];
-            const curVal = current?.[key];
-            if (newVal !== curVal) {
-              if (key === 'email_notifications') changed.receive_news = newVal;
-              else changed[key] = newVal;
-            }
-          }
-        }
-
-        if (Object.keys(changed).length === 0) {
-          return this.user;
-        }
-
-        const updatedUser = await api.auth.updateMe(changed);
-        const merged = normalizeUser({
-          ...(this.user || {}),
-          ...(updatedUser || {}),
-        });
-        this.user = merged;
-        return merged;
+        const data = {};
+        for (const k of allowed) if (k in profileData) data[k] = profileData[k];
+        const updatedUser = await api.auth.updateMe(data);
+        this.user = normalizeUser(updatedUser);
+        return updatedUser;
       } catch (e) {
         this.error = e?.response?.data?.message || e.message;
         throw e;

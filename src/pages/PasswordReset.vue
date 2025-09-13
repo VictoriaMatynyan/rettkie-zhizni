@@ -12,10 +12,20 @@
             v-model="email"
             type="email"
             class="form-input"
+            :class="{ invalid: showEmailError }"
             required
             :disabled="loading"
             placeholder="Введите e-mail"
+            @input="onEmailInput"
+            @blur="emailTouched = true"
           />
+          <p
+            class="field-error"
+            :class="{ visible: showEmailError }"
+            :aria-hidden="!showEmailError"
+          >
+            {{ emailError }}
+          </p>
         </div>
         <div v-if="successMessage" class="success-message">
           {{ successMessage }}
@@ -25,7 +35,7 @@
             </a>
           </div>
         </div>
-        <button type="submit" class="auth-button" :disabled="loading">
+        <button type="submit" class="auth-button" :disabled="loading || !!emailError">
           {{ loading ? 'Отправка...' : 'Восстановить пароль' }}
         </button>
       </form>
@@ -45,6 +55,22 @@ const email = ref('')
 const errorMessage = ref('')
 const successMessage = ref('')
 const loading = ref(false)
+const emailTouched = ref(false)
+
+// Валидация email
+const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+const trimmedEmail = computed(() => email.value.trim())
+const emailError = computed(() => {
+  if (!trimmedEmail.value) return 'Введите e-mail'
+  if (!EMAIL_RE.test(trimmedEmail.value)) return 'Укажите корректный e-mail (например, ivan@example.com)'
+  return ''
+})
+const showEmailError = computed(() => emailTouched.value && !!emailError.value)
+function onEmailInput(e) {
+  // убираем пробелы по краям и приводим домен к нижнему регистру
+  const val = String(e.target.value).replace(/\s+/g, '')
+  email.value = val
+}
 
 // карта популярных почтовых доменов
 const MAIL_SERVICE_MAP = {
@@ -95,7 +121,7 @@ const MAIL_SERVICE_MAP = {
 }
 
 const emailDomain = computed(() => {
-  const m = email.value.match(/@([\w.-]+)/)
+  const m = trimmedEmail.value.match(/@([\w.-]+)/)
   return m ? m[1].toLowerCase() : ''
 })
 
@@ -121,11 +147,13 @@ function resolveMailUrl(domain) {
 
 const emailServiceUrl = computed(() => resolveMailUrl(emailDomain.value))
 const handleSubmit = async () => {
+  emailTouched.value = true
+  if (emailError.value) return
   errorMessage.value = ''
   successMessage.value = ''
   loading.value = true
   try {
-    await api.auth.requestPasswordReset({ email: email.value })
+    await api.auth.requestPasswordReset({ email: trimmedEmail.value })
     successMessage.value = 'Инструкция по восстановлению отправлена на указанный e-mail.'
     // Оставим email для отображения ссылки
     // email.value = ''  — НЕ очищаем!
@@ -179,6 +207,21 @@ const handleSubmit = async () => {
   box-shadow: 0 0 0 3px rgba(129, 50, 173, 0.1);
 }
 .form-input:disabled { background-color: #f5f5f5; cursor: not-allowed; }
+.form-input.invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.08);
+}
+.field-error {
+  color: #dc3545;
+  font-size: 13px;
+  margin-top: 6px;
+  min-height: 18px; /* резервируем место под строку ошибки */
+  line-height: 18px;
+  visibility: hidden; /* по умолчанию скрыто, но место занято */
+}
+.field-error.visible {
+  visibility: visible;
+}
 
 .auth-button {
   width: 100%;

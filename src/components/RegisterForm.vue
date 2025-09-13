@@ -11,10 +11,13 @@
               v-model="form.first_name"
               type="text"
               class="form-input"
+              :class="{ invalid: firstNameTouched && !!firstNameError }"
               required
-              :disabled="loading"
+              :disabled="loading || isLocked"
               placeholder="Ваше имя"
+              @blur="firstNameTouched = true; trimField('first_name')"
             />
+            <p class="field-error" :class="{ visible: firstNameTouched && !!firstNameError }">{{ firstNameError }}</p>
           </div>
 
           <div class="form-group">
@@ -24,10 +27,13 @@
               v-model="form.last_name"
               type="text"
               class="form-input"
+              :class="{ invalid: lastNameTouched && !!lastNameError }"
               required
-              :disabled="loading"
+              :disabled="loading || isLocked"
               placeholder="Ваша фамилия"
+              @blur="lastNameTouched = true; trimField('last_name')"
             />
+            <p class="field-error" :class="{ visible: lastNameTouched && !!lastNameError }">{{ lastNameError }}</p>
           </div>
         </div>
 
@@ -38,10 +44,14 @@
             v-model="form.email"
             type="email"
             class="form-input"
+            :class="{ invalid: emailTouched && !!emailError }"
             required
-            :disabled="loading"
+            :disabled="loading || isLocked"
             placeholder="Ваш email адрес"
+            @input="onEmailInput"
+            @blur="emailTouched = true; trimField('email')"
           />
+          <p class="field-error" :class="{ visible: emailTouched && !!emailError }">{{ emailError }}</p>
         </div>
 
         <div class="form-group">
@@ -52,8 +62,9 @@
             v-mask="'+7 ### ###-##-##'"
             type="tel"
             class="form-input"
-            :disabled="loading"
+            :disabled="loading || isLocked"
             placeholder="+7 999 123-45-67"
+            @blur="trimField('phone')"
           />
         </div>
         <div class="form-group">
@@ -62,8 +73,10 @@
             id="region_id"
             v-model.number="form.region_id"
             class="form-input"
+            :class="{ invalid: regionTouched && !!regionError }"
             required
-            :disabled="loading || dictLoading"
+            :disabled="loading || dictLoading || isLocked"
+            @blur="regionTouched = true"
           >
             <option value="">Выберите регион</option>
             <option
@@ -74,6 +87,7 @@
               {{ region.name }}
             </option>
           </select>
+          <p class="field-error" :class="{ visible: regionTouched && !!regionError }">{{ regionError }}</p>
         </div>
         <div class="form-group">
           <label for="user_type_id" class="form-label">Кто вы? *</label>
@@ -81,14 +95,17 @@
             id="user_type_id"
             v-model.number="form.user_type_id"
             class="form-input"
+            :class="{ invalid: userTypeTouched && !!userTypeError }"
             required
-            :disabled="loading || dictLoading"
+            :disabled="loading || dictLoading || isLocked"
+            @blur="userTypeTouched = true"
           >
             <option value="">Выберите роль</option>
             <option v-for="type in userTypes" :key="type.id" :value="type.id">
               {{ type.name }}
             </option>
           </select>
+          <p class="field-error" :class="{ visible: userTypeTouched && !!userTypeError }">{{ userTypeError }}</p>
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -98,11 +115,14 @@
               v-model="form.password"
               type="password"
               class="form-input"
+              :class="{ invalid: passwordTouched && !!passwordError }"
               required
-              :disabled="loading"
+              :disabled="loading || isLocked"
               placeholder="Минимум 6 символов"
               minlength="6"
+              @blur="passwordTouched = true"
             />
+            <p class="field-error" :class="{ visible: passwordTouched && !!passwordError }">{{ passwordError }}</p>
           </div>
           <div class="form-group">
             <label for="confirmPassword" class="form-label"
@@ -113,10 +133,13 @@
               v-model="form.password_confirm"
               type="password"
               class="form-input"
+              :class="{ invalid: confirmTouched && !!confirmError }"
               required
-              :disabled="loading"
+              :disabled="loading || isLocked"
               placeholder="Повторите пароль"
+              @blur="confirmTouched = true"
             />
+            <p class="field-error" :class="{ visible: confirmTouched && !!confirmError }">{{ confirmError }}</p>
           </div>
         </div>
         <div class="form-group">
@@ -125,7 +148,7 @@
               v-model="form.consent"
               type="checkbox"
               required
-              :disabled="loading"
+              :disabled="loading || isLocked"
             />
             <span class="checkbox-text">
               Я даю согласие на обработку персональных данных в соответствии с
@@ -134,10 +157,15 @@
               >
             </span>
           </label>
+          <p class="field-error" :class="{ visible: consentTouched && !!consentError }">{{ consentError }}</p>
         </div>
         <div v-if="registrationSuccess" class="success-message">
-          Регистрация прошла успешно! Пожалуйста, проверьте вашу электронную
-          почту для подтверждения аккаунта.
+          <strong>Спасибо, {{ submittedFirstName || 'друг' }}!</strong>
+          Регистрация прошла успешно. Мы отправили письмо для подтверждения.
+          Если его нет, загляните в папку «Спам».
+          <div v-if="isLocked" class="muted" style="margin-top:6px;">
+            Форма регистрации будет снова доступна через {{ lockRemaining }} сек.
+          </div>
           <div v-if="emailServiceUrl" class="go-to-email">
             <a :href="emailServiceUrl" target="_blank" rel="noopener" class="email-link">
               Перейти к почте {{ submittedEmail }}
@@ -150,7 +178,7 @@
         <button
           type="submit"
           class="auth-button"
-          :disabled="loading || !isFormValid"
+          :disabled="loading || !isFormValid || isLocked"
         >
           {{ loading ? 'Регистрация...' : 'Зарегистрироваться' }}
         </button>
@@ -190,6 +218,21 @@ export default {
       dictLoading: false,
       dictError: '',
       registrationSuccess: false,
+      // touched flags
+      firstNameTouched: false,
+      lastNameTouched: false,
+      emailTouched: false,
+      regionTouched: false,
+      userTypeTouched: false,
+      passwordTouched: false,
+      confirmTouched: false,
+      consentTouched: false,
+      // success lock
+      isLocked: false,
+      lockRemaining: 0,
+      lockIntervalId: null,
+      successLockSeconds: 30,
+      submittedFirstName: '',
     };
   },
   computed: {
@@ -211,17 +254,55 @@ export default {
     emailServiceUrl() {
       return this.resolveMailUrl(this.emailDomain);
     },
+    trimmedEmail() {
+      return (this.form.email || '').trim();
+    },
+    firstNameError() {
+      if (!this.form.first_name) return 'Введите имя';
+      return '';
+    },
+    lastNameError() {
+      if (!this.form.last_name) return 'Введите фамилию';
+      return '';
+    },
+    emailError() {
+      const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+      if (!this.trimmedEmail) return 'Введите e-mail';
+      if (!EMAIL_RE.test(this.trimmedEmail)) return 'Укажите корректный e-mail (например, ivan@example.com)';
+      return '';
+    },
+    regionError() {
+      if (!this.form.region_id) return 'Выберите регион';
+      return '';
+    },
+    userTypeError() {
+      if (!this.form.user_type_id) return 'Выберите роль';
+      return '';
+    },
+    passwordError() {
+      if (!this.form.password) return 'Введите пароль';
+      if (this.form.password.length < 6) return 'Минимум 6 символов';
+      return '';
+    },
+    confirmError() {
+      if (!this.form.password_confirm) return 'Повторите пароль';
+      if (this.form.password_confirm !== this.form.password) return 'Пароли не совпадают';
+      return '';
+    },
+    consentError() {
+      if (!this.form.consent) return 'Требуется согласие';
+      return '';
+    },
     isFormValid() {
-      return (
-        this.form.first_name &&
-        this.form.last_name &&
-        this.form.email &&
-        this.form.region_id &&
-        this.form.user_type_id &&
-        this.form.password &&
-        this.form.password_confirm &&
-        this.form.password === this.form.password_confirm &&
-        this.form.consent
+      return !(
+        this.firstNameError ||
+        this.lastNameError ||
+        this.emailError ||
+        this.regionError ||
+        this.userTypeError ||
+        this.passwordError ||
+        this.confirmError ||
+        this.consentError
       );
     },
     registrationComplete() {
@@ -232,7 +313,39 @@ export default {
     this.authStore.clearError();
     await this.loadDictionaries();
   },
+  beforeUnmount() {
+    if (this.lockIntervalId) clearInterval(this.lockIntervalId);
+  },
   methods: {
+    onEmailInput(e) {
+      this.form.email = String(e.target.value).replace(/\s+/g, '');
+    },
+    trimField(field) {
+      this.form[field] = (this.form[field] || '').trim();
+    },
+    startSuccessLock() {
+      this.isLocked = true;
+      this.lockRemaining = this.successLockSeconds;
+      if (this.lockIntervalId) clearInterval(this.lockIntervalId);
+      this.lockIntervalId = setInterval(() => {
+        if (this.lockRemaining > 0) this.lockRemaining -= 1;
+        if (this.lockRemaining <= 0) {
+          clearInterval(this.lockIntervalId);
+          this.lockIntervalId = null;
+          this.isLocked = false;
+        }
+      }, 1000);
+    },
+    clearTouched() {
+      this.firstNameTouched = false;
+      this.lastNameTouched = false;
+      this.emailTouched = false;
+      this.regionTouched = false;
+      this.userTypeTouched = false;
+      this.passwordTouched = false;
+      this.confirmTouched = false;
+      this.consentTouched = false;
+    },
     // Определяем ссылку на почтовый сервис по домену
     resolveMailUrl(domain) {
       if (!domain) return null;
@@ -313,23 +426,32 @@ export default {
       };
     },
     async handleRegister() {
-      if (!this.isFormValid) {
-        return;
-      }
-
-      if (this.form.password !== this.form.password_confirm) {
-        this.authStore.error = 'Пароли не совпадают';
-        return;
-      }
+      // показать ошибки
+      this.firstNameTouched = true;
+      this.lastNameTouched = true;
+      this.emailTouched = true;
+      this.regionTouched = true;
+      this.userTypeTouched = true;
+      this.passwordTouched = true;
+      this.confirmTouched = true;
+      this.consentTouched = true;
+      if (!this.isFormValid) return;
 
       try {
-        await this.authStore.register(this.form);
+        await this.authStore.register({
+          ...this.form,
+          email: this.trimmedEmail,
+        });
         // Сохраняем email для ссылки на почту
         this.submittedEmail = this.form.email;
-        // Показываем сообщение об успешной регистрации
+        this.submittedFirstName = (this.form.first_name || '').trim();
         this.registrationSuccess = true;
         // Очищаем поля формы (email уже сохранен отдельно)
         this.resetForm();
+        // Сбрасываем состояния ошибок, чтобы не отвлекать пользователя
+        this.clearTouched();
+        // Блокируем повторный сабмит на 60с
+        this.startSuccessLock();
       } catch (error) {
         console.error('Registration failed:', error);
       }
@@ -403,6 +525,21 @@ export default {
   background-color: #f5f5f5;
   cursor: not-allowed;
 }
+
+.form-input.invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.08);
+}
+
+.field-error {
+  color: #dc3545;
+  font-size: 13px;
+  margin-top: 6px;
+  min-height: 18px;
+  line-height: 18px;
+  visibility: hidden;
+}
+.field-error.visible { visibility: visible; }
 
 .checkbox-label {
   display: flex;
@@ -496,6 +633,8 @@ export default {
   text-align: center;
   border: 1px solid #bde9dc;
 }
+
+.muted { color: #666; font-size: 13px; }
 
 @media (max-width: 768px) {
   .form-row {

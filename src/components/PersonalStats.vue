@@ -16,14 +16,57 @@
       download-link-name="Гайд-заглушка (1.2 МБ)"
     />
 
-    <div class="chart-section">
+    <div class="chart-section card">
       <h3>Статистика по мутациям</h3>
+      <p v-if="usingMocks" class="muted">
+        Показаны демонстрационные данные (моки)
+      </p>
 
       <div class="chart-controls">
         <label>
           Количество отображаемых мутаций:
-          <input v-model.number="displayLimit" type="number" min="2" />
+          <input
+            v-model.number="displayLimit"
+            type="number"
+            min="2"
+            :max="maxDisplayLimit"
+            :disabled="selectedIds.length > 0"
+          />
+          <span class="control-hint">от 2 до {{ maxDisplayLimit }}</span>
         </label>
+        <p v-if="selectedIds.length > 0" class="muted small">
+          При выбранных мутациях ограничение по количеству не применяется
+        </p>
+      </div>
+
+      <div class="chart-filters">
+        <label class="chk-inline">
+          <input v-model="includeOthers" type="checkbox" />
+          <span>Добавить столбец «Прочие»</span>
+        </label>
+        <div class="mutations-select">
+          <div class="select-actions">
+            <button type="button" class="btn ghost" @click="selectAll">
+              Выбрать все
+            </button>
+            <button type="button" class="btn ghost" @click="clearSelection">
+              Сбросить
+            </button>
+          </div>
+          <div class="checkbox-list">
+            <label
+              v-for="m in sortedMutations"
+              :key="'chk-' + m.id"
+              class="chk"
+            >
+              <input v-model="selectedIds" type="checkbox" :value="m.id" />
+              <span :class="{ self: userMutationId === m.id }">{{
+                m.shortName || m.gene
+              }}</span>
+              <span class="muted small"> ({{ m.count }})</span>
+            </label>
+          </div>
+        </div>
       </div>
 
       <div v-if="chartItems.length" class="bar-chart">
@@ -43,8 +86,11 @@
       <p v-else class="muted">Нет данных для построения диаграммы</p>
     </div>
 
-    <div class="table-section">
+    <div class="table-section card">
       <h3>Подробная статистика</h3>
+      <p v-if="usingMocks" class="muted">
+        Показаны демонстрационные данные (моки)
+      </p>
       <table>
         <thead>
           <tr>
@@ -89,6 +135,102 @@ import { api } from '../services/api.js';
  * @typedef {{id:number|string,name:string,lat:number,lon:number,count:number}} CityPoint
  */
 
+const MOCK_MUTATIONS = [
+  {
+    id: 101,
+    gene: 'MECP2',
+    short_name: 'R106W',
+    alt_names: 'Arg106Trp',
+    type: 'missense',
+    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/17601/',
+    description: 'Заменa аминокислоты (Arg→Trp) в MECP2',
+  },
+  {
+    id: 102,
+    gene: 'MECP2',
+    short_name: 'T158M',
+    alt_names: 'Thr158Met',
+    type: 'missense',
+    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/11821/',
+    description: 'Заменa аминокислоты (Thr→Met) в MECP2',
+  },
+  {
+    id: 103,
+    gene: 'MECP2',
+    short_name: 'R168X',
+    alt_names: 'Arg168Ter, R168*',
+    type: 'nonsense',
+    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/16376/',
+    description: 'Нонсенс‑мутация (стоп‑кодон) в MECP2',
+  },
+  {
+    id: 104,
+    gene: 'MECP2',
+    short_name: 'R255X',
+    alt_names: 'Arg255Ter, R255*',
+    type: 'nonsense',
+    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/16377/',
+    description: 'Нонсенс‑мутация (стоп‑кодон) в MECP2',
+  },
+  {
+    id: 105,
+    gene: 'MECP2',
+    short_name: 'R270X',
+    alt_names: 'Arg270Ter, R270*',
+    type: 'nonsense',
+    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/16378/',
+    description: 'Нонсенс‑мутация (стоп‑кодон) в MECP2',
+  },
+  {
+    id: 201,
+    gene: 'CDKL5',
+    short_name: 'c.404_405del',
+    alt_names: 'p.Glu135Valfs*20',
+    type: 'frameshift',
+    link: 'https://www.ncbi.nlm.nih.gov/clinvar/?term=CDKL5%20c.404_405del',
+    description: 'Сдвиг рамки считывания в CDKL5',
+  },
+  {
+    id: 202,
+    gene: 'FOXG1',
+    short_name: 'c.460C>T',
+    alt_names: 'p.Arg154Cys',
+    type: 'missense',
+    link: 'https://www.ncbi.nlm.nih.gov/clinvar/?term=FOXG1%20c.460C%3ET',
+    description: 'Замена аминокислоты в FOXG1',
+  },
+  {
+    id: 301,
+    gene: 'Другой',
+    short_name: 'Индел',
+    alt_names: 'Реже встречающиеся варианты',
+    type: 'indel',
+    link: '',
+    description: 'Прочие редкие варианты вне основных генов',
+  },
+  {
+    id: 302,
+    gene: 'MECP2',
+    short_name: 'ΔExon4',
+    alt_names: 'Deletion Exon 4',
+    type: 'deletion',
+    link: 'https://www.ncbi.nlm.nih.gov/clinvar/?term=MECP2%20exon%204%20deletion',
+    description: 'Делеция экзона 4 в MECP2',
+  },
+];
+
+const MOCK_COUNTS = {
+  101: 22,
+  102: 18,
+  103: 15,
+  104: 10,
+  105: 7,
+  201: 6,
+  202: 4,
+  301: 3,
+  302: 2,
+};
+
 export default {
   name: 'PersonalStats',
   components: { StandardContent },
@@ -99,28 +241,34 @@ export default {
       ],
       symptomsImg: symptomsImg,
 
-      // Карта
       /** @type {CityPoint[]} */
       points: [],
       mapError: '',
       mapLoading: false,
 
-      // Диаграмма / таблица
       displayLimit: 5,
-      dict: [], // справочник мутаций
-      countsByMutation: {}, // { [id]: count }
+      dict: [],
+      countsByMutation: {},
       userMutationId: null,
       dictLoading: false,
       dictError: '',
+      usingMocks: false,
+      forceMocks: false,
+      selectedIds: [],
+      includeOthers: true,
     };
   },
   computed: {
+    maxDisplayLimit() {
+      const MAX_TOP = 10;
+      const available = Math.max(2, this.sortedMutations.length);
+      return Math.min(MAX_TOP, available);
+    },
     totalPatients() {
       const vals = Object.values(this.countsByMutation);
       return vals.reduce((a, b) => a + (Number(b) || 0), 0) || 0;
     },
     enriched() {
-      // объединяем справочник с количествами
       return (this.dict || []).map(item => {
         const count = Number(this.countsByMutation?.[item.id]) || 0;
         return {
@@ -141,9 +289,19 @@ export default {
     chartItems() {
       const list = this.sortedMutations;
       if (!list.length) return [];
-      const limit = Math.max(2, Number(this.displayLimit) || 5);
-      const top = list.slice(0, limit - 1);
-      const rest = list.slice(limit - 1);
+      const selectedSet = new Set((this.selectedIds || []).map(v => String(v)));
+
+      let chosen = [];
+      if (selectedSet.size > 0) {
+        chosen = list.filter(m => selectedSet.has(String(m.id)));
+      } else {
+        const limitRaw = Number(this.displayLimit) || 5;
+        const limit = Math.min(Math.max(2, limitRaw), this.maxDisplayLimit);
+        chosen = list.slice(0, limit - 1);
+      }
+
+      const chosenIds = new Set(chosen.map(m => String(m.id)));
+      const rest = list.filter(m => !chosenIds.has(String(m.id)));
       const others = {
         key: 'others',
         id: null,
@@ -151,25 +309,50 @@ export default {
         tooltip: 'Прочие мутации',
         count: rest.reduce((s, x) => s + x.count, 0),
       };
-      const bars = top.map(m => ({
+      const bars = chosen.map(m => ({
         key: `m-${m.id}`,
         id: m.id,
         short: m.shortName || m.gene || String(m.id),
         tooltip: m.description || m.shortName || m.gene,
         count: m.count,
       }));
-      return [...bars, others];
+
+      if (this.includeOthers && others.count > 0) return [...bars, others];
+      return bars;
     },
     maxCount() {
       return this.chartItems.reduce((mx, b) => Math.max(mx, b.count), 0) || 1;
     },
   },
+  watch: {
+    displayLimit(val) {
+      const n = Number(val) || 5;
+      const clamped = Math.min(Math.max(2, n), this.maxDisplayLimit);
+      if (clamped !== this.displayLimit) this.displayLimit = clamped;
+    },
+  },
   mounted() {
+    try {
+      const fromEnv =
+        (import.meta && import.meta.env && import.meta.env.VITE_USE_MOCKS) ===
+        '1';
+      const fromQuery =
+        new URLSearchParams(window.location.search).get('useMocks') === '1';
+      this.forceMocks = !!(fromEnv || fromQuery);
+    } catch (_) {
+      this.forceMocks = false;
+    }
     this.fetchMapPoints();
     this.fetchMutationsDictAndStats();
     this.fetchUserMutation();
   },
   methods: {
+    selectAll() {
+      this.selectedIds = this.sortedMutations.map(m => m.id);
+    },
+    clearSelection() {
+      this.selectedIds = [];
+    },
     percent(n) {
       const t = this.totalPatients || 1;
       return `${(((Number(n) || 0) * 100) / t).toFixed(1)}%`;
@@ -185,15 +368,64 @@ export default {
       this.points = [];
       try {
         const res = await api.accounts.getQuestionnaireStatsByCity();
-        const items = Array.isArray(res?.items) ? res.items : [];
-        this.points = items
-          .filter(i => i && (i.count || i.count === 0))
+        const raw = Array.isArray(res)
+          ? res
+          : Array.isArray(res?.items)
+            ? res.items
+            : Array.isArray(res?.results)
+              ? res.results
+              : Array.isArray(res?.data)
+                ? res.data
+                : [];
+
+        const toNumber = v => {
+          const n = Number(v);
+          return Number.isFinite(n) ? n : 0;
+        };
+        const getCount = i =>
+          toNumber(
+            i.count ??
+              i.total ??
+              i.value ??
+              i.num ??
+              i.qty ??
+              i.questionnaires_count ??
+              i.cnt
+          );
+        const getLat = i =>
+          toNumber(
+            i.lat ??
+              i.latitude ??
+              i.city?.lat ??
+              i.city?.latitude ??
+              i.geo?.lat ??
+              i.coords?.lat
+          );
+        const getLon = i =>
+          toNumber(
+            i.lon ??
+              i.lng ??
+              i.longitude ??
+              i.city?.lon ??
+              i.city?.lng ??
+              i.city?.longitude ??
+              i.geo?.lon ??
+              i.coords?.lon
+          );
+        const getName = i =>
+          i.name ?? i.city_name ?? i.city?.name ?? i.title ?? '';
+        const getId = i => i.id ?? i.city_id ?? i.city?.id ?? getName(i);
+
+        this.points = raw
+          .filter(
+            i => i && (getLat(i) || getLon(i) || getCount(i) || getName(i))
+          )
           .map(i => ({
-            id: i.id,
-            name: i.name,
-            lat: Number(i.lat),
-            lon: Number(i.lon),
-            count: Number(i.count) || 0,
+            id: getId(i),
+            name: getName(i),
+            lat: getLat(i),
+            lon: getLon(i),
+            count: getCount(i),
           }));
       } catch (e) {
         this.mapError =
@@ -207,11 +439,17 @@ export default {
     async fetchMutationsDictAndStats() {
       this.dictLoading = true;
       this.dictError = '';
+      if (this.forceMocks) {
+        this.dict = MOCK_MUTATIONS;
+        this.countsByMutation = { ...MOCK_COUNTS };
+        this.usingMocks = true;
+        this.dictLoading = false;
+        return;
+      }
       try {
         const dictRes = await api.accounts.getMutationGenes();
         this.dict = Array.isArray(dictRes?.items) ? dictRes.items : [];
 
-        // Попробуем получить статистику по мутациям с сервера (если есть)
         try {
           const statsRes =
             await api.accounts.getQuestionnaireStatsByMutation?.();
@@ -223,16 +461,25 @@ export default {
             return acc;
           }, {});
         } catch (_) {
-          // Фолбэк: если отдельной статистики нет — заполним нулями
           this.countsByMutation = {};
+        }
+
+        const hasCounts = Object.values(this.countsByMutation || {}).some(
+          n => Number(n) > 0
+        );
+        if (!this.dict.length || !hasCounts) {
+          this.dict = MOCK_MUTATIONS;
+          this.countsByMutation = { ...MOCK_COUNTS };
+          this.usingMocks = true;
         }
       } catch (e) {
         this.dictError =
           e?.response?.data?.message ||
           e.message ||
           'Не удалось загрузить справочник мутаций';
-        this.dict = [];
-        this.countsByMutation = {};
+        this.dict = MOCK_MUTATIONS;
+        this.countsByMutation = { ...MOCK_COUNTS };
+        this.usingMocks = true;
       } finally {
         this.dictLoading = false;
       }
@@ -244,7 +491,7 @@ export default {
         const withGene = items.find(x => x?.mutation_gene?.id != null);
         this.userMutationId = withGene?.mutation_gene?.id ?? null;
       } catch (_) {
-        this.userMutationId = null;
+        this.userMutationId = this.usingMocks ? 102 : null;
       }
     },
   },
@@ -256,13 +503,79 @@ export default {
   text-align: center;
 }
 
-.chart-section,
-.table-section {
-  margin-bottom: 2rem;
+.card {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  margin-bottom: 24px;
 }
 
 .chart-controls {
-  margin-top: 1rem;
+  margin-top: 8px;
+}
+.chart-controls input {
+  width: 72px;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-left: 8px;
+}
+.control-hint {
+  margin-left: 8px;
+  color: #777;
+  font-size: 12px;
+}
+
+.small {
+  font-size: 12px;
+}
+
+.chart-filters {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.chk-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.mutations-select {
+  border: 1px dashed #e3e7ea;
+  border-radius: 8px;
+  padding: 8px;
+}
+.select-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.btn.ghost {
+  background: #fff;
+  color: #23938c;
+  border: 1px solid #23938c;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn.ghost:hover {
+  background: #23938c;
+  color: #fff;
+}
+.checkbox-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 4px 12px;
+  max-height: 180px;
+  overflow: auto;
+}
+.chk {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .bar-chart {
@@ -271,23 +584,26 @@ export default {
   gap: 10px;
   height: 280px;
   margin-top: 16px;
-  border-left: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
+  border-left: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
   padding: 8px 8px 0 8px;
 }
 .bar {
   position: relative;
   flex: 1 1 0;
   min-width: 40px;
-  background: linear-gradient(180deg, #2aaea2, #1e9086);
-  border-radius: 4px 4px 0 0;
+  background: linear-gradient(180deg, #28b0a5, #23938c);
+  border-radius: 6px 6px 0 0;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  transition: opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 .bar:hover {
-  opacity: 0.9;
+  opacity: 0.95;
+  transform: translateY(-2px);
 }
 .bar-value {
   position: absolute;
@@ -308,14 +624,13 @@ export default {
 }
 .bar-label.self {
   font-weight: 700;
-  color: #123;
+  color: #23938c;
 }
 
 .highlight {
   background-color: #f0f9ff;
-  font-weight: bold;
+  font-weight: 600;
 }
-
 .muted {
   color: #666;
 }
@@ -324,13 +639,33 @@ table {
   width: 100%;
   border-collapse: collapse;
 }
+thead th {
+  background: #f8fafb;
+  color: #333;
+  font-weight: 600;
+  font-size: 14px;
+}
 th,
 td {
-  padding: 8px 10px;
+  padding: 10px 12px;
   border-bottom: 1px solid #eee;
   text-align: left;
 }
-thead th {
-  background: #f7f7f7;
+tbody tr:hover {
+  background: #fafafa;
+}
+
+@media (max-width: 768px) {
+  .bar-chart {
+    height: 220px;
+    gap: 8px;
+  }
+  .bar {
+    min-width: 32px;
+  }
+  .bar-label {
+    bottom: -34px;
+    font-size: 11px;
+  }
 }
 </style>

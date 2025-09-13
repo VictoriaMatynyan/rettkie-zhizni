@@ -13,7 +13,12 @@
           class="news-card"
           @click="goToNews(news.id)"
         >
-          <img :src="news.image" :alt="news.title" class="news-image" />
+          <div
+            class="news-image-wrap"
+            :style="{ backgroundImage: `url(${news.image})` }"
+          >
+            <img :src="news.image" :alt="news.title" class="news-image" />
+          </div>
           <p class="date">{{ formatDate(news.date) }}</p>
           <h3 class="card-title">{{ news.title }}</h3>
           <p class="preview">{{ news.preview }}</p>
@@ -138,10 +143,12 @@ onMounted(fetchNews);
 }
 
 .news-image {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin-bottom: 12px;
+  height: 100%;
+  display: block;
+  object-fit: contain;
 }
 
 .date {
@@ -159,6 +166,31 @@ onMounted(fetchNews);
 .preview {
   font-size: 14px;
   color: #444;
+}
+
+/* Размытый фон + фиксированная высота превью */
+.news-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 300px; /* единая высота превью, как на главной */
+  overflow: hidden;
+  border-radius: 8px;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: #f3f4f6; /* фон-заглушка */
+  margin-bottom: 12px;
+}
+.news-image-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  background-position: inherit;
+  background-size: inherit;
+  background-repeat: inherit;
+  filter: blur(18px);
+  transform: scale(1.12);
 }
 
 .load-more {

@@ -71,7 +71,6 @@ import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { api } from '../services/api.js'
 
-// поддерживаем оба варианта: params и query
 const route = useRoute()
 const uid = ref(route.params.uid || route.query.uid || '')
 const token = ref(route.params.token || route.query.token || '')
@@ -116,7 +115,7 @@ async function handleSubmit() {
       uid: uid.value,
       token: token.value,
       password: password.value,
-      password_confirm: password2.value, // если бек не требует — уберём
+      password_confirm: password2.value,
     }
 
     await api.auth.confirmPasswordReset(payload)
@@ -125,7 +124,6 @@ async function handleSubmit() {
     password.value = ''
     password2.value = ''
   } catch (e) {
-    // обработаем типичные ответы
     const serverMsg = e?.response?.data?.message
       || e?.response?.data?.detail
       || e?.response?.data?.errors
@@ -135,7 +133,7 @@ async function handleSubmit() {
     if (typeof serverMsg === 'string') {
       errorMessage.value = serverMsg
     } else if (serverMsg && typeof serverMsg === 'object') {
-      // если бек вернул объект с полями ошибок
+      // если бэк вернул объект с полями ошибок
       errorMessage.value = Object.values(serverMsg).flat().join(', ')
     } else {
       errorMessage.value = 'Не удалось обновить пароль. Попробуйте ещё раз.'

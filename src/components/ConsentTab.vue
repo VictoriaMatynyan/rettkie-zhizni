@@ -49,11 +49,11 @@
           @keydown.space.prevent="triggerFileDialog"
         >
           <div class="dropzone-inner">
-            <div class="dropzone-text" v-if="!file">
+            <div v-if="!file" class="dropzone-text">
               <strong>Выберите файл</strong> или перетащите его сюда
               <div class="hint">Поддерживаются PDF и изображения</div>
             </div>
-            <div class="selected-file" v-else>
+            <div v-else class="selected-file">
               <span class="file-pill">{{ file.name }}</span>
               <span class="file-size">{{ formatSize(file.size) }}</span>
               <button

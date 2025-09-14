@@ -10,18 +10,18 @@
         <button
           :class="{ active: tab === 'contact' }"
           class="button tab"
-          @click="tab = 'contact'"
           role="tab"
           :aria-selected="tab === 'contact'"
+          @click="tab = 'contact'"
         >
           Контактные данные
         </button>
         <button
           :class="{ active: tab === 'children' }"
           class="button tab"
-          @click="tab = 'children'"
           role="tab"
           :aria-selected="tab === 'children'"
+          @click="tab = 'children'"
         >
           Анкеты подопечных
         </button>
@@ -36,9 +36,9 @@
         <button
           :class="{ active: tab === 'stats' }"
           class="button tab"
-          @click="tab = 'stats'"
           role="tab"
           :aria-selected="tab === 'stats'"
+          @click="tab = 'stats'"
         >
           Статистика
         </button>
@@ -46,7 +46,7 @@
       </div>
       <div class="tabs-select-container">
         <label for="tabs-select" class="sr-only">Раздел</label>
-        <select id="tabs-select" class="tabs-select" v-model="tab">
+        <select id="tabs-select" v-model="tab" class="tabs-select">
           <option value="contact">Контактные данные</option>
           <option value="children">Анкеты подопечных</option>
           <option value="stats">Статистика</option>
@@ -114,7 +114,7 @@ async function handleLogout() {
 .personal-account {
   max-width: 1050px;
   margin: 0 auto;
-  padding: 0 16px 25px; /* горизонтальные отступы как в App.vue */
+  padding: 0 16px 25px;
 }
 
 @media (min-width: 768px) {

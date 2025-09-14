@@ -15,7 +15,6 @@
 - **Vite** — быстрый сборщик
 - **Vue Router** — маршрутизация
 - **Pinia** — управление состоянием
-- **JSON Server** — mock API для разработки
 - **ESLint + Prettier** — качество кода
 - **GitHub Pages** — хостинг
 
@@ -27,12 +26,6 @@ npm install
 
 # Запустить только frontend (порт 5173)
 npm run dev
-
-# Запустить только JSON Server API (порт 3001)
-npm run json-server
-
-# Запустить frontend + API одновременно
-npm run dev:full
 
 # Собрать для продакшена
 npm run build
@@ -69,15 +62,7 @@ npm run format
 - ✅ Профили пользователей
 - ✅ Роли: администратор, родитель, врач, исследователь
 
-### API Endpoints:
-
-```
-http://localhost:3001/users     - пользователи
-http://localhost:3001/children  - дети пациентов
-http://localhost:3001/news      - новости
-http://localhost:3001/articles  - статьи
-http://localhost:3001/events    - мероприятия
-```
+Бэкенд API настраивается в `src/services/api.js` через `API_BASE_URL`.
 
 ## 📦 Планы на развитие
 

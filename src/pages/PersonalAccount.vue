@@ -17,6 +17,14 @@
         Анкеты подопечных
       </button>
       <button
+        v-if="showConsentTab"
+        :class="{ active: tab === 'consent' }"
+        class="button tab"
+        @click="tab = 'consent'"
+      >
+        Согласие
+      </button>
+      <button
         :class="{ active: tab === 'stats' }"
         class="button tab"
         @click="tab = 'stats'"
@@ -30,17 +38,20 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth.js';
+import { api } from '../services/api.js';
 
 import ContactForm from '../components/ContactForm.vue';
 import ChildrenProfiles from '../components/ChildrenProfiles.vue';
 import PersonalStats from '../components/PersonalStats.vue';
+import ConsentTab from '../components/ConsentTab.vue';
 
 const tab = ref('contact');
 const router = useRouter();
 const authStore = useAuthStore();
+const showConsentTab = ref(false);
 
 const currentTabComponent = computed(() => {
   switch (tab.value) {
@@ -48,10 +59,27 @@ const currentTabComponent = computed(() => {
       return ContactForm;
     case 'children':
       return ChildrenProfiles;
+    case 'consent':
+      return ConsentTab;
     case 'stats':
       return PersonalStats;
     default:
       return ContactForm;
+  }
+});
+
+onMounted(async () => {
+  try {
+    const res = await api.accounts.getMyQuestionnaires();
+    const items = Array.isArray(res)
+      ? res
+      : Array.isArray(res?.items)
+      ? res.items
+      : [];
+    showConsentTab.value = items.length > 0;
+  } catch (e) {
+    // Если эндпоинт недоступен, вкладку не показываем
+    showConsentTab.value = false;
   }
 });
 

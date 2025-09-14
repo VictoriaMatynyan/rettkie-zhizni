@@ -310,6 +310,19 @@ export const api = {
       httpClient
         .post(`/accounts/questionnaires/${id}/delete/`)
         .then(r => r.data),
+
+    // Согласие (статус и загрузка файла)
+    getConsentStatus: () =>
+      httpClient.get('/accounts/consent/status/').then(r => r.data),
+    uploadConsent: file => {
+      const fd = new FormData();
+      if (file instanceof File) fd.append('consent_file', file, file.name);
+      return httpClient
+        .post('/accounts/consent/upload/', fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        .then(r => r.data);
+    },
   },
 
   // Пользователи

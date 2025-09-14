@@ -16,12 +16,15 @@
             v-model.trim="password"
             :type="showPassword ? 'text' : 'password'"
             class="form-input"
+            :class="{ invalid: passwordTouched && !!passwordError }"
             :disabled="loading || !hasTokens"
             placeholder="Введите новый пароль"
             required
             minlength="8"
             autocomplete="new-password"
+            @blur="passwordTouched = true"
           />
+          <p class="field-error" :class="{ visible: passwordTouched && !!passwordError }">{{ passwordError }}</p>
         </div>
 
         <div class="form-group">
@@ -31,12 +34,15 @@
             v-model.trim="password2"
             :type="showPassword ? 'text' : 'password'"
             class="form-input"
+            :class="{ invalid: confirmTouched && !!confirmError }"
             :disabled="loading || !hasTokens"
             placeholder="Повторите пароль"
             required
             minlength="8"
             autocomplete="new-password"
+            @blur="confirmTouched = true"
           />
+          <p class="field-error" :class="{ visible: confirmTouched && !!confirmError }">{{ confirmError }}</p>
         </div>
 
         <div class="form-group" style="margin-top:-8px;">
@@ -45,11 +51,14 @@
           </label>
         </div>
 
-        <div v-if="localValidationError" class="error-message">{{ localValidationError }}</div>
         <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
         <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
 
-        <button type="submit" class="auth-button" :disabled="loading || !hasTokens">
+        <button
+          type="submit"
+          class="auth-button"
+          :disabled="loading || !hasTokens || !!passwordError || !!confirmError"
+        >
           {{ loading ? 'Сохранение...' : 'Сохранить новый пароль' }}
         </button>
       </form>
@@ -77,34 +86,34 @@ const token = ref(route.params.token || route.query.token || '')
 
 const password = ref('')
 const password2 = ref('')
+const passwordTouched = ref(false)
+const confirmTouched = ref(false)
 const showPassword = ref(false)
 const loading = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
-const localValidationError = ref('')
+// Errors by field
+const passwordError = computed(() => {
+  if (!hasTokens.value) return ''
+  if (!password.value) return 'Введите пароль'
+  if (password.value.length < 8) return 'Минимум 8 символов'
+  return ''
+})
+const confirmError = computed(() => {
+  if (!hasTokens.value) return ''
+  if (!password2.value) return 'Повторите пароль'
+  if (password2.value !== password.value) return 'Пароли не совпадают'
+  return ''
+})
 
 const hasTokens = computed(() => !!uid.value && !!token.value)
-
-function validate() {
-  localValidationError.value = ''
-  if (password.value.length < 8) {
-    localValidationError.value = 'Пароль должен содержать не менее 8 символов.'
-    return false
-  }
-  // При желании можно усилить требования:
-  // if (!/[A-ZА-Я]/.test(password.value) || !/[a-zа-я]/.test(password.value) || !/\d/.test(password.value)) { ... }
-
-  if (password.value !== password2.value) {
-    localValidationError.value = 'Пароли не совпадают.'
-    return false
-  }
-  return true
-}
 
 async function handleSubmit() {
   errorMessage.value = ''
   successMessage.value = ''
-  if (!validate()) return
+  passwordTouched.value = true
+  confirmTouched.value = true
+  if (passwordError.value || confirmError.value) return
   if (!hasTokens.value) {
     errorMessage.value = 'Отсутствуют данные для сброса пароля.'
     return
@@ -186,6 +195,21 @@ async function handleSubmit() {
   box-shadow: 0 0 0 3px rgba(129, 50, 173, 0.1);
 }
 .form-input:disabled { background-color: #f5f5f5; cursor: not-allowed; }
+
+.form-input.invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.08);
+}
+
+.field-error {
+  color: #dc3545;
+  font-size: 12px;
+  margin: 5px 0;
+  min-height: 12px;
+  line-height: 12px;
+  visibility: hidden;
+}
+.field-error.visible { visibility: visible; }
 
 .auth-button {
   width: 100%;

@@ -51,14 +51,23 @@
 
     <section class="stories-block">
       <h2 class="block-title">Наши истории</h2>
-      <div class="card-list">
-        <div v-for="s in 3" :key="s" class="story-card">
-          <img src="/src/assets/patient_history.jpeg" alt="История пациента" />
-          <h3 class="card-title">История №{{ s }}</h3>
-          <p>
-            Краткий анонс истории семьи / пациента, который можно будет открыть
-            подробнее
-          </p>
+      <p v-if="storiesLoading" class="status muted">Загрузка…</p>
+      <p v-else-if="storiesError" class="status error">{{ storiesError }}</p>
+      <div v-else class="card-list">
+        <div
+          v-for="s in latestThreeStories"
+          :key="s.id"
+          class="story-card"
+          @click="goToStory(s.id)"
+        >
+           <div
+            class="story-image-wrap"
+            :style="{ backgroundImage: `url(${s.photo || storiesFallbackImg})` }"
+          >
+            <img :src="s.photo || storiesFallbackImg" :alt="s.title" class="story-image" />
+          </div>
+          <p class="date">{{ formatDate(s.created_at) }}</p>
+          <h3 class="card-title">{{ s.title }}</h3>
         </div>
       </div>
     </section>
@@ -71,6 +80,7 @@ import { useRouter } from 'vue-router';
 import { api } from '../services/api.js';
 import symptomsImg from '../assets/symptoms.png';
 import newsImg from '../assets/news.jpeg';
+import familyImg from '../assets/family.png';
 import StandardContent from '../components/StandardContent.vue';
 
 const router = useRouter();
@@ -115,6 +125,43 @@ async function fetchLatestNews() {
 }
 
 onMounted(fetchLatestNews);
+
+// Stories: last 3
+const stories = ref([]);
+const storiesLoading = ref(false);
+const storiesError = ref('');
+const storiesFallbackImg = familyImg;
+
+const sortedStories = computed(() =>
+  [...stories.value].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+);
+const latestThreeStories = computed(() => sortedStories.value.slice(0, 3));
+
+function goToStory(id) {
+  router.push(`/stories/${id}`);
+}
+
+async function fetchLatestStories() {
+  storiesLoading.value = true;
+  storiesError.value = '';
+  try {
+    const res = await api.accounts.getFamilyStories();
+    const items = Array.isArray(res?.items) ? res.items : [];
+    stories.value = items.map(s => ({
+      id: s.id,
+      title: s.title,
+      created_at: s.created_at || '',
+      photo: s.photo || '',
+    }));
+  } catch (e) {
+    storiesError.value = e?.response?.data?.message || e.message || 'Не удалось загрузить истории';
+    stories.value = [];
+  } finally {
+    storiesLoading.value = false;
+  }
+}
+
+onMounted(fetchLatestStories);
 </script>
 
 <style scoped>
@@ -126,6 +173,7 @@ onMounted(fetchLatestNews);
   justify-content: center;
   align-items: center;
   padding-bottom: 24px;
+  margin: 0 auto;
 }
 
 .home-page .home-page-title {
@@ -240,6 +288,54 @@ onMounted(fetchLatestNews);
   font-size: 12px;
   color: #666;
   margin-bottom: 6px;
+}
+
+.stories-block .story-card .date {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.stories-block .story-card .story-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 6px;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: #f3f4f6;
+  margin-bottom: 12px;
+}
+.stories-block .story-card .story-image-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  background-position: inherit;
+  background-size: inherit;
+  background-repeat: inherit;
+  filter: blur(18px);
+  transform: scale(1.12);
+}
+.stories-block .story-card .story-image {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background-color: transparent;
+  margin-bottom: 0;
+  border-radius: 0;
+}
+.stories-block .story-card .card-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 44px;
 }
 
 .block-title {

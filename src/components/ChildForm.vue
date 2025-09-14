@@ -12,9 +12,12 @@
           <input
             v-model="form.lastName"
             class="form-input"
+            :class="{ invalid: touched.lastName && !!lastNameError }"
             type="text"
+            @blur="onBlur('lastName')"
             required
           />
+          <p class="field-error" :class="{ visible: touched.lastName && !!lastNameError }">{{ lastNameError }}</p>
         </label>
       </div>
 
@@ -24,29 +27,44 @@
           <input
             v-model="form.firstName"
             class="form-input"
+            :class="{ invalid: touched.firstName && !!firstNameError }"
             type="text"
+            @blur="onBlur('firstName')"
             required
           />
+          <p class="field-error" :class="{ visible: touched.firstName && !!firstNameError }">{{ firstNameError }}</p>
         </label>
       </div>
 
       <div class="form-group">
         <label class="form-label"
           >Отчество
-          <input v-model="form.middleName" class="form-input" type="text" />
+          <input
+            v-model="form.middleName"
+            class="form-input"
+            type="text"
+            @blur="onBlur('middleName')"
+          />
         </label>
       </div>
 
       <div class="form-group">
         <label class="form-label"
           >Пол
-          <select v-model="form.gender" class="form-select" required>
+          <select
+            v-model="form.gender"
+            class="form-select"
+            :class="{ invalid: touched.gender && !!genderError }"
+            @blur="onBlur('gender')"
+            required
+          >
             <option class="form-option gender" disabled value="">
               Выберите пол
             </option>
             <option class="form-option" value="м">Мужской</option>
             <option class="form-option" value="ж">Женский</option>
           </select>
+          <p class="field-error" :class="{ visible: touched.gender && !!genderError }">{{ genderError }}</p>
         </label>
       </div>
 
@@ -56,9 +74,12 @@
           <input
             v-model="form.birthDate"
             class="form-input"
+            :class="{ invalid: touched.birthDate && !!birthDateError }"
             type="date"
+            @blur="onBlur('birthDate')"
             required
           />
+          <p class="field-error" :class="{ visible: touched.birthDate && !!birthDateError }">{{ birthDateError }}</p>
         </label>
       </div>
 
@@ -66,12 +87,19 @@
       <div class="form-group">
         <label class="form-label"
           >Гражданство
-          <select v-model="form.citizenship" class="form-select" required>
+          <select
+            v-model="form.citizenship"
+            class="form-select"
+            :class="{ invalid: touched.citizenship && !!citizenshipError }"
+            @blur="onBlur('citizenship')"
+            required
+          >
             <option disabled value="">Выберите</option>
             <option value="РФ">РФ</option>
             <option value="Другое">Другое</option>
           </select>
         </label>
+        <p class="field-error" :class="{ visible: touched.citizenship && !!citizenshipError }">{{ citizenshipError }}</p>
         <p v-if="isCitizenshipOther" class="alert alert-warning">
           Для гражданства «Другое» сохранение анкеты недоступно.
         </p>
@@ -84,12 +112,15 @@
           <select
             v-model="form.countryOfResidence"
             class="form-select"
+            :class="{ invalid: touched.countryOfResidence && !!countryError }"
+            @blur="onBlur('countryOfResidence')"
             required
           >
             <option disabled value="">Выберите</option>
             <option value="Россия">Россия</option>
             <option value="Другая страна">Другая страна</option>
           </select>
+          <p class="field-error" :class="{ visible: touched.countryOfResidence && !!countryError }">{{ countryError }}</p>
         </label>
       </div>
 
@@ -99,7 +130,9 @@
           <select
             v-model="form.cityId"
             class="form-select"
+            :class="{ invalid: touched.cityId && !!cityError }"
             :disabled="regionsLoading || !!regionsError"
+            @blur="onBlur('cityId')"
             required
           >
             <option disabled value="">
@@ -116,6 +149,7 @@
             </option>
           </select>
         </label>
+        <p class="field-error" :class="{ visible: touched.cityId && !!cityError }">{{ cityError }}</p>
         <p v-if="regionsError" class="alert alert-error">{{ regionsError }}</p>
       </div>
 
@@ -126,12 +160,15 @@
           <select
             v-model="form.geneticTestConfirmed"
             class="form-select"
+            :class="{ invalid: touched.geneticTestConfirmed && !!geneticTestConfirmedError }"
+            @blur="onBlur('geneticTestConfirmed')"
             required
           >
             <option disabled value="">Выберите</option>
             <option value="да">да</option>
             <option value="нет">нет</option>
           </select>
+          <p class="field-error" :class="{ visible: touched.geneticTestConfirmed && !!geneticTestConfirmedError }">{{ geneticTestConfirmedError }}</p>
         </label>
       </div>
 
@@ -141,7 +178,9 @@
           <select
             v-model="form.geneId"
             class="form-select"
+            :class="{ invalid: touched.geneId && !!geneIdError }"
             :disabled="mutationGenesLoading || !!mutationGenesError"
+            @blur="onBlur('geneId')"
             required
           >
             <option disabled value="">
@@ -161,6 +200,7 @@
               {{ g.name }}
             </option>
           </select>
+          <p class="field-error" :class="{ visible: touched.geneId && !!geneIdError }">{{ geneIdError }}</p>
         </label>
         <p v-if="mutationGenesError" class="alert alert-error">{{ mutationGenesError }}</p>
       </div>
@@ -171,30 +211,33 @@
           <input
             v-model="form.geneOther"
             class="form-input"
+            :class="{ invalid: touched.geneOther && !!geneOtherError }"
             type="text"
+            @blur="onBlur('geneOther')"
             required
           />
+          <p class="field-error" :class="{ visible: touched.geneOther && !!geneOtherError }">{{ geneOtherError }}</p>
         </label>
       </div>
 
       <div v-if="isGeneticConfirmed" class="form-group">
         <label class="form-label"
           >Скан/фото генетического анализа (PDF/JPG/PNG)
-          <input
-            class="form-input"
-            type="file"
-            accept="application/pdf,image/*"
-            @change="onFileChange"
-          />
+          <div class="file-upload">
+            <input
+              id="genetic-file"
+              ref="fileInput"
+              class="file-input-hidden"
+              type="file"
+              accept="application/pdf,image/*"
+              @change="onFileChange"
+            />
+            <button type="button" class="file-button" @click="openFileDialog">
+              Выбрать файл
+            </button>
+            <span class="file-chosen">{{ fileChosenText }}</span>
+          </div>
         </label>
-        <p
-          v-if="form.geneticTestFile && form.geneticTestFile.name"
-          class="file-info"
-        >
-          Файл: {{ form.geneticTestFile.name }} ({{
-            prettySize(form.geneticTestFile.size)
-          }})
-        </p>
         <p v-if="fileError" class="alert alert-error">{{ fileError }}</p>
       </div>
 
@@ -204,9 +247,12 @@
           <textarea
             v-model="form.diagnosisDescription"
             class="form-input textarea"
+            :class="{ invalid: touched.diagnosisDescription && !!diagnosisError }"
             :maxlength="2000"
             required
+            @blur="onBlur('diagnosisDescription')"
           />
+          <p class="field-error" :class="{ visible: touched.diagnosisDescription && !!diagnosisError }">{{ diagnosisError }}</p>
         </label>
         <div class="muted">
           Осталось символов:
@@ -217,24 +263,21 @@
       <!-- Законный представитель -->
       <div class="form-group">
         <label class="checkbox-label">
-          <input v-model="form.isLegalRepresentative" type="checkbox" />
+          <input
+            v-model="form.isLegalRepresentative"
+            type="checkbox"
+            @change="onBlur('isLegalRepresentative')"
+          />
           <span class="checkbox-text"
             >Я являюсь законным представителем несовершеннолетнего
             ребенка/подопечного (родитель, опекун, попечитель)</span
           >
         </label>
-        <p
-          v-if="!form.isLegalRepresentative && triedSubmit"
-          class="alert alert-error"
-        >
-          Подтверждение законного представителя обязательно.
-        </p>
+        <p class="field-error" :class="{ visible: touched.isLegalRepresentative && !!isLegalRepError }">{{ isLegalRepError }}</p>
       </div>
 
-      <p v-if="formError" class="alert alert-error">{{ formError }}</p>
-
       <div class="form-buttons">
-        <button class="btn submit" type="submit">Сохранить</button>
+        <button class="btn submit" type="submit" :disabled="!isFormValid">Сохранить</button>
         <button class="btn cancel" type="button" @click="$emit('cancel')">
           Отмена
         </button>
@@ -269,6 +312,21 @@ export default {
         diagnosisDescription: '',
         isLegalRepresentative: false,
       },
+      touched: {
+        lastName: false,
+        firstName: false,
+        middleName: false,
+        gender: false,
+        birthDate: false,
+        citizenship: false,
+        countryOfResidence: false,
+        cityId: false,
+        geneticTestConfirmed: false,
+        geneId: false,
+        geneOther: false,
+        diagnosisDescription: false,
+        isLegalRepresentative: false,
+      },
       regions: [],
       regionsLoading: false,
       regionsError: '',
@@ -276,7 +334,6 @@ export default {
       mutationGenesLoading: false,
       mutationGenesError: '',
       triedSubmit: false,
-      formError: '',
       fileError: '',
     };
   },
@@ -299,28 +356,80 @@ export default {
       const name = (g?.name || '').toLowerCase();
       return name === 'другое' || name === 'другой';
     },
-    canSubmit() {
-      // Базовая блокировка кнопки, чтобы UX был понятен
-      if (this.isCitizenshipOther) return false;
-      if (!this.form.isLegalRepresentative) return false;
-      if (
-        !this.form.lastName ||
-        !this.form.firstName ||
-        !this.form.gender ||
-        !this.form.birthDate
-      )
-        return false;
-      if (!this.form.citizenship || !this.form.countryOfResidence) return false;
-      if (this.isRussia && !this.form.cityId) return false;
-      if (!this.form.geneticTestConfirmed) return false;
-      if (this.isGeneticConfirmed) {
-        if (!this.form.geneId) return false;
-        if (this.isGeneOther && !this.form.geneOther) return false;
+    fileChosenText() {
+      const f = this.form.geneticTestFile;
+      if (f && f.name) {
+        return f.size ? `${f.name} (${this.prettySize(f.size)})` : f.name;
       }
-      if (this.isGeneticNotConfirmed && !this.form.diagnosisDescription)
-        return false;
-      if ((this.form.diagnosisDescription || '').length > 2000) return false;
-      return true;
+      return 'Файл не выбран';
+    },
+    // Ошибки по полям
+    lastNameError() {
+      if (!this.form.lastName?.trim()) return 'Введите фамилию';
+      return '';
+    },
+    firstNameError() {
+      if (!this.form.firstName?.trim()) return 'Введите имя';
+      return '';
+    },
+    genderError() {
+      if (!this.form.gender) return 'Выберите пол';
+      return '';
+    },
+    birthDateError() {
+      if (!this.form.birthDate) return 'Укажите дату рождения';
+      return '';
+    },
+    citizenshipError() {
+      if (!this.form.citizenship) return 'Выберите гражданство';
+      if (this.isCitizenshipOther) return 'Для гражданства «Другое» сохранение недоступно';
+      return '';
+    },
+    countryError() {
+      if (!this.form.countryOfResidence) return 'Выберите страну проживания';
+      return '';
+    },
+    cityError() {
+      if (this.isRussia && !this.form.cityId) return 'Выберите город';
+      return '';
+    },
+    geneticTestConfirmedError() {
+      if (!this.form.geneticTestConfirmed) return 'Укажите подтверждение генетического теста';
+      return '';
+    },
+    geneIdError() {
+      if (this.isGeneticConfirmed && !this.form.geneId) return 'Выберите ген';
+      return '';
+    },
+    geneOtherError() {
+      if (this.isGeneticConfirmed && this.isGeneOther && !this.form.geneOther?.trim()) return 'Укажите название гена';
+      return '';
+    },
+    diagnosisError() {
+      const text = (this.form.diagnosisDescription || '').trim();
+      if (this.isGeneticNotConfirmed && !text) return 'Опишите, кем и когда поставлен диагноз';
+      if (text.length > 2000) return 'Описание не должно превышать 2000 символов';
+      return '';
+    },
+    isLegalRepError() {
+      if (!this.form.isLegalRepresentative) return 'Подтвердите, что вы законный представитель';
+      return '';
+    },
+    isFormValid() {
+      return !(
+        this.lastNameError ||
+        this.firstNameError ||
+        this.genderError ||
+        this.birthDateError ||
+        this.citizenshipError ||
+        this.countryError ||
+        this.cityError ||
+        this.geneticTestConfirmedError ||
+        this.geneIdError ||
+        this.geneOtherError ||
+        this.diagnosisError ||
+        this.isLegalRepError
+      );
     },
   },
   mounted() {
@@ -332,6 +441,16 @@ export default {
     this.fetchMutationGenes();
   },
   methods: {
+    openFileDialog() {
+      this.$refs.fileInput?.click();
+    },
+    onBlur(field) {
+      if (field in this.touched) this.touched[field] = true;
+      // Тримим текстовые поля
+      if (['lastName', 'firstName', 'middleName', 'geneOther', 'diagnosisDescription'].includes(field)) {
+        this.form[field] = (this.form[field] || '').trim();
+      }
+    },
     async fetchRegions() {
       this.regionsLoading = true;
       this.regionsError = '';
@@ -417,64 +536,21 @@ export default {
       }
       return `${s.toFixed(1)} ${units[i]}`;
     },
-    validate() {
-      this.formError = '';
-      // Блокирующие условия
-      if (this.isCitizenshipOther) {
-        this.formError = 'Нельзя сохранить анкету при гражданстве «Другое»';
-        return false;
-      }
-      if (!this.form.isLegalRepresentative) {
-        this.formError =
-          'Необходимо подтвердить, что вы законный представитель';
-        return false;
-      }
-      if (
-        !this.form.lastName ||
-        !this.form.firstName ||
-        !this.form.gender ||
-        !this.form.birthDate
-      ) {
-        this.formError = 'Заполните все обязательные поля';
-        return false;
-      }
-      if (!this.form.citizenship || !this.form.countryOfResidence) {
-        this.formError = 'Укажите гражданство и страну проживания';
-        return false;
-      }
-      if (this.isRussia && !this.form.cityId) {
-        this.formError = 'Выберите город проживания';
-        return false;
-      }
-      if (!this.form.geneticTestConfirmed) {
-        this.formError = 'Укажите подтверждение генетического теста';
-        return false;
-      }
-      if (this.isGeneticConfirmed) {
-        if (!this.form.geneId) {
-          this.formError = 'Укажите ген';
-          return false;
-        }
-        if (this.isGeneOther && !this.form.geneOther) {
-          this.formError = 'Укажите название гена';
-          return false;
-        }
-        // файл не обязателен, но если выбран, уже проверен
-      } else if (this.isGeneticNotConfirmed) {
-        if (!this.form.diagnosisDescription) {
-          this.formError = 'Опишите, кем и когда поставлен диагноз';
-          return false;
-        }
-        if (this.form.diagnosisDescription.length > 2000) {
-          this.formError = 'Описание не должно превышать 2000 символов';
-          return false;
-        }
-      }
-      return true;
-    },
     submitForm() {
       this.triedSubmit = true;
-      if (!this.validate()) return;
+      // Показать ошибки под всеми активными полями
+      const toTouch = ['lastName','firstName','gender','birthDate','citizenship','countryOfResidence'];
+      if (this.isRussia) toTouch.push('cityId');
+      toTouch.push('geneticTestConfirmed');
+      if (this.isGeneticConfirmed) {
+        toTouch.push('geneId');
+        if (this.isGeneOther) toTouch.push('geneOther');
+      } else if (this.isGeneticNotConfirmed) {
+        toTouch.push('diagnosisDescription');
+      }
+      toTouch.push('isLegalRepresentative');
+      toTouch.forEach(f => (this.touched[f] = true));
+      if (!this.isFormValid) return;
       this.$emit('save', { ...this.form });
     },
   },
@@ -527,6 +603,24 @@ select:focus {
   outline: none;
 }
 
+/* Ошибки и состояния валидации */
+.form-input.invalid,
+.form-select.invalid {
+  border-color: #dc3545;
+}
+.field-error {
+  color: #dc3545;
+  font-size: 12px;
+  margin: 5px 0;
+  min-height: 12px;
+  line-height: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  visibility: hidden;
+}
+.field-error.visible { visibility: visible; }
+
 .form-buttons {
   display: flex;
   justify-content: space-between;
@@ -535,7 +629,7 @@ select:focus {
 }
 
 .btn {
-  margin-top: 16px;
+  margin: 0;
   background-color: transparent;
   border: none;
   border-bottom: 1px solid #23938c;
@@ -598,5 +692,41 @@ select:focus {
 .textarea {
   min-height: 120px;
   resize: vertical;
+}
+
+/* Стили для загрузки файла */
+.file-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+.file-input-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.file-button {
+  background-color: transparent;
+  border: 1px solid #23938c;
+  color: #23938c;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.file-button:hover {
+  background-color: #23938c;
+  color: white;
+}
+.file-chosen {
+  font-size: 14px;
+  color: #555;
 }
 </style>

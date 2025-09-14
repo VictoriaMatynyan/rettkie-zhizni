@@ -145,6 +145,24 @@ export const api = {
     getNews: () => httpClient.get('/accounts/news/').then(r => r.data),
     getNewsById: id => httpClient.get(`/accounts/news/${id}`).then(r => r.data),
 
+    // Мероприятия
+    getEvents: () => httpClient.get('/accounts/events/').then(r => r.data),
+    getEventById: id => httpClient.get(`/accounts/events/${id}`).then(r => r.data),
+
+    // Истории семей
+    getFamilyStories: () => httpClient.get('/accounts/family-stories/').then(r => r.data),
+    getFamilyStoryById: id => httpClient.get(`/accounts/family-stories/${id}`).then(r => r.data),
+
+    // Категории статей
+    getArticleCategories: () => httpClient.get('/accounts/article-categories/').then(r => r.data),
+
+    // Статьи
+    getArticles: () => httpClient.get('/accounts/articles/').then(r => r.data),
+    getArticleById: id => httpClient.get(`/accounts/articles/${id}`).then(r => r.data),
+
+    // Обратная связь
+    sendFeedback: payload => httpClient.post('/accounts/feedback/', payload).then(r => r.data),
+
     // Статистика анкет по городам
     getQuestionnaireStatsByCity: () =>
       httpClient.get('/accounts/questionnaires/stats/by-city/').then(r => r.data),

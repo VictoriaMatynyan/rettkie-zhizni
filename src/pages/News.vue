@@ -168,17 +168,16 @@ onMounted(fetchNews);
   color: #444;
 }
 
-/* Размытый фон + фиксированная высота превью */
 .news-image-wrap {
   position: relative;
   width: 100%;
-  height: 300px; /* единая высота превью, как на главной */
+  height: 300px;
   overflow: hidden;
   border-radius: 8px;
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-  background-color: #f3f4f6; /* фон-заглушка */
+  background-color: #f3f4f6;
   margin-bottom: 12px;
 }
 .news-image-wrap::before {

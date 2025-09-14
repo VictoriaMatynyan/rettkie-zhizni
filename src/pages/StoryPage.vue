@@ -1,140 +1,70 @@
 <template>
   <div class="story-page">
-    <h1 class="story-title">{{ story?.title }}</h1>
+    <h1 class="story-title">{{ story?.title || 'История семьи' }}</h1>
 
-    <!-- <img :src="story?.image" :alt="story?.title" class="story-image" /> -->
+    <p v-if="loading" class="status muted">Загрузка…</p>
+    <p v-else-if="error" class="status error">{{ error }}</p>
 
-    <StandardContent
-      :paragraphs="story?.content"
-      :image-src="story?.image"
-      :image-src-modal="story?.image"
-      image-alt="Фотография героя истории"
-      image-alt-modal="Фотография героя (увеличено)"
-      :download-link="story?.downloadLink"
-      download-label="Скачать дополнительный материал: "
-      :download-link-name="story?.downloadLinkName"
-      :video-url="story?.videoUrl"
-    />
+    <template v-else-if="story">
+      <div class="story-hero" v-if="story.photo || fallbackImg">
+        <img :src="story.photo || fallbackImg" :alt="story.title || 'Фото'" />
+      </div>
+      <article class="story-html" v-html="storyHtml"></article>
+    </template>
 
-    <p v-if="!story" class="not-found">История не найдена</p>
+    <p v-else class="not-found">История не найдена</p>
   </div>
+  
 </template>
 
 <script setup>
 import { useRoute } from 'vue-router';
-import { computed } from 'vue';
-import StandardContent from '../components/StandardContent.vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import familyImg from '../assets/family.png';
-
-// имитация базы историй
-const stories = [
-  {
-    id: '1',
-    title: 'История семьи Ивановых',
-    image: familyImg,
-    content: [
-      'Это трогательная история семьи, которая столкнулась с синдромом Ретта...',
-    ],
-    downloadLink: '/files/story-ivanovy.pdf',
-    downloadLinkName: 'PDF',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-  },
-  {
-    id: '2',
-    title: 'История Маши',
-    image: familyImg,
-    content: ['Маша была активным и весёлым ребёнком до 2 лет...'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '3',
-    title: 'История семьи Поповых',
-    image: familyImg,
-    content: ['История борьбы и надежды одной семьи...'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '4',
-    title: 'История 4',
-    image: familyImg,
-    content: ['История борьбы и надежды одной семьи...'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '5',
-    title: 'История 5',
-    image: familyImg,
-    content: ['История борьбы и надежды одной семьи...'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '6',
-    title: 'История 6',
-    image: familyImg,
-    content: ['История борьбы и надежды одной семьи...'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '7',
-    title: 'История 7',
-    image: familyImg,
-    content: ['История борьбы и надежды одной семьи...'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '8',
-    title: 'История 8',
-    image: familyImg,
-    preview: ['История борьбы и надежды одной семьи...'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '9',
-    title: 'История 9',
-    image: familyImg,
-    content: ['История борьбы и надежды одной семьи...'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '10',
-    title: 'История 10',
-    image: familyImg,
-    content: ['История борьбы и надежды одной семьи...'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '11',
-    title: 'История 11',
-    image: familyImg,
-    content: ['История борьбы и надежды одной семьи...'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-];
+import { api } from '../services/api.js';
 
 const route = useRoute();
-const story = computed(() => {
-  return stories.find(s => s.id === route.params.id);
+const story = ref(null);
+const loading = ref(false);
+const error = ref('');
+const fallbackImg = familyImg;
+
+async function loadStory() {
+  loading.value = true;
+  error.value = '';
+  story.value = null;
+  try {
+    const id = route.params.id;
+    const res = await api.accounts.getFamilyStoryById(id);
+    // Ответ: { ok, id, title, announcement, created_at, photo }
+    story.value = res || null;
+  } catch (e) {
+    error.value = e?.response?.data?.message || e.message || 'Не удалось загрузить историю';
+  } finally {
+    loading.value = false;
+  }
+}
+
+// Санитайзер: убираем теги script, on* атрибуты и javascript: ссылки
+function sanitizeHtml(html) {
+  if (!html) return '';
+  let out = String(html);
+  // Удаляем теги <scr"+"ipt>… (без прямого написания закрывающего тега)
+  const scriptRe = new RegExp('<' + 'script[^>]*>[\\s\\S]*?<\\/' + 'script>', 'gi');
+  out = out.replace(scriptRe, '');
+  out = out.replace(/\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '');
+  out = out.replace(/javascript:/gi, '');
+  return out;
+}
+
+const storyHtml = computed(() => {
+  const raw = story.value?.announcement;
+  if (!raw) return '';
+  return sanitizeHtml(raw);
 });
+
+onMounted(loadStory);
+watch(() => route.params.id, () => loadStory());
 </script>
 
 <style scoped>
@@ -150,15 +80,22 @@ const story = computed(() => {
   text-align: center;
 }
 
-.story-image {
-  max-width: 100%;
-  border-radius: 8px;
-  margin-bottom: 24px;
-}
+.story-hero { text-align: center; margin-bottom: 16px; }
+.story-hero img { max-width: 100%; border-radius: 8px; }
 
 .not-found {
   color: #999;
   text-align: center;
   font-style: italic;
 }
+
+.status { text-align: center; margin: 16px 0; }
+.status.muted { color: #666; }
+.status.error { color: #c33; }
+
+.story-html :deep(p) { line-height: 1.7; margin: 12px 0; }
+.story-html :deep(h2),
+.story-html :deep(h3) { margin: 18px 0 10px; }
+.story-html :deep(img) { max-width: 100%; height: auto; border-radius: 6px; }
+.story-html :deep(a) { color: #23938c; }
 </style>

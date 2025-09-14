@@ -281,7 +281,7 @@ export default {
     },
     passwordError() {
       if (!this.form.password) return 'Введите пароль';
-      if (this.form.password.length < 6) return 'Минимум 6 символов';
+      if (this.form.password.length < 8) return 'Минимум 8 символов';
       return '';
     },
     confirmError() {

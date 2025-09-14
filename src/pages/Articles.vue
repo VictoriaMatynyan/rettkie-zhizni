@@ -40,6 +40,8 @@
 
     <section class="articles-block">
       <h2 class="block-title">Статьи</h2>
+      <p v-if="loading" class="status muted">Загрузка…</p>
+      <p v-else-if="error" class="status error">{{ error }}</p>
       <div class="article-list">
         <div
           v-for="article in visibleArticles"
@@ -47,14 +49,15 @@
           class="article-card"
           @click="goToArticle(article.id)"
         >
-          <img
-            :src="article.image"
-            :alt="article.title"
-            class="article-image"
-          />
+          <div
+            class="article-image-wrap"
+            :style="{ backgroundImage: `url(${article.photo || fallbackImg})` }"
+          >
+            <img :src="article.photo || fallbackImg" :alt="article.title" class="article-image" />
+          </div>
           <p class="category">{{ article.category }}</p>
+          <p class="date">{{ formatDate(article.created_at) }}</p>
           <h3 class="card-title">{{ article.title }}</h3>
-          <p>{{ article.preview }}</p>
         </div>
       </div>
       <button v-if="hasMore" class="load-more" @click="loadMore">
@@ -68,115 +71,55 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { api, httpClient } from '../services/api.js';
 import symptomsImg from '../assets/symptoms.png';
 import articleImg from '../assets/news.jpeg';
 import StandardContent from '../components/StandardContent.vue';
 
 const router = useRouter();
 
-// массив статей - заглушки; позже будут загружаться с сервера)
-const articles = ref([
-  {
-    id: 1,
-    title: 'Статья 1',
-    image: articleImg,
-    preview: 'Анонс статьи',
-    category: 'Медицина',
-    date: '2025-06-01',
-  },
-  {
-    id: 2,
-    title: 'Статья 2',
-    image: articleImg,
-    preview: 'Анонс статьи',
-    category: 'Истории',
-    date: '2025-05-20',
-  },
-  {
-    id: 3,
-    title: 'Статья 3',
-    image: articleImg,
-    preview: 'Анонс статьи',
-    category: 'Медицина',
-    date: '2025-05-21',
-  },
-  {
-    id: 4,
-    title: 'Статья 4',
-    image: articleImg,
-    preview: 'Анонс статьи',
-    category: 'Истории',
-    date: '2025-05-20',
-  },
-  {
-    id: 5,
-    title: 'Статья 5',
-    image: articleImg,
-    preview: 'Анонс статьи',
-    category: 'Медицина',
-    date: '2025-05-20',
-  },
-  {
-    id: 6,
-    title: 'Статья 6',
-    image: articleImg,
-    preview: 'Анонс статьи',
-    category: 'Реабилитация',
-    date: '2025-05-20',
-  },
-  {
-    id: 7,
-    title: 'Статья 7',
-    image: articleImg,
-    preview: 'Анонс статьи',
-    category: 'Истории',
-    date: '2025-05-20',
-  },
-  {
-    id: 8,
-    title: 'Статья 8',
-    image: articleImg,
-    preview: 'Анонс статьи',
-    category: 'Реабилитация',
-    date: '2025-05-20',
-  },
-  {
-    id: 9,
-    title: 'Статья 9',
-    image: articleImg,
-    preview: 'Анонс статьи',
-    category: 'Медицина',
-    date: '2025-05-20',
-  },
-  {
-    id: 10,
-    title: 'Статья 10',
-    image: articleImg,
-    preview: 'Анонс статьи',
-    category: 'Медицина',
-    date: '2025-05-20',
-  },
-  {
-    id: 11,
-    title: 'Статья 11',
-    image: articleImg,
-    preview: 'Анонс статьи',
-    category: 'Реабилитация',
-    date: '2025-05-20',
-  },
-]);
+// Данные с бэка
+const articles = ref([]);
+const loading = ref(false);
+const error = ref('');
+const fallbackImg = articleImg;
+const baseURL = (httpClient?.defaults?.baseURL || '').replace(/\/+$/, '');
+
+function absUrl(url) {
+  if (!url) return '';
+  if (/^https?:\/\//i.test(url)) return url;
+  if (url.startsWith('/')) return `${baseURL}${url}`;
+  return url;
+}
+
+async function loadArticles() {
+  loading.value = true;
+  error.value = '';
+  try {
+    const res = await api.accounts.getArticles();
+    const items = Array.isArray(res?.items) ? res.items : [];
+    articles.value = items.map(a => ({
+      id: a.id,
+      title: a.title,
+      created_at: a.created_at || '',
+      photo: absUrl(a.photo || ''),
+      category: a.category || '',
+      category_id: a.category_id ?? null,
+    }));
+  } catch (e) {
+    error.value = e?.response?.data?.message || e.message || 'Не удалось загрузить статьи';
+  } finally {
+    loading.value = false;
+  }
+}
 
 // кол-во отображаемых историй
 const pageSize = 10;
 const currentPage = ref(1);
 
-const categories = computed(() =>
-  // получаем массив уникальных (set) категорий статей
-  [...new Set(articles.value.map(article => article.category))]
-);
-// категории, кот. выбрал пользователь
+const categories = ref([]);
 const selectedCategories = ref([]);
 
 const filteredArticles = computed(() => {
@@ -188,7 +131,7 @@ const filteredArticles = computed(() => {
 
 const sortedArticles = computed(() =>
   [...filteredArticles.value].sort(
-    (a, b) => new Date(b.date) - new Date(a.date)
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
   )
 );
 
@@ -220,6 +163,23 @@ function loadMore() {
 function goToArticle(id) {
   router.push(`/articles/${id}`);
 }
+
+function formatDate(d) {
+  if (!d) return '';
+  try { return new Date(d).toLocaleDateString('ru-RU'); } catch { return d; }
+}
+
+async function loadCategories() {
+  try {
+    const res = await api.accounts.getArticleCategories();
+    const items = Array.isArray(res?.items) ? res.items : [];
+    categories.value = items.map(i => i.name).filter(Boolean);
+  } catch { categories.value = []; }
+}
+
+onMounted(async () => {
+  await Promise.all([loadCategories(), loadArticles()]);
+});
 </script>
 
 <style scoped>
@@ -251,6 +211,7 @@ function goToArticle(id) {
 }
 
 .article-card {
+  width: 800px;
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -264,11 +225,37 @@ function goToArticle(id) {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 }
 
-.article-card img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 6px;
+.articles-block .article-card .article-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  border-radius: 8px;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: #f3f4f6;
   margin-bottom: 12px;
+}
+.articles-block .article-card .article-image-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  background-position: inherit;
+  background-size: inherit;
+  background-repeat: inherit;
+  filter: blur(18px);
+  transform: scale(1.12);
+}
+.articles-block .article-card .article-image {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* не режем саму картинку */
+  display: block;
+  background: transparent;
 }
 
 .card-title {
@@ -336,16 +323,16 @@ function goToArticle(id) {
   cursor: pointer;
 }
 
-.article-card img {
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-}
-
 .category {
   font-size: 12px;
   color: #888;
 }
+
+.date { font-size: 12px; color: #666; margin: 4px 0 6px; }
+
+.status { text-align: center; margin: 16px 0; }
+.status.muted { color: #666; }
+.status.error { color: #c33; }
 
 .no-articles {
   margin-top: 24px;

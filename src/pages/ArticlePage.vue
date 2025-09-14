@@ -1,138 +1,91 @@
 <template>
   <div class="article-page">
-    <h1 class="article-title">{{ article?.title }}</h1>
+    <p v-if="loading" class="status muted">Загрузка…</p>
+    <p v-else-if="error" class="status error">{{ error }}</p>
 
-    <!-- <img :src="article?.image" :alt="article?.title" class="article-image" /> -->
+    <template v-else-if="article">
+      <h1 class="article-title">{{ article.title || 'Статья' }}</h1>
+      <p class="meta">
+        <span v-if="article.created_at">{{ formatDate(article.created_at) }}</span>
+        <span v-if="article.category"> • {{ article.category }}</span>
+      </p>
+      <div class="article-hero" v-if="article.photo">
+        <img :src="article.photo" :alt="article.title" />
+      </div>
+      <article class="article-html" v-html="articleHtml"></article>
+    </template>
 
-    <StandardContent
-      :paragraphs="article?.content"
-      :image-src="article?.image"
-      :image-src-modal="article?.image"
-      image-alt="Обложка статьи"
-      image-alt-modal="Обложка статьи (увеличено)"
-      :download-link="article?.downloadLink"
-      download-label="Скачать дополнительный материал: "
-      :download-link-name="article?.downloadLinkName"
-      :video-url="article?.videoUrl"
-    />
-
-    <p v-if="!article" class="not-found">Статья не найдена</p>
+    <p v-else class="not-found">Статья не найдена</p>
   </div>
 </template>
 
 <script setup>
 import { useRoute } from 'vue-router';
-import { computed } from 'vue';
-import StandardContent from '../components/StandardContent.vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import { api, httpClient } from '../services/api.js';
 import articleImg from '../assets/news.jpeg';
 
-// имитация базы статей
-const articles = [
-  {
-    id: '1',
-    title: 'Статья 1',
-    image: articleImg,
-    content: ['Анонс статьи'],
-    downloadLink: '/files/article-ivanovy.pdf',
-    downloadLinkName: 'PDF',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-  },
-  {
-    id: '2',
-    title: 'Статья 2',
-    image: articleImg,
-    content: ['Анонс статьи'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '3',
-    title: 'Статья 3',
-    image: articleImg,
-    content: ['Анонс статьи'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '4',
-    title: 'Статья 4',
-    image: articleImg,
-    content: ['Анонс статьи'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '5',
-    title: 'Статья 5',
-    image: articleImg,
-    content: ['Анонс статьи'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '6',
-    title: 'Статья 6',
-    image: articleImg,
-    content: ['Анонс статьи'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '7',
-    title: 'Статья 7',
-    image: articleImg,
-    content: ['Анонс статьи'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '8',
-    title: 'Статья 8',
-    image: articleImg,
-    preview: ['Анонс статьи'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '9',
-    title: 'Статья 9',
-    image: articleImg,
-    content: ['Анонс статьи'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '10',
-    title: 'Статья 10',
-    image: articleImg,
-    content: ['Анонс статьи'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-  {
-    id: '11',
-    title: 'Статья 11',
-    image: articleImg,
-    content: ['Анонс статьи'],
-    downloadLink: '',
-    downloadLinkName: '',
-    videoUrl: '',
-  },
-];
-
 const route = useRoute();
-const article = computed(() => {
-  return articles.find(a => a.id === route.params.id);
-});
+const loading = ref(false);
+const error = ref('');
+const article = ref(null);
+const baseURL = (httpClient?.defaults?.baseURL || '').replace(/\/+$/, '');
+const fallbackImg = articleImg;
+
+function sanitizeHtml(html) {
+  if (!html) return '';
+  let out = String(html);
+  const scriptRe = new RegExp('<' + 'script[^>]*>[\\s\\S]*?<\\/' + 'script>', 'gi');
+  out = out.replace(scriptRe, '');
+  out = out.replace(/\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '');
+  out = out.replace(/javascript:/gi, '');
+  return out;
+}
+
+function absolutize(html) {
+  if (!html || !baseURL) return html || '';
+  let out = String(html);
+  out = out.replace(/\b(src|href)=("|')\/(?!\/)([^"']+)\2/gi, (m, attr, q, rest) => `${attr}=${q}${baseURL}/${rest}${q}`);
+  out = out.replace(/url\(\s*(["'])?\/(?!\/)([^\)"']+)\1?\s*\)/gi, (m, q, rest) => {
+    const qq = q || '"';
+    return `url(${qq}${baseURL}/${rest}${qq})`;
+  });
+  return out;
+}
+
+const articleHtml = computed(() => absolutize(sanitizeHtml(article.value?.announcement)));
+
+async function loadArticle() {
+  loading.value = true;
+  error.value = '';
+  article.value = null;
+  try {
+    const id = route.params.id;
+    const res = await api.accounts.getArticleById(id);
+    // { ok, id, title, announcement, created_at, photo, category_id, category }
+    article.value = {
+      id: res.id,
+      title: res.title,
+      created_at: res.created_at || '',
+      category: res.category || '',
+      category_id: res.category_id ?? null,
+      photo: res.photo ? (res.photo.startsWith('/') ? `${baseURL}${res.photo}` : res.photo) : '',
+      announcement: res.announcement || '',
+    };
+  } catch (e) {
+    error.value = e?.response?.data?.message || e.message || 'Не удалось загрузить статью';
+  } finally {
+    loading.value = false;
+  }
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  try { return new Date(d).toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' }); } catch { return d; }
+}
+
+onMounted(loadArticle);
+watch(() => route.params.id, () => loadArticle());
 </script>
 
 <style scoped>
@@ -144,19 +97,26 @@ const article = computed(() => {
 
 .article-title {
   font-size: 28px;
-  margin-bottom: 24px;
+  margin-bottom: 8px;
   text-align: center;
 }
+.meta { text-align: center; color: #666; margin-bottom: 16px; }
 
-.article-image {
-  max-width: 100%;
-  border-radius: 8px;
-  margin-bottom: 24px;
-}
+.article-hero { text-align: center; margin-bottom: 16px; }
+.article-hero img { max-width: 100%; border-radius: 8px; }
 
-.not-found {
-  color: #999;
-  text-align: center;
-  font-style: italic;
-}
+.article-html :deep(h1),
+.article-html :deep(h2),
+.article-html :deep(h3),
+.article-html :deep(h4),
+.article-html :deep(h5),
+.article-html :deep(h6) { margin: 16px 0 8px; }
+.article-html :deep(p) { line-height: 1.7; margin-bottom: 12px; }
+.article-html :deep(img) { max-width: 100%; height: auto; border-radius: 6px; }
+
+.status { text-align: center; margin: 16px 0; }
+.status.muted { color: #666; }
+.status.error { color: #c33; }
+
+.not-found { color: #999; text-align: center; font-style: italic; }
 </style>

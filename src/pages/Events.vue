@@ -19,6 +19,8 @@
 
     <section class="events-block">
       <h2 class="block-title">Мероприятия</h2>
+      <p v-if="loading" class="status muted">Загрузка…</p>
+      <p v-else-if="error" class="status error">{{ error }}</p>
       <div class="event-list">
         <div
           v-for="event in visibleEvents"
@@ -26,9 +28,9 @@
           class="event-card"
           @click="goToEvent(event.id)"
         >
-          <img :src="event.image" :alt="event.title" class="event-image" />
+          <img :src="event.photo || fallbackImg" :alt="event.title" class="event-image" />
+          <p class="date">{{ formatDate(event.event_date) }} <span v-if="event.location">• {{ event.location }}</span></p>
           <h3 class="card-title">{{ event.title }}</h3>
-          <p>{{ event.preview }}</p>
         </div>
       </div>
       <button v-if="hasMore" class="load-more" @click="loadMore">
@@ -39,101 +41,54 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { api, httpClient } from '../services/api.js';
 import symptomsImg from '../assets/symptoms.png';
 import eventImg from '../assets/news.jpeg';
 import StandardContent from '../components/StandardContent.vue';
 
 const router = useRouter();
+// Данные мероприятий с бэка
+const events = ref([]);
+const loading = ref(false);
+const error = ref('');
+const fallbackImg = eventImg;
+const baseURL = (httpClient?.defaults?.baseURL || '').replace(/\/+$/, '');
 
-// массив мероприятий - заглушки; позже будут загружаться с сервера)
-const events = ref([
-  {
-    id: 1,
-    title: 'Мероприятие 1',
-    image: eventImg,
-    preview: 'Анонс Мероприятие',
-    date: '2025-06-01',
-  },
-  {
-    id: 2,
-    title: 'Мероприятие 2',
-    image: eventImg,
-    preview: 'Анонс Мероприятие',
-    date: '2025-05-20',
-  },
-  {
-    id: 3,
-    title: 'Мероприятие 3',
-    image: eventImg,
-    preview: 'Анонс Мероприятие',
-    date: '2025-05-21',
-  },
-  {
-    id: 4,
-    title: 'Мероприятие 4',
-    image: eventImg,
-    preview: 'Анонс Мероприятие',
-    date: '2025-05-20',
-  },
-  {
-    id: 5,
-    title: 'Мероприятие 5',
-    image: eventImg,
-    preview: 'Анонс Мероприятие',
-    date: '2025-05-20',
-  },
-  {
-    id: 6,
-    title: 'Мероприятие 6',
-    image: eventImg,
-    preview: 'Анонс Мероприятие',
-    date: '2025-05-20',
-  },
-  {
-    id: 7,
-    title: 'Мероприятие 7',
-    image: eventImg,
-    preview: 'Анонс Мероприятие',
-    date: '2025-05-20',
-  },
-  {
-    id: 8,
-    title: 'Мероприятие 8',
-    image: eventImg,
-    preview: 'Анонс Мероприятие',
-    date: '2025-05-20',
-  },
-  {
-    id: 9,
-    title: 'Мероприятие 9',
-    image: eventImg,
-    preview: 'Анонс Мероприятие',
-    date: '2025-05-20',
-  },
-  {
-    id: 10,
-    title: 'Мероприятие 10',
-    image: eventImg,
-    preview: 'Анонс Мероприятие',
-    date: '2025-05-20',
-  },
-  {
-    id: 11,
-    title: 'Мероприятие 11',
-    image: eventImg,
-    preview: 'Анонс Мероприятие',
-    date: '2025-05-20',
-  },
-]);
+function absUrl(url) {
+  if (!url) return '';
+  if (/^https?:\/\//i.test(url)) return url;
+  if (url.startsWith('/')) return `${baseURL}${url}`;
+  return url;
+}
+
+async function loadEvents() {
+  loading.value = true;
+  error.value = '';
+  try {
+    const res = await api.accounts.getEvents();
+    const items = Array.isArray(res?.items) ? res.items : [];
+    events.value = items.map(e => ({
+      id: e.id,
+      title: e.title,
+      event_date: e.event_date || e.created_at || '',
+      location: e.location || '',
+      photo: absUrl(e.photo || ''),
+    }));
+  } catch (e) {
+    error.value = e?.response?.data?.message || e.message || 'Не удалось загрузить мероприятия';
+  } finally {
+    loading.value = false;
+  }
+}
 
 // кол-во отображаемых историй
 const pageSize = 10;
 const currentPage = ref(1);
 
 const sortedEvents = computed(() =>
-  [...events.value].sort((a, b) => new Date(b.date) - new Date(a.date))
+  [...events.value].sort((a, b) => new Date(b.event_date) - new Date(a.event_date))
 );
 
 const visibleEvents = computed(() =>
@@ -151,6 +106,15 @@ function loadMore() {
 function goToEvent(id) {
   router.push(`/events/${id}`);
 }
+
+function formatDate(d) {
+  if (!d) return '';
+  try {
+    return new Date(d).toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' });
+  } catch { return d; }
+}
+
+onMounted(loadEvents);
 </script>
 
 <style scoped>
@@ -195,17 +159,16 @@ function goToEvent(id) {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 }
 
-.event-card img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 6px;
-  margin-bottom: 12px;
-}
-
 .card-title {
   font-size: 18px;
   margin: 8px 0;
 }
+
+.date { font-size: 12px; color: #666; margin-bottom: 6px; }
+
+.status { text-align: center; margin: 16px 0; }
+.status.muted { color: #666; }
+.status.error { color: #c33; }
 
 .load-more {
   margin: 24px auto 0;
@@ -261,6 +224,7 @@ function goToEvent(id) {
 }
 
 .event-card {
+  width: 800px;
   border: 1px solid #ccc;
   padding: 16px;
   margin-bottom: 16px;
@@ -269,8 +233,9 @@ function goToEvent(id) {
 
 .event-card img {
   width: 100%;
-  max-width: 100%;
+  max-width: 50%;
   height: auto;
+  align-self: center;
 }
 
 .category {

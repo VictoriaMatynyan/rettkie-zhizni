@@ -23,8 +23,8 @@ import Footer from './components/Footer.vue';
   width: 100%;
   flex: 1;
   align-self: center;
-  /* Горизонтальные отступы только для основной области, не затрагивая Header/Footer */
   padding: 0 16px;
+  margin: 0 auto;
 }
 .logo {
   height: 6em;

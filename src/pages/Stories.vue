@@ -18,6 +18,8 @@
     </StandardContent>
     <section class="family-stories">
       <h2 class="block-title">Истории семей</h2>
+      <div v-if="loading" class="status muted">Загрузка…</div>
+      <div v-if="error" class="status error">{{ error }}</div>
       <div class="card-list">
         <div
           v-for="story in visibleStories"
@@ -25,9 +27,9 @@
           class="story-card"
           @click="goToStory(story.id)"
         >
-          <img :src="story.image" :alt="story.title" class="story-image" />
+          <img :src="story.photo || fallbackImg" :alt="story.title" class="story-image" />
           <h3 class="card-title">{{ story.title }}</h3>
-          <p>{{ story.preview }}</p>
+          <p class="card-date">{{ formatDate(story.created_at) }}</p>
         </div>
       </div>
       <button v-if="hasMore" class="load-more" @click="loadMore">
@@ -38,101 +40,49 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import symptomsImg from '../assets/symptoms.png';
 import familyImg from '../assets/family.png';
 import StandardContent from '../components/StandardContent.vue';
+import { api } from '../services/api.js';
 
 const router = useRouter();
 
-// массив историй - заглушки; позже будут загружаться с сервера)
-const stories = ref([
-  {
-    id: 1,
-    title: 'История семьи Ивановых',
-    image: familyImg,
-    preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-06-01',
-  },
-  {
-    id: 2,
-    title: 'История Маши',
-    image: familyImg,
-    preview: 'Как маленькая Маша училась жить с диагнозом...',
-    date: '2025-05-20',
-  },
-  {
-    id: 3,
-    title: 'История семьи Поповых',
-    image: familyImg,
-    preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-21',
-  },
-  {
-    id: 4,
-    title: 'История 4',
-    image: familyImg,
-    preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20',
-  },
-  {
-    id: 5,
-    title: 'История 5',
-    image: familyImg,
-    preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20',
-  },
-  {
-    id: 6,
-    title: 'История 6',
-    image: familyImg,
-    preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20',
-  },
-  {
-    id: 7,
-    title: 'История 7',
-    image: familyImg,
-    preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20',
-  },
-  {
-    id: 8,
-    title: 'История 8',
-    image: familyImg,
-    preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20',
-  },
-  {
-    id: 9,
-    title: 'История 9',
-    image: familyImg,
-    preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20',
-  },
-  {
-    id: 10,
-    title: 'История 10',
-    image: familyImg,
-    preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20',
-  },
-  {
-    id: 11,
-    title: 'История 11',
-    image: familyImg,
-    preview: 'История борьбы и надежды одной семьи...',
-    date: '2025-05-20',
-  },
-]);
+// Истории с бэка
+const stories = ref([]);
+const loading = ref(false);
+const error = ref('');
+const fallbackImg = familyImg;
+
+onMounted(loadStories);
+
+async function loadStories() {
+  loading.value = true;
+  error.value = '';
+  try {
+    const res = await api.accounts.getFamilyStories();
+    const items = Array.isArray(res?.items) ? res.items : [];
+    // Храним как есть, только нормализуем поле даты для сортировки
+    stories.value = items.map(it => ({
+      id: it.id,
+      title: it.title,
+      created_at: it.created_at || it.date || '',
+      photo: it.photo || '',
+    }));
+  } catch (e) {
+    error.value = e?.response?.data?.message || e.message || 'Не удалось загрузить истории';
+  } finally {
+    loading.value = false;
+  }
+}
 
 // кол-во отображаемых историй
 const pageSize = 10;
 const currentPage = ref(1);
 
 const sortedStories = computed(() =>
-  [...stories.value].sort((a, b) => new Date(b.date) - new Date(a.date))
+  [...stories.value].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 );
 const visibleStories = computed(() =>
   sortedStories.value.slice(0, currentPage.value * pageSize)
@@ -147,6 +97,16 @@ function loadMore() {
 
 function goToStory(id) {
   router.push(`/stories/${id}`);
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  try {
+    const date = new Date(d);
+    return date.toLocaleDateString('ru-RU');
+  } catch {
+    return d;
+  }
 }
 </script>
 
@@ -204,6 +164,12 @@ function goToStory(id) {
   font-size: 18px;
   margin: 8px 0;
 }
+
+.card-date { color: #666; font-size: 13px; }
+
+.status { text-align: center; margin: 16px 0; }
+.status.muted { color: #666; }
+.status.error { color: #c33; }
 
 .load-more {
   margin: 24px auto 0;

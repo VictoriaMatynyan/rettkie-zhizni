@@ -435,14 +435,18 @@ onBeforeUnmount(() => {
   .dropdown {
     width: 100%;
   }
-  /* На мобильном позволяем перенос строк для длинных пунктов */
   .main-nav a,
   .dropdown-trigger {
     white-space: normal;
   }
+  .main-nav > .btn-donate, .main-nav > .btn-help {
+    max-width: 115px;
+    width: 100%;
+    align-self: start;
+        justify-content: center;
+  }
 }
 
-/* Сглаживаем сжатие меню между 1216px и бургером */
 @media (max-width: 1216px) and (min-width: 1191px) {
   .header-container {
     padding: 0 12px;

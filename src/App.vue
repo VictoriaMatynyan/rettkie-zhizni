@@ -23,6 +23,8 @@ import Footer from './components/Footer.vue';
   width: 100%;
   flex: 1;
   align-self: center;
+  /* Горизонтальные отступы только для основной области, не затрагивая Header/Footer */
+  padding: 0 16px;
 }
 .logo {
   height: 6em;
@@ -35,5 +37,12 @@ import Footer from './components/Footer.vue';
 }
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #42b883aa);
+}
+
+@media (min-width: 768px) {
+  .main-content { padding: 0 24px; }
+}
+@media (min-width: 1200px) {
+  .main-content { padding: 0 32px; }
 }
 </style>

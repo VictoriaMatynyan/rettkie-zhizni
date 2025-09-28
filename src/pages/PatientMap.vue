@@ -64,12 +64,12 @@ onMounted(fetchStats);
 
 /* .main-content > .patient-registry .standard-content {
   text-align: justify;
-} */
+}
 
 .main-content > .patient-registry > p {
   text-align: justify;
   margin: 0 10px 0;
-}
+} */
 
 .block-title {
   font-size: 22px;

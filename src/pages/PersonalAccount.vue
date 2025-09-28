@@ -1,6 +1,10 @@
 <template>
   <div class="personal-account">
     <h1>Личный кабинет</h1>
+    <div v-if="authStore.user" class="subscription-status">
+      Подписка на новости:
+      <strong>{{ authStore.user.email_notifications ? 'включена' : 'выключена' }}</strong>
+    </div>
     <nav class="tabs">
       <div
         class="tabs-list"
@@ -115,6 +119,12 @@ async function handleLogout() {
   max-width: 1050px;
   margin: 0 auto;
   padding: 0 16px 25px;
+}
+
+.subscription-status {
+  margin: 6px 0 14px;
+  font-size: 14px;
+  color: #444;
 }
 
 @media (min-width: 768px) {

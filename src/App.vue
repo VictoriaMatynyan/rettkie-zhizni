@@ -25,6 +25,7 @@ import Footer from './components/Footer.vue';
   align-self: center;
   padding: 0 16px;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 .logo {
   height: 6em;
@@ -40,9 +41,15 @@ import Footer from './components/Footer.vue';
 }
 
 @media (min-width: 768px) {
-  .main-content { padding: 0 24px; }
+  .main-content {
+    padding: 0 24px;
+    display: flex;
+    width: 100%;
+  }
 }
 @media (min-width: 1200px) {
-  .main-content { padding: 0 32px; }
+  .main-content {
+    padding: 0 32px;
+  }
 }
 </style>

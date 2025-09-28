@@ -142,6 +142,20 @@
             <p class="field-error" :class="{ visible: confirmTouched && !!confirmError }">{{ confirmError }}</p>
           </div>
         </div>
+        <!-- Newsletter subscription checkbox -->
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input
+              v-model="form.email_notifications"
+              type="checkbox"
+              :disabled="loading || isLocked"
+            />
+            <span class="checkbox-text">
+              Получать новости и важные обновления по e‑mail
+              <span class="muted">(можно изменить в личном кабинете)</span>
+            </span>
+          </label>
+        </div>
         <div class="form-group">
           <label class="checkbox-label">
             <input
@@ -209,6 +223,7 @@ export default {
         user_type_id: '',
         password: '',
         password_confirm: '',
+        email_notifications: false,
         consent: false,
       },
       // Сохраняем email, использованный при регистрации, для ссылки на почту
@@ -422,6 +437,7 @@ export default {
         user_type_id: '',
         password: '',
         password_confirm: '',
+        email_notifications: false,
         consent: false,
       };
     },

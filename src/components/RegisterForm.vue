@@ -110,35 +110,55 @@
         <div class="form-row">
           <div class="form-group">
             <label for="password" class="form-label">Пароль *</label>
-            <input
-              id="password"
-              v-model="form.password"
-              type="password"
-              class="form-input"
-              :class="{ invalid: passwordTouched && !!passwordError }"
-              required
-              :disabled="loading || isLocked"
-              placeholder="Минимум 6 символов"
-              minlength="6"
-              @blur="passwordTouched = true"
-            />
+            <div class="password-input">
+              <input
+                id="password"
+                v-model="form.password"
+                :type="showPassword ? 'text' : 'password'"
+                class="form-input"
+                :class="{ invalid: passwordTouched && !!passwordError }"
+                required
+                :disabled="loading || isLocked"
+                placeholder="Минимум 6 символов"
+                minlength="6"
+                @blur="passwordTouched = true"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                :aria-label="showPassword ? 'Скрыть пароль' : 'Показать пароль'"
+                @click="showPassword = !showPassword"
+              >
+                <img :src="hideIcon" alt="" />
+              </button>
+            </div>
             <p class="field-error" :class="{ visible: passwordTouched && !!passwordError }">{{ passwordError }}</p>
           </div>
           <div class="form-group">
             <label for="confirmPassword" class="form-label"
               >Повторите пароль *</label
             >
-            <input
-              id="confirmPassword"
-              v-model="form.password_confirm"
-              type="password"
-              class="form-input"
-              :class="{ invalid: confirmTouched && !!confirmError }"
-              required
-              :disabled="loading || isLocked"
-              placeholder="Повторите пароль"
-              @blur="confirmTouched = true"
-            />
+            <div class="password-input">
+              <input
+                id="confirmPassword"
+                v-model="form.password_confirm"
+                :type="showConfirmPassword ? 'text' : 'password'"
+                class="form-input"
+                :class="{ invalid: confirmTouched && !!confirmError }"
+                required
+                :disabled="loading || isLocked"
+                placeholder="Повторите пароль"
+                @blur="confirmTouched = true"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                :aria-label="showConfirmPassword ? 'Скрыть пароль' : 'Показать пароль'"
+                @click="showConfirmPassword = !showConfirmPassword"
+              >
+                <img :src="hideIcon" alt="" />
+              </button>
+            </div>
             <p class="field-error" :class="{ visible: confirmTouched && !!confirmError }">{{ confirmError }}</p>
           </div>
         </div>
@@ -159,19 +179,6 @@
           </label>
           <p class="field-error" :class="{ visible: consentTouched && !!consentError }">{{ consentError }}</p>
         </div>
-        <div v-if="registrationSuccess" class="success-message">
-          <strong>Спасибо, {{ submittedFirstName || 'друг' }}!</strong>
-          Регистрация прошла успешно. Мы отправили письмо для подтверждения.
-          Если его нет, загляните в папку «Спам».
-          <div v-if="isLocked" class="muted" style="margin-top:6px;">
-            Форма регистрации будет снова доступна через {{ lockRemaining }} сек.
-          </div>
-          <div v-if="emailServiceUrl" class="go-to-email">
-            <a :href="emailServiceUrl" target="_blank" rel="noopener" class="email-link">
-              Перейти к почте {{ submittedEmail }}
-            </a>
-          </div>
-        </div>
         <div v-if="error" class="error-message">
           {{ error }}
         </div>
@@ -190,14 +197,37 @@
       </div>
     </div>
   </div>
+  <ConfirmModal
+    v-model="showSuccessModal"
+    :title="successModalTitle"
+    :cancel-text="successCancelText"
+    :show-cancel="true"
+    @confirm="handleSuccessConfirm"
+    @cancel="closeSuccessModal"
+  >
+    <template #message>
+      <p>Регистрация прошла успешно. Мы отправили письмо для подтверждения. Если его нет, загляните в папку «Спам».</p>
+      <p v-if="emailServiceUrl" class="modal-email-link">
+        <a :href="emailServiceUrl" target="_blank" rel="noopener" class="email-link">
+          Перейти к почте {{ submittedEmail || trimmedEmail }}
+        </a>
+      </p>
+      <p v-if="isLocked" class="modal-muted">
+        Форма регистрации будет снова доступна через {{ lockRemaining }} сек.
+      </p>
+    </template>
+  </ConfirmModal>
 </template>
 
 <script>
 import { useAuthStore } from '../stores/auth.js';
 import { api } from '../services/api.js';
+import ConfirmModal from './ConfirmModal.vue';
+import hideIcon from '../assets/hide.png';
 
 export default {
   name: 'RegisterForm',
+  components: { ConfirmModal },
   data() {
     return {
       form: {
@@ -233,6 +263,10 @@ export default {
       lockIntervalId: null,
       successLockSeconds: 30,
       submittedFirstName: '',
+      showSuccessModal: false,
+      showPassword: false,
+      showConfirmPassword: false,
+      hideIcon,
     };
   },
   computed: {
@@ -308,6 +342,16 @@ export default {
     registrationComplete() {
       return this.authStore.registrationSuccess;
     },
+    successModalTitle() {
+      const name = this.submittedFirstName || this.form.first_name || '';
+      return name ? `Добро пожаловать, ${name}!` : 'Добро пожаловать, друг';
+    },
+    // successConfirmText() {
+    //   return this.emailServiceUrl ? 'Перейти к почте' : 'Хорошо';
+    // },
+    successCancelText() {
+      return this.emailServiceUrl ? 'Закрыть' : 'Отмена';
+    },
   },
   async mounted() {
     this.authStore.clearError();
@@ -335,6 +379,17 @@ export default {
           this.isLocked = false;
         }
       }, 1000);
+    },
+    closeSuccessModal() {
+      this.showSuccessModal = false;
+    },
+    handleSuccessConfirm() {
+      if (this.emailServiceUrl && typeof window !== 'undefined') {
+        try {
+          window.open(this.emailServiceUrl, '_blank', 'noopener');
+        } catch (_) {}
+      }
+      this.closeSuccessModal();
     },
     clearTouched() {
       this.firstNameTouched = false;
@@ -446,6 +501,9 @@ export default {
         this.submittedEmail = this.form.email;
         this.submittedFirstName = (this.form.first_name || '').trim();
         this.registrationSuccess = true;
+        this.showSuccessModal = true;
+        this.showPassword = false;
+        this.showConfirmPassword = false;
         // Очищаем поля формы (email уже сохранен отдельно)
         this.resetForm();
         // Сбрасываем состояния ошибок, чтобы не отвлекать пользователя
@@ -496,6 +554,46 @@ export default {
 
 .form-group {
   margin-bottom: 20px;
+}
+
+.password-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input .form-input {
+  padding-right: 44px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  height: 100%;
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid rgba(129, 50, 173, 0.6);
+  outline-offset: 2px;
+}
+
+.password-toggle img {
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  opacity: 0.75;
+  transition: opacity 0.2s ease;
+}
+
+.password-toggle:hover img {
+  opacity: 1;
 }
 
 .form-label {
@@ -622,6 +720,16 @@ export default {
 
 .email-link:hover {
   text-decoration: underline;
+}
+
+.modal-email-link {
+  margin-top: 12px;
+}
+
+.modal-muted {
+  margin-top: 12px;
+  color: #666;
+  font-size: 13px;
 }
 
 .success-message {

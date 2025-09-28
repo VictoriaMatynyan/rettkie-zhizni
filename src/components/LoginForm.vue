@@ -29,18 +29,28 @@
 
         <div class="form-group">
           <label for="password" class="form-label">Пароль</label>
-          <input
-            id="password"
-            v-model="form.password"
-            type="password"
-            class="form-input"
-            :class="{ invalid: passwordTouched && !!passwordError }"
-            required
-            :disabled="loading"
-            placeholder="Введите пароль"
-            @input="onPasswordInput"
-            @blur="passwordTouched = true"
-          />
+          <div class="password-input">
+            <input
+              id="password"
+              v-model="form.password"
+              :type="showPassword ? 'text' : 'password'"
+              class="form-input"
+              :class="{ invalid: passwordTouched && !!passwordError }"
+              required
+              :disabled="loading"
+              placeholder="Введите пароль"
+              @input="onPasswordInput"
+              @blur="passwordTouched = true"
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              :aria-label="showPassword ? 'Скрыть пароль' : 'Показать пароль'"
+              @click="showPassword = !showPassword"
+            >
+              <img :src="hideIcon" alt="" />
+            </button>
+          </div>
           <p
             class="field-error"
             :class="{ visible: passwordTouched && !!passwordError }"
@@ -77,6 +87,7 @@
 
 <script>
 import { useAuthStore } from '../stores/auth.js';
+import hideIcon from '../assets/hide.png';
 
 export default {
   name: 'LoginForm',
@@ -88,6 +99,8 @@ export default {
       },
       emailTouched: false,
       passwordTouched: false,
+      showPassword: false,
+      hideIcon,
     };
   },
   computed: {
@@ -138,6 +151,7 @@ export default {
           email: this.trimmedEmail,
           password: this.form.password,
         });
+        this.showPassword = false;
 
         // Перенаправляем в личный кабинет
         this.$router.push('/personal-account');
@@ -156,6 +170,8 @@ export default {
 
 <style scoped>
 .auth-form-container {
+  width: 50vw;
+  max-width: 500px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -181,6 +197,46 @@ export default {
 
 .form-group {
   margin-bottom: 20px;
+}
+
+.password-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input .form-input {
+  padding-right: 44px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  height: 100%;
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid rgba(129, 50, 173, 0.6);
+  outline-offset: 2px;
+}
+
+.password-toggle img {
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  opacity: 0.75;
+  transition: opacity 0.2s ease;
+}
+
+.password-toggle:hover img {
+  opacity: 1;
 }
 
 .form-label {

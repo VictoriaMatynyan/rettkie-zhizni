@@ -11,44 +11,58 @@
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
           <label for="password" class="form-label">Новый пароль</label>
-          <input
-            id="password"
-            v-model.trim="password"
-            :type="showPassword ? 'text' : 'password'"
-            class="form-input"
-            :class="{ invalid: passwordTouched && !!passwordError }"
-            :disabled="loading || !hasTokens"
-            placeholder="Введите новый пароль"
-            required
-            minlength="8"
-            autocomplete="new-password"
-            @blur="passwordTouched = true"
-          />
+          <div class="password-input">
+            <input
+              id="password"
+              v-model.trim="password"
+              :type="showPasswordField ? 'text' : 'password'"
+              class="form-input"
+              :class="{ invalid: passwordTouched && !!passwordError }"
+              :disabled="loading || !hasTokens"
+              placeholder="Введите новый пароль"
+              required
+              minlength="8"
+              autocomplete="new-password"
+              @blur="passwordTouched = true"
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              :aria-label="showPasswordField ? 'Скрыть пароль' : 'Показать пароль'"
+              @click="showPasswordField = !showPasswordField"
+            >
+              <img :src="hideIcon" alt="" />
+            </button>
+          </div>
           <p class="field-error" :class="{ visible: passwordTouched && !!passwordError }">{{ passwordError }}</p>
         </div>
 
         <div class="form-group">
           <label for="password2" class="form-label">Подтверждение пароля</label>
-          <input
-            id="password2"
-            v-model.trim="password2"
-            :type="showPassword ? 'text' : 'password'"
-            class="form-input"
-            :class="{ invalid: confirmTouched && !!confirmError }"
-            :disabled="loading || !hasTokens"
-            placeholder="Повторите пароль"
-            required
-            minlength="8"
-            autocomplete="new-password"
-            @blur="confirmTouched = true"
-          />
+          <div class="password-input">
+            <input
+              id="password2"
+              v-model.trim="password2"
+              :type="showConfirmPasswordField ? 'text' : 'password'"
+              class="form-input"
+              :class="{ invalid: confirmTouched && !!confirmError }"
+              :disabled="loading || !hasTokens"
+              placeholder="Повторите пароль"
+              required
+              minlength="8"
+              autocomplete="new-password"
+              @blur="confirmTouched = true"
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              :aria-label="showConfirmPasswordField ? 'Скрыть пароль' : 'Показать пароль'"
+              @click="showConfirmPasswordField = !showConfirmPasswordField"
+            >
+              <img :src="hideIcon" alt="" />
+            </button>
+          </div>
           <p class="field-error" :class="{ visible: confirmTouched && !!confirmError }">{{ confirmError }}</p>
-        </div>
-
-        <div class="form-group" style="margin-top:-8px;">
-          <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
-            <input type="checkbox" v-model="showPassword" /> Показать пароль
-          </label>
         </div>
 
         <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
@@ -79,6 +93,7 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { api } from '../services/api.js'
+import hideIcon from '../assets/hide.png'
 
 const route = useRoute()
 const uid = ref(route.params.uid || route.query.uid || '')
@@ -88,10 +103,26 @@ const password = ref('')
 const password2 = ref('')
 const passwordTouched = ref(false)
 const confirmTouched = ref(false)
-const showPassword = ref(false)
+const showPasswordField = ref(false)
+const showConfirmPasswordField = ref(false)
 const loading = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
+
+function collectMessages(source) {
+  if (!source) return []
+  if (typeof source === 'string') {
+    const trimmed = source.trim()
+    return trimmed ? [trimmed] : []
+  }
+  if (Array.isArray(source)) {
+    return source.flatMap(item => collectMessages(item))
+  }
+  if (typeof source === 'object') {
+    return Object.values(source).flatMap(item => collectMessages(item))
+  }
+  return []
+}
 // Errors by field
 const passwordError = computed(() => {
   if (!hasTokens.value) return ''
@@ -132,18 +163,26 @@ async function handleSubmit() {
     successMessage.value = 'Пароль успешно обновлён. Теперь вы можете войти.'
     password.value = ''
     password2.value = ''
+    passwordTouched.value = false
+    confirmTouched.value = false
+    showPasswordField.value = false
+    showConfirmPasswordField.value = false
   } catch (e) {
-    const serverMsg = e?.response?.data?.message
-      || e?.response?.data?.detail
-      || e?.response?.data?.errors
-      || e?.message
-
-    // возможные кейсы: "invalid token", "token expired", "uid invalid"
-    if (typeof serverMsg === 'string') {
-      errorMessage.value = serverMsg
-    } else if (serverMsg && typeof serverMsg === 'object') {
-      // если бэк вернул объект с полями ошибок
-      errorMessage.value = Object.values(serverMsg).flat().join(', ')
+    const data = e?.response?.data || null
+    const messages = [
+      ...collectMessages(data?.message),
+      ...collectMessages(data?.detail),
+      ...collectMessages(data?.errors),
+      ...collectMessages(data?.non_field_errors),
+      ...collectMessages(data?.password),
+      ...collectMessages(data?.password_confirm),
+      ...collectMessages(data),
+    ]
+    const uniqueMessages = [...new Set(messages)]
+    if (uniqueMessages.length) {
+      errorMessage.value = uniqueMessages.join(' ')
+    } else if (e?.message) {
+      errorMessage.value = e.message
     } else {
       errorMessage.value = 'Не удалось обновить пароль. Попробуйте ещё раз.'
     }
@@ -155,6 +194,8 @@ async function handleSubmit() {
 
 <style scoped>
 .auth-form-container {
+  width: 50vw;
+  max-width: 500px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -179,6 +220,46 @@ async function handleSubmit() {
 }
 
 .form-group { margin-bottom: 16px; }
+
+.password-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input .form-input {
+  padding-right: 44px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  height: 100%;
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid rgba(129, 50, 173, 0.6);
+  outline-offset: 2px;
+}
+
+.password-toggle img {
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  opacity: 0.75;
+  transition: opacity 0.2s ease;
+}
+
+.password-toggle:hover img {
+  opacity: 1;
+}
 .form-label { display: block; margin-bottom: 8px; color: #555; }
 .form-input {
   width: 100%;

@@ -27,14 +27,6 @@
             {{ emailError }}
           </p>
         </div>
-        <div v-if="successMessage" class="success-message">
-          {{ successMessage }}
-          <div v-if="emailServiceUrl" class="go-to-email">
-            <a :href="emailServiceUrl" target="_blank" rel="noopener" class="email-link">
-              Перейти к почте {{ email }}
-            </a>
-          </div>
-        </div>
         <button type="submit" class="auth-button" :disabled="loading || !!emailError">
           {{ loading ? 'Отправка...' : 'Восстановить пароль' }}
         </button>
@@ -44,18 +36,39 @@
       </div>
     </div>
   </div>
+
+  <ConfirmModal
+    v-model="showSuccessModal"
+    title="Письмо отправлено"
+    :message="successMessage"
+    :cancel-text="successCancelText"
+    :show-cancel="showSuccessCancel"
+    @confirm="handleSuccessConfirm"
+    @cancel="closeSuccessModal"
+  >
+    <template #message>
+      <p>{{ successMessage }}</p>
+      <p v-if="emailServiceUrl" class="modal-email-link">
+        <a :href="emailServiceUrl" target="_blank" rel="noopener" class="email-link">
+          Перейти к почте {{ trimmedEmail }}
+        </a>
+      </p>
+    </template>
+  </ConfirmModal>
   
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { api } from '../services/api.js'
+import ConfirmModal from '../components/ConfirmModal.vue'
 
 const email = ref('')
 const errorMessage = ref('')
 const successMessage = ref('')
 const loading = ref(false)
 const emailTouched = ref(false)
+const showSuccessModal = ref(false)
 
 // Валидация email
 const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
@@ -146,6 +159,22 @@ function resolveMailUrl(domain) {
 }
 
 const emailServiceUrl = computed(() => resolveMailUrl(emailDomain.value))
+
+const successCancelText = computed(() =>
+  emailServiceUrl.value ? 'Закрыть' : 'Отмена'
+)
+const showSuccessCancel = computed(() => !!emailServiceUrl.value)
+function closeSuccessModal() {
+  showSuccessModal.value = false
+}
+function handleSuccessConfirm() {
+  if (emailServiceUrl.value && typeof window !== 'undefined') {
+    try {
+      window.open(emailServiceUrl.value, '_blank', 'noopener')
+    } catch (_) {}
+  }
+  closeSuccessModal()
+}
 const handleSubmit = async () => {
   emailTouched.value = true
   if (emailError.value) return
@@ -155,6 +184,7 @@ const handleSubmit = async () => {
   try {
     await api.auth.requestPasswordReset({ email: trimmedEmail.value })
     successMessage.value = 'Инструкция по восстановлению отправлена на указанный e-mail.'
+    showSuccessModal.value = true
     // Оставим email для отображения ссылки
     // email.value = ''  — НЕ очищаем!
   } catch (e) {
@@ -247,18 +277,6 @@ const handleSubmit = async () => {
   text-align: center;
   border: 1px solid #fcc;
 }
-.success-message {
-  background-color: #e8f8f2;
-  color: #0f8a66;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  text-align: center;
-  border: 1px solid #bde9dc;
-}
-
-.open-mail { margin-top: 10px; }
-
 .auth-links { 
   margin-top: 16px;
   text-align: center;
@@ -271,10 +289,6 @@ const handleSubmit = async () => {
   text-decoration: underline;
 }
 
-.go-to-email {
-  margin-top: 12px;
-}
-
 .email-link {
   color: #23938c;
   font-weight: 500;
@@ -283,5 +297,9 @@ const handleSubmit = async () => {
 
 .email-link:hover {
   text-decoration: underline;
+}
+
+.modal-email-link {
+  margin-top: 12px;
 }
 </style>

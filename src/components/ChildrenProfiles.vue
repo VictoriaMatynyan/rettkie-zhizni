@@ -20,7 +20,7 @@
           <button class="menu-button edit-button" @click="editChild(index)">
             Редактировать
           </button>
-          <button class="menu-button delete-button" @click="deleteChild(index)">
+          <button class="menu-button delete-button" @click="requestDelete(index)">
             Удалить
           </button>
         </div>
@@ -35,17 +35,27 @@
       @save="saveChild"
       @cancel="cancelEdit"
     />
+    <ConfirmModal
+      v-model="showDeleteConfirm"
+      title="Удалить анкету?"
+      :message="deleteConfirmMessage"
+      confirm-text="Да"
+      cancel-text="Отмена"
+      @confirm="confirmDelete"
+      @cancel="cancelDelete"
+    />
   </div>
 </template>
 
 <script>
 import ChildForm from './ChildForm.vue';
+import ConfirmModal from './ConfirmModal.vue';
 import { api } from '../services/api.js';
 import { useAuthStore } from '../stores/auth.js';
 
 export default {
   name: 'ChildrenProfiles',
-  components: { ChildForm },
+  components: { ChildForm, ConfirmModal },
   data() {
     return {
       children: [], // список анкет текущего пользователя
@@ -53,6 +63,8 @@ export default {
       editedIndex: null,
       loading: false,
       error: null,
+      showDeleteConfirm: false,
+      pendingDeleteIndex: null,
     };
   },
   computed: {
@@ -63,6 +75,21 @@ export default {
     },
     authStore() {
       return useAuthStore();
+    },
+    pendingChild() {
+      if (this.pendingDeleteIndex === null) return null;
+      return this.children[this.pendingDeleteIndex] || null;
+    },
+    deleteConfirmMessage() {
+      const child = this.pendingChild;
+      if (!child) {
+        return 'Вы уверены, что хотите удалить анкету?';
+      }
+      const parts = [child.lastName, child.firstName].filter(Boolean);
+      const name = parts.join(' ').trim();
+      return name
+        ? `Вы уверены, что хотите удалить анкету "${name}"?`
+        : 'Вы уверены, что хотите удалить анкету?';
     },
   },
   async mounted() {
@@ -197,17 +224,31 @@ export default {
       }
     },
 
-    async deleteChild(index) {
-      if (!confirm('Удалить эту анкету?')) return;
+    requestDelete(index) {
+      this.pendingDeleteIndex = index;
+      this.showDeleteConfirm = true;
+    },
+    cancelDelete() {
+      this.showDeleteConfirm = false;
+      this.pendingDeleteIndex = null;
+    },
+    async confirmDelete() {
+      if (this.pendingDeleteIndex === null) {
+        this.showDeleteConfirm = false;
+        return;
+      }
       this.loading = true;
       this.error = null;
       try {
-        const child = this.children[index];
+        const child = this.children[this.pendingDeleteIndex];
+        if (!child) throw new Error('Анкета не найдена');
         await api.accounts.deleteQuestionnaire(child.id);
         // После успешного удаления — обновим список с сервера
         await this.loadChildren();
+        this.cancelDelete();
       } catch (e) {
         this.error = e?.response?.data?.message || e.message || 'Не удалось удалить анкету';
+        this.cancelDelete();
       } finally {
         this.loading = false;
       }

@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount, nextTick} from 'vue';
 
 const props = defineProps({
   points: {
@@ -16,6 +16,8 @@ const mapEl = ref(null);
 let mapInstance = null;
 let markersLayer = null;
 let leafletWaitTimer = null;
+let ro = null; // ResizeObserver
+let waitTimer = null;
 
 function ensureLeaflet() {
   const L = window.L;
@@ -25,80 +27,80 @@ function ensureLeaflet() {
 function createMap() {
   const L = ensureLeaflet();
   if (!L) {
-    // Подождём, пока Leaflet загрузится (через CDN в index.html)
-    leafletWaitTimer = setTimeout(createMap, 100);
+    waitTimer = setTimeout(createMap, 80);
     return;
   }
+  if (!mapEl.value) return;
+
   mapInstance = L.map(mapEl.value, {
-    center: [55.751244, 37.618423],
-    zoom: 4,
+    center: [55.751244, 37.618423], // Москва по умолчанию
+    zoom: 5,
     minZoom: 2,
     attributionControl: true,
   });
-  // Убираем «Leaflet» и любые символы из префикса атрибуции
-  try {
-    mapInstance.attributionControl.setPrefix('');
-  } catch (_) {}
+  try { mapInstance.attributionControl.setPrefix(''); } catch {}
+
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors',
+    attribution: '© OpenStreetMap contributors',
     maxZoom: 19,
   }).addTo(mapInstance);
+
   markersLayer = L.layerGroup().addTo(mapInstance);
+  nextTick(() => mapInstance.invalidateSize(true));
+  ro = new ResizeObserver(() => mapInstance && mapInstance.invalidateSize());
+  ro.observe(mapEl.value);
 }
 
 function updateMarkers() {
   if (!mapInstance || !markersLayer) return;
   const L = ensureLeaflet();
   markersLayer.clearLayers();
-  const bounds = [];
 
+  const bounds = [];
   (props.points || []).forEach(p => {
     const lat = Number(p.lat);
     const lon = Number(p.lon);
     if (Number.isNaN(lat) || Number.isNaN(lon)) return;
 
-    const count = Number(p.count) || 0;
-    const name = p.name || '';
-
-    const iconHtml = `
-      <div class="city-marker">
-        <div class="city-marker__bubble">
-          <div class="city-marker__name">${name}</div>
-          <div class="city-marker__count">Анкет: ${count}</div>
-        </div>
-        <div class="city-marker__pin"></div>
-      </div>`;
     const icon = L.divIcon({
       className: 'city-marker-wrapper',
-      html: iconHtml,
+      html: `
+        <div class="city-marker">
+          <div class="city-marker__bubble">
+            <div class="city-marker__name">${p.name ?? ''}</div>
+            <div class="city-marker__count">Анкет: ${Number(p.count) || 0}</div>
+          </div>
+          <div class="city-marker__pin"></div>
+        </div>`,
       iconSize: [200, 70],
       iconAnchor: [100, 70],
     });
 
-    const marker = L.marker([lat, lon], { icon });
-    marker.addTo(markersLayer);
+    const marker = L.marker([lat, lon], { icon }).addTo(markersLayer);
+    bounds.push([lat, lon]);
     try {
-      const el = marker.getElement ? marker.getElement() : marker._icon;
+      const el = marker.getElement?.() || marker._icon;
       if (el) {
-        // Центрируем баббл по ширине и привязываем нижний край к координате
         const w = el.offsetWidth || 200;
         const h = el.offsetHeight || 60;
         el.style.marginLeft = `${-Math.round(w / 2)}px`;
         el.style.marginTop = `${-Math.round(h)}px`;
       }
-    } catch (_) {}
-    bounds.push([lat, lon]);
+    } catch {}
   });
 
-  // Fit bounds if we have at least one point
-  if (bounds.length > 0) {
-    try {
-      mapInstance.fitBounds(bounds, { padding: [30, 30] });
-    } catch (_) {
-      // ignore
-    }
+  // Центрирование/зум:
+  if (bounds.length === 1) {
+    mapInstance.setView(bounds[0], 8);
+  } else if (bounds.length > 1) {
+    mapInstance.fitBounds(bounds, { padding: [24, 24] });
+  } else {
+    mapInstance.setView([55.751244, 37.618423], 5);
   }
+
+  nextTick(() => mapInstance && mapInstance.invalidateSize());
 }
+
 
 onMounted(() => {
   createMap();
@@ -106,15 +108,11 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  try {
-    mapInstance?.remove();
-  } catch (_) {}
+  if (waitTimer) clearTimeout(waitTimer);
+  try { ro && ro.disconnect(); } catch {}
+  try { mapInstance?.remove(); } catch {}
   mapInstance = null;
   markersLayer = null;
-  if (leafletWaitTimer) {
-    clearTimeout(leafletWaitTimer);
-    leafletWaitTimer = null;
-  }
 });
 
 watch(
@@ -123,7 +121,6 @@ watch(
   { deep: true }
 );
 
-// панель больше не используется — вся информация на маркере
 </script>
 
 <style scoped>
@@ -136,7 +133,21 @@ watch(
   position: relative;
 }
 
-/* City marker bubble */
+:deep(.leaflet-container),
+:deep(.leaflet-pane),
+:deep(.leaflet-map-pane),
+:deep(.leaflet-tile-pane),
+:deep(.leaflet-objects-pane) {
+  width: 100%;
+  height: 520px;
+  z-index: 0;
+}
+
+:deep(.leaflet-control),
+:deep(.leaflet-top, .leaflet-bottom) {
+  z-index: 0;
+}
+
 :deep(.city-marker) {
   display: flex;
   flex-direction: column;
@@ -147,20 +158,20 @@ watch(
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  background: #f1fbf9; /* светлый фон */
+  background: #f1fbf9;
   border: 1px solid rgba(42, 174, 162, 0.25);
   border-radius: 6px;
   padding: 8px 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 :deep(.city-marker__name) {
-  font-size: 16px; /* крупнее */
+  font-size: 16px;
   font-weight: 800;
   color: #123;
   white-space: nowrap;
 }
 :deep(.city-marker__count) {
-  font-size: 15px; /* крупнее */
+  font-size: 15px;
   font-weight: 700;
   color: #2b6;
 }
@@ -169,7 +180,7 @@ watch(
   height: 0;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
-  border-top: 8px solid #f1fbf9; /* фон треугольника как у баббла */
+  border-top: 8px solid #f1fbf9;
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.15));
   margin-top: -1px;
 }

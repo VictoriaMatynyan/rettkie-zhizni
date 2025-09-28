@@ -42,9 +42,12 @@
           <input
             v-model="form.middleName"
             class="form-input"
+            :class="{ invalid: touched.middleName && !!middleNameError }"
             type="text"
             @blur="onBlur('middleName')"
+            required
           />
+          <p class="field-error" :class="{ visible: touched.middleName && !!middleNameError }">{{ middleNameError }}</p>
         </label>
       </div>
 
@@ -277,7 +280,7 @@
       </div>
 
       <div class="form-buttons">
-        <button class="btn submit" type="submit" :disabled="!isFormValid">Сохранить</button>
+        <button class="btn submit" type="submit" :disabled="!canSubmit">Сохранить</button>
         <button class="btn cancel" type="button" @click="$emit('cancel')">
           Отмена
         </button>
@@ -372,6 +375,10 @@ export default {
       if (!this.form.firstName?.trim()) return 'Введите имя';
       return '';
     },
+    middleNameError() {
+      if (!this.form.middleName?.trim()) return 'Введите отчество';
+      return '';
+    },
     genderError() {
       if (!this.form.gender) return 'Выберите пол';
       return '';
@@ -419,6 +426,7 @@ export default {
       return !(
         this.lastNameError ||
         this.firstNameError ||
+        this.middleNameError ||
         this.genderError ||
         this.birthDateError ||
         this.citizenshipError ||
@@ -430,6 +438,9 @@ export default {
         this.diagnosisError ||
         this.isLegalRepError
       );
+    },
+    canSubmit() {
+      return this.isFormValid && !this.fileError;
     },
   },
   mounted() {
@@ -539,7 +550,7 @@ export default {
     submitForm() {
       this.triedSubmit = true;
       // Показать ошибки под всеми активными полями
-      const toTouch = ['lastName','firstName','gender','birthDate','citizenship','countryOfResidence'];
+      const toTouch = ['lastName','firstName','middleName','gender','birthDate','citizenship','countryOfResidence'];
       if (this.isRussia) toTouch.push('cityId');
       toTouch.push('geneticTestConfirmed');
       if (this.isGeneticConfirmed) {
@@ -638,11 +649,26 @@ select:focus {
   font-size: 16px;
   border-radius: 6px;
   cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn:disabled,
+.btn[disabled] {
+  border-color: rgba(35, 147, 140, 0.4);
+  color: rgba(0, 0, 0, 0.4);
+  cursor: not-allowed;
 }
 
 .btn.submit:hover {
   background-color: #23938c;
   color: white;
+}
+
+.btn.submit:disabled,
+.btn.submit[disabled] {
+  background-color: rgba(35, 147, 140, 0.4);
+  color: rgba(255, 255, 255, 0.85);
+  box-shadow: none;
 }
 
 .btn.cancel {

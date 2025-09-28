@@ -42,7 +42,7 @@
         >
           Статистика
         </button>
-        <button class="button logout" @click="handleLogout">Выйти</button>
+        <button class="button logout" @click="requestLogout">Выйти</button>
       </div>
       <div class="tabs-select-container">
         <label for="tabs-select" class="sr-only">Раздел</label>
@@ -51,10 +51,19 @@
           <option value="children">Анкеты подопечных</option>
           <option value="stats">Статистика</option>
         </select>
-        <button class="button logout" @click="handleLogout">Выйти</button>
+        <button class="button logout" @click="requestLogout">Выйти</button>
       </div>
     </nav>
     <component :is="currentTabComponent" />
+    <ConfirmModal
+      v-model="showLogoutConfirm"
+      title="Подтвердите выход"
+      message="Вы действительно хотите выйти из аккаунта?"
+      confirm-text="Да"
+      cancel-text="Отмена"
+      @confirm="handleLogout"
+      @cancel="cancelLogout"
+    />
   </div>
 </template>
 
@@ -68,11 +77,13 @@ import ContactForm from '../components/ContactForm.vue';
 import ChildrenProfiles from '../components/ChildrenProfiles.vue';
 import PersonalStats from '../components/PersonalStats.vue';
 import ConsentTab from '../components/ConsentTab.vue';
+import ConfirmModal from '../components/ConfirmModal.vue';
 
 const tab = ref('contact');
 const router = useRouter();
 const authStore = useAuthStore();
 const showConsentTab = ref(false);
+const showLogoutConfirm = ref(false);
 
 const currentTabComponent = computed(() => {
   switch (tab.value) {
@@ -104,9 +115,20 @@ onMounted(async () => {
   }
 });
 
+function requestLogout() {
+  showLogoutConfirm.value = true;
+}
+
 async function handleLogout() {
-  await authStore.logoutRemote();
-  router.push('/');
+  try {
+    await authStore.logoutRemote();
+  } finally {
+    router.push('/');
+  }
+}
+
+function cancelLogout() {
+  showLogoutConfirm.value = false;
 }
 </script>
 

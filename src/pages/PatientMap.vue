@@ -52,7 +52,7 @@ onMounted(fetchStats);
 .patient-registry {
   width: 100%;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: 0 0 32px;
   box-sizing: border-box;
 }
 
@@ -61,10 +61,6 @@ onMounted(fetchStats);
   margin-bottom: 24px;
   text-align: center;
 }
-
-/* .main-content > .patient-registry .standard-content {
-  text-align: justify;
-} */
 
 .main-content > .patient-registry > p {
   text-align: justify;
@@ -75,6 +71,11 @@ onMounted(fetchStats);
   font-size: 22px;
   margin-top: 40px;
   margin-bottom: 20px;
+  text-align: center;
+}
+
+.map-section {
+  width: 90vw;
 }
 
 .registry-button {

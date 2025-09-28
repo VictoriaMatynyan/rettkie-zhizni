@@ -46,7 +46,6 @@
         title="Видеоплеер"
       ></iframe>
     </div>
-    <!-- Optional OSM Map section -->
     <div v-if="showMap" class="map-section">
       <h3 v-if="mapTitle" class="map-title">{{ mapTitle }}</h3>
       <OSMMap :points="mapPoints" />

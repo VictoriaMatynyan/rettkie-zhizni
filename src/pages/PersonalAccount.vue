@@ -29,9 +29,17 @@
           v-if="showConsentTab"
           :class="{ active: tab === 'consent' }"
           class="button tab"
-          @click="tab = 'consent'"
+          @click="
+            tab = 'consent';
+            loadConsentStatus();
+          "
         >
           Согласие
+          <span
+            v-if="showConsentDot"
+            class="notification-dot"
+            aria-label="Требуется действие"
+          ></span>
         </button>
         <button
           :class="{ active: tab === 'stats' }"
@@ -49,6 +57,9 @@
         <select id="tabs-select" v-model="tab" class="tabs-select">
           <option value="contact">Контактные данные</option>
           <option value="children">Анкеты подопечных</option>
+          <option v-if="showConsentTab" value="consent">
+            Согласие{{ showConsentDot ? ' •' : '' }}
+          </option>
           <option value="stats">Статистика</option>
         </select>
         <button class="button logout" @click="requestLogout">Выйти</button>
@@ -68,7 +79,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, provide } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth.js';
 import { api } from '../services/api.js';
@@ -84,6 +95,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 const showConsentTab = ref(false);
 const showLogoutConfirm = ref(false);
+const consentStatus = ref('none'); // 'none' | 'pending' | 'active'
 
 const currentTabComponent = computed(() => {
   switch (tab.value) {
@@ -100,6 +112,33 @@ const currentTabComponent = computed(() => {
   }
 });
 
+// Показывать ли красную точечку на вкладке согласия
+const showConsentDot = computed(() => {
+  return showConsentTab.value && consentStatus.value === 'none';
+});
+
+// Функция для обновления статуса согласия (для использования в ConsentTab)
+function updateConsentStatus(newStatus) {
+  consentStatus.value = newStatus;
+}
+
+// Предоставляем функцию обновления статуса для дочерних компонентов
+provide('updateConsentStatus', updateConsentStatus);
+
+// Функция для загрузки статуса согласия
+async function loadConsentStatus() {
+  try {
+    const data = await api.accounts.getConsentStatus?.();
+    if (data && typeof data.status === 'string') {
+      const s = data.status.toLowerCase();
+      consentStatus.value =
+        s === 'active' ? 'active' : s === 'pending' ? 'pending' : 'none';
+    }
+  } catch {
+    consentStatus.value = 'none';
+  }
+}
+
 onMounted(async () => {
   try {
     const res = await api.accounts.getMyQuestionnaires();
@@ -109,6 +148,11 @@ onMounted(async () => {
         ? res.items
         : [];
     showConsentTab.value = items.length > 0;
+
+    // Загружаем статус согласия только если вкладка показывается
+    if (showConsentTab.value) {
+      await loadConsentStatus();
+    }
   } catch (e) {
     // Если эндпоинт недоступен, вкладку не показываем
     showConsentTab.value = false;
@@ -213,6 +257,7 @@ function cancelLogout() {
     border-color 0.2s ease,
     transform 0.2s ease;
   flex: 0 0 auto;
+  position: relative;
 }
 
 .tab:hover {
@@ -269,6 +314,33 @@ function cancelLogout() {
   }
   .logout {
     margin-left: 0;
+  }
+}
+
+/* Красная точечка уведомления */
+.notification-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  background-color: #dc3545;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 </style>

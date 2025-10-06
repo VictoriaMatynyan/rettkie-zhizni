@@ -15,9 +15,17 @@
               required
               :disabled="loading || isLocked"
               placeholder="Ваше имя"
-              @blur="firstNameTouched = true; trimField('first_name')"
+              @blur="
+                firstNameTouched = true;
+                trimField('first_name');
+              "
             />
-            <p class="field-error" :class="{ visible: firstNameTouched && !!firstNameError }">{{ firstNameError }}</p>
+            <p
+              class="field-error"
+              :class="{ visible: firstNameTouched && !!firstNameError }"
+            >
+              {{ firstNameError }}
+            </p>
           </div>
 
           <div class="form-group">
@@ -31,9 +39,17 @@
               required
               :disabled="loading || isLocked"
               placeholder="Ваша фамилия"
-              @blur="lastNameTouched = true; trimField('last_name')"
+              @blur="
+                lastNameTouched = true;
+                trimField('last_name');
+              "
             />
-            <p class="field-error" :class="{ visible: lastNameTouched && !!lastNameError }">{{ lastNameError }}</p>
+            <p
+              class="field-error"
+              :class="{ visible: lastNameTouched && !!lastNameError }"
+            >
+              {{ lastNameError }}
+            </p>
           </div>
         </div>
 
@@ -49,9 +65,17 @@
             :disabled="loading || isLocked"
             placeholder="Ваш email адрес"
             @input="onEmailInput"
-            @blur="emailTouched = true; trimField('email')"
+            @blur="
+              emailTouched = true;
+              trimField('email');
+            "
           />
-          <p class="field-error" :class="{ visible: emailTouched && !!emailError }">{{ emailError }}</p>
+          <p
+            class="field-error"
+            :class="{ visible: emailTouched && !!emailError }"
+          >
+            {{ emailError }}
+          </p>
         </div>
 
         <div class="form-group">
@@ -78,7 +102,9 @@
             :disabled="loading || dictLoading || isLocked"
             @blur="regionTouched = true"
           >
-            <option value="">Выберите регион</option>
+            <option value="">
+              {{ dictLoading ? 'Загрузка...' : 'Выберите регион' }}
+            </option>
             <option
               v-for="region in regions"
               :key="region.id"
@@ -87,7 +113,19 @@
               {{ region.name }}
             </option>
           </select>
-          <p class="field-error" :class="{ visible: regionTouched && !!regionError }">{{ regionError }}</p>
+          <p v-if="dictLoading" class="field-info">Загрузка регионов...</p>
+          <p
+            v-else-if="regions.length === 0 && !dictLoading"
+            class="field-info"
+          >
+            Регионы не загружены ({{ regions.length }})
+          </p>
+          <p
+            class="field-error"
+            :class="{ visible: regionTouched && !!regionError }"
+          >
+            {{ regionError }}
+          </p>
         </div>
         <div class="form-group">
           <label for="user_type_id" class="form-label">Кто вы? *</label>
@@ -100,12 +138,28 @@
             :disabled="loading || dictLoading || isLocked"
             @blur="userTypeTouched = true"
           >
-            <option value="">Выберите роль</option>
+            <option value="">
+              {{ dictLoading ? 'Загрузка...' : 'Выберите роль' }}
+            </option>
             <option v-for="type in userTypes" :key="type.id" :value="type.id">
               {{ type.name }}
             </option>
           </select>
-          <p class="field-error" :class="{ visible: userTypeTouched && !!userTypeError }">{{ userTypeError }}</p>
+          <p v-if="dictLoading" class="field-info">
+            Загрузка типов пользователей...
+          </p>
+          <p
+            v-else-if="userTypes.length === 0 && !dictLoading"
+            class="field-info"
+          >
+            Типы пользователей не загружены ({{ userTypes.length }})
+          </p>
+          <p
+            class="field-error"
+            :class="{ visible: userTypeTouched && !!userTypeError }"
+          >
+            {{ userTypeError }}
+          </p>
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -132,7 +186,12 @@
                 <img :src="hideIcon" alt="" />
               </button>
             </div>
-            <p class="field-error" :class="{ visible: passwordTouched && !!passwordError }">{{ passwordError }}</p>
+            <p
+              class="field-error"
+              :class="{ visible: passwordTouched && !!passwordError }"
+            >
+              {{ passwordError }}
+            </p>
           </div>
           <div class="form-group">
             <label for="confirmPassword" class="form-label"
@@ -153,13 +212,20 @@
               <button
                 type="button"
                 class="password-toggle"
-                :aria-label="showConfirmPassword ? 'Скрыть пароль' : 'Показать пароль'"
+                :aria-label="
+                  showConfirmPassword ? 'Скрыть пароль' : 'Показать пароль'
+                "
                 @click="showConfirmPassword = !showConfirmPassword"
               >
                 <img :src="hideIcon" alt="" />
               </button>
             </div>
-            <p class="field-error" :class="{ visible: confirmTouched && !!confirmError }">{{ confirmError }}</p>
+            <p
+              class="field-error"
+              :class="{ visible: confirmTouched && !!confirmError }"
+            >
+              {{ confirmError }}
+            </p>
           </div>
         </div>
         <div class="form-group">
@@ -177,7 +243,15 @@
               >
             </span>
           </label>
-          <p class="field-error" :class="{ visible: consentTouched && !!consentError }">{{ consentError }}</p>
+          <p
+            class="field-error"
+            :class="{ visible: consentTouched && !!consentError }"
+          >
+            {{ consentError }}
+          </p>
+        </div>
+        <div v-if="dictError" class="error-message">
+          {{ dictError }}
         </div>
         <div v-if="error" class="error-message">
           {{ error }}
@@ -206,9 +280,17 @@
     @cancel="closeSuccessModal"
   >
     <template #message>
-      <p>Регистрация прошла успешно. Мы отправили письмо для подтверждения. Если его нет, загляните в папку «Спам».</p>
+      <p>
+        Регистрация прошла успешно. Мы отправили письмо для подтверждения. Если
+        его нет, загляните в папку «Спам».
+      </p>
       <p v-if="emailServiceUrl" class="modal-email-link">
-        <a :href="emailServiceUrl" target="_blank" rel="noopener" class="email-link">
+        <a
+          :href="emailServiceUrl"
+          target="_blank"
+          rel="noopener"
+          class="email-link"
+        >
           Перейти к почте {{ submittedEmail || trimmedEmail }}
         </a>
       </p>
@@ -302,7 +384,8 @@ export default {
     emailError() {
       const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
       if (!this.trimmedEmail) return 'Введите e-mail';
-      if (!EMAIL_RE.test(this.trimmedEmail)) return 'Укажите корректный e-mail (например, ivan@example.com)';
+      if (!EMAIL_RE.test(this.trimmedEmail))
+        return 'Укажите корректный e-mail (например, ivan@example.com)';
       return '';
     },
     regionError() {
@@ -320,7 +403,8 @@ export default {
     },
     confirmError() {
       if (!this.form.password_confirm) return 'Повторите пароль';
-      if (this.form.password_confirm !== this.form.password) return 'Пароли не совпадают';
+      if (this.form.password_confirm !== this.form.password)
+        return 'Пароли не совпадают';
       return '';
     },
     consentError() {
@@ -440,8 +524,14 @@ export default {
       if (MAP[domain]) return MAP[domain];
       if (domain.includes('yandex')) return 'https://mail.yandex.ru/';
       if (domain.includes('mail.ru')) return 'https://e.mail.ru/inbox/';
-      if (domain.includes('gmail') || domain.includes('googlemail')) return 'https://mail.google.com/';
-      if (domain.includes('outlook') || domain.includes('hotmail') || domain.includes('live') || domain.includes('msn')) {
+      if (domain.includes('gmail') || domain.includes('googlemail'))
+        return 'https://mail.google.com/';
+      if (
+        domain.includes('outlook') ||
+        domain.includes('hotmail') ||
+        domain.includes('live') ||
+        domain.includes('msn')
+      ) {
         return 'https://outlook.live.com/';
       }
       if (domain.includes('rambler')) return 'https://mail.rambler.ru/';
@@ -457,12 +547,40 @@ export default {
           api.accounts.getRegions(),
           api.accounts.getUserTypes(),
         ]);
-        this.regions = Array.isArray(regionsRes?.items) ? regionsRes.items : [];
-        this.userTypes = Array.isArray(userTypesRes?.items)
-          ? userTypesRes.items
-          : [];
+
+        // Проверяем структуру ответа
+        if (
+          regionsRes &&
+          typeof regionsRes === 'object' &&
+          'items' in regionsRes
+        ) {
+          this.regions = Array.isArray(regionsRes.items)
+            ? regionsRes.items
+            : [];
+        } else {
+          console.warn('Неожиданная структура ответа регионов:', regionsRes);
+          this.regions = [];
+        }
+
+        if (
+          userTypesRes &&
+          typeof userTypesRes === 'object' &&
+          'items' in userTypesRes
+        ) {
+          this.userTypes = Array.isArray(userTypesRes.items)
+            ? userTypesRes.items
+            : [];
+        } else {
+          console.warn(
+            'Неожиданная структура ответа типов пользователей:',
+            userTypesRes
+          );
+          this.userTypes = [];
+        }
       } catch (e) {
-        this.dictError = e?.response?.data?.message || e.message || 'Ошибка загрузки списков';
+        console.error('Ошибка загрузки справочников:', e);
+        this.dictError =
+          e?.response?.data?.message || e.message || 'Ошибка загрузки списков';
       } finally {
         this.dictLoading = false;
       }
@@ -637,7 +755,17 @@ export default {
   line-height: 18px;
   visibility: hidden;
 }
-.field-error.visible { visibility: visible; }
+.field-error.visible {
+  visibility: visible;
+}
+
+.field-info {
+  color: #666;
+  font-size: 13px;
+  margin-top: 6px;
+  min-height: 18px;
+  line-height: 18px;
+}
 
 .checkbox-label {
   display: flex;
@@ -742,7 +870,10 @@ export default {
   border: 1px solid #bde9dc;
 }
 
-.muted { color: #666; font-size: 13px; }
+.muted {
+  color: #666;
+  font-size: 13px;
+}
 
 @media (max-width: 768px) {
   .form-row {

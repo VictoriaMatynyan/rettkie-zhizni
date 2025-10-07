@@ -112,20 +112,16 @@ const currentTabComponent = computed(() => {
   }
 });
 
-// Показывать ли красную точечку на вкладке согласия
 const showConsentDot = computed(() => {
   return showConsentTab.value && consentStatus.value === 'none';
 });
 
-// Функция для обновления статуса согласия (для использования в ConsentTab)
 function updateConsentStatus(newStatus) {
   consentStatus.value = newStatus;
 }
 
-// Предоставляем функцию обновления статуса для дочерних компонентов
 provide('updateConsentStatus', updateConsentStatus);
 
-// Функция для загрузки статуса согласия
 async function loadConsentStatus() {
   try {
     const data = await api.accounts.getConsentStatus?.();
@@ -149,12 +145,10 @@ onMounted(async () => {
         : [];
     showConsentTab.value = items.length > 0;
 
-    // Загружаем статус согласия только если вкладка показывается
     if (showConsentTab.value) {
       await loadConsentStatus();
     }
   } catch (e) {
-    // Если эндпоинт недоступен, вкладку не показываем
     showConsentTab.value = false;
   }
 });
@@ -205,7 +199,6 @@ function cancelLogout() {
   display: flex;
   gap: 12px;
   flex: 1;
-  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   white-space: nowrap;
   scrollbar-width: thin;
@@ -317,30 +310,15 @@ function cancelLogout() {
   }
 }
 
-/* Красная точечка уведомления */
 .notification-dot {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 8px;
-  height: 8px;
+  top: -4px;
+  right: -4px;
+  width: 10px;
+  height: 10px;
   background-color: #dc3545;
   border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  box-shadow: 0 0 0 2px #fff;
+  z-index: 1;
 }
 </style>

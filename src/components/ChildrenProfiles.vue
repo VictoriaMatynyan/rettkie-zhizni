@@ -20,7 +20,10 @@
           <button class="menu-button edit-button" @click="editChild(index)">
             Редактировать
           </button>
-          <button class="menu-button delete-button" @click="requestDelete(index)">
+          <button
+            class="menu-button delete-button"
+            @click="requestDelete(index)"
+          >
             Удалить
           </button>
         </div>
@@ -114,9 +117,15 @@ export default {
           lastName: item.last_name || '',
           firstName: item.first_name || '',
           middleName: item.middle_name || '',
-          gender: item.gender === 'женский' ? 'ж' : item.gender === 'мужской' ? 'м' : (item.gender || ''),
+          gender:
+            item.gender === 'женский'
+              ? 'ж'
+              : item.gender === 'мужской'
+                ? 'м'
+                : item.gender || '',
           birthDate: item.birth_date || '',
-          citizenship: item.citizenship === 'Россия' ? 'РФ' : (item.citizenship || ''),
+          citizenship:
+            item.citizenship === 'Россия' ? 'РФ' : item.citizenship || '',
           countryOfResidence: item.country_of_residence || '',
           cityId: item.city?.id ?? '',
           geneticTestConfirmed: item.rett_confirmed || '',
@@ -143,7 +152,10 @@ export default {
           updatedAt: item.updated_at,
         }));
       } catch (e) {
-        this.error = e?.response?.data?.message || e.message || 'Не удалось загрузить анкеты';
+        this.error =
+          e?.response?.data?.message ||
+          e.message ||
+          'Не удалось загрузить анкеты';
         this.children = [];
       } finally {
         this.loading = false;
@@ -213,11 +225,15 @@ export default {
         // Успех
         this.cancelEdit();
         await this.loadChildren();
-        try { alert('Анкета успешно сохранена'); } catch (_) {}
+        try {
+          alert('Анкета успешно сохранена');
+        } catch (_) {}
         return res;
       } catch (e) {
         this.error =
-          e?.response?.data?.message || e.message || 'Не удалось сохранить анкету';
+          e?.response?.data?.message ||
+          e.message ||
+          'Не удалось сохранить анкету';
         throw e;
       } finally {
         this.loading = false;
@@ -247,7 +263,10 @@ export default {
         await this.loadChildren();
         this.cancelDelete();
       } catch (e) {
-        this.error = e?.response?.data?.message || e.message || 'Не удалось удалить анкету';
+        this.error =
+          e?.response?.data?.message ||
+          e.message ||
+          'Не удалось удалить анкету';
         this.cancelDelete();
       } finally {
         this.loading = false;
@@ -266,6 +285,11 @@ export default {
 </script>
 
 <style scoped>
+.children-profiles {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
 .children-list {
   list-style: none;
   padding: 0;

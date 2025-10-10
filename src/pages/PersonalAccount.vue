@@ -230,19 +230,19 @@ function cancelLogout() {
 
 .tabs .button {
   padding: 8px 16px;
-  background: transparent;
+  background: #f0f0f0;
   border-radius: 6px;
   cursor: pointer;
+  border: 1px solid #d5d5d5;
 }
 
 .tabs .button.active {
   background-color: #2aaea2;
   color: white;
+  border-color: #2aaea2;
 }
 
 .tab {
-  border: none;
-  border-bottom: 1px solid rgba(42, 174, 162, 0.5);
   font-size: 14px;
   transition:
     background-color 0.2s ease,
@@ -254,16 +254,15 @@ function cancelLogout() {
 }
 
 .tab:hover {
-  background-color: rgba(42, 174, 162, 0.4);
-  border-bottom: 1px solid rgba(42, 174, 162, 0.1);
+  background-color: #e0e0e0;
+  border-color: #c0c0c0;
   transform: translateY(0);
 }
 
 .logout {
   margin-left: auto;
   background-color: #d4392e;
-  border: none;
-  border-bottom: 1px solid rgba(244, 67, 54, 0.5);
+  border: 1px solid #d4392e;
   font-size: 14px;
   transition:
     background-color 0.2s ease,
@@ -274,6 +273,7 @@ function cancelLogout() {
 
 .logout:hover {
   background-color: #f44336;
+  border-color: #f44336;
   color: white;
   transform: translateY(0);
 }

@@ -198,7 +198,8 @@ async function handleUpload() {
 
 <style scoped>
 .consent-tab {
-  max-width: 760px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .status.muted {

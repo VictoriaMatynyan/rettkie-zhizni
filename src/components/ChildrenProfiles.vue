@@ -266,63 +266,150 @@ export default {
 </script>
 
 <style scoped>
+.children-profiles {
+  max-width: 1050px;
+  padding: 10px 15px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 3vw, 28px);
+}
+
+.children-profiles h2 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 30px);
+}
+
+.empty-message {
+  padding: clamp(16px, 3.5vw, 24px);
+  border-radius: 10px;
+  background: rgba(35, 147, 140, 0.08);
+  font-size: clamp(14px, 2.2vw, 16px);
+  color: #2c3e50;
+}
+
 .children-list {
   list-style: none;
   padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(16px, 3.5vw, 28px);
 }
+
 .child-card {
-  border: 1px solid #ccc;
-  padding: 1em;
-  margin-bottom: 1em;
-}
-.child-actions {
-  margin-top: 0.5em;
+  max-width: 1050px;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: clamp(12px, 2vw, 20px);
+  padding: clamp(16px, 3vw, 24px);
+  border: 1px solid rgba(35, 147, 140, 0.18);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(23, 60, 108, 0.06);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.child-card:hover {
+  box-shadow: 0 16px 34px rgba(23, 60, 108, 0.12);
+  transform: translateY(-2px);
+}
+
+.child-info p {
+  margin: 0;
+  font-size: clamp(14px, 2.1vw, 16px);
+  color: #2c3e50;
+}
+
+.child-info strong {
+  font-size: clamp(15px, 2.3vw, 18px);
+}
+
+.child-actions {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(10px, 2.5vw, 18px);
+  justify-content: flex-end;
 }
 
 .menu-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   background-color: transparent;
   border: 1px solid #23938c;
   color: #23938c;
-  padding: 10px 15px 10px 30px;
-  font-size: 14px;
-  border-radius: 6px;
+  padding: clamp(10px, 2.6vw, 14px) clamp(16px, 4vw, 28px);
+  font-size: clamp(13px, 2vw, 15px);
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  background-repeat: no-repeat;
+  background-position: 18px 50%;
+  background-size: clamp(16px, 3vw, 20px);
+  padding-left: clamp(40px, 5vw, 52px);
 }
 
 .menu-button:hover {
   background-color: #23938c;
   color: white;
+  box-shadow: 0 4px 12px rgba(35, 147, 140, 0.25);
 }
 
 .edit-button {
-  background: url('../assets/edit-icon.png') no-repeat 7px 6px/13%;
+  background-image: url('../assets/edit-icon.png');
 }
 .edit-button:hover {
   background-image: url('../assets/edit-icon-hover.png');
 }
 
 .delete-button {
-  background: url('../assets/delete-icon.png') no-repeat 7px 11px/14%;
+  background-image: url('../assets/delete-icon.png');
 }
 .delete-button:hover {
   background-image: url('../assets/delete-icon-hover.png');
 }
 
 .add-button {
-  margin-top: 16px;
+  align-self: flex-start;
   background-color: transparent;
   border: 1px solid #23938c;
   color: #23938c;
-  padding: 10px 15px;
-  font-size: 14px;
-  border-radius: 6px;
+  padding: clamp(12px, 3vw, 16px) clamp(18px, 4vw, 24px);
+  font-size: clamp(14px, 2.2vw, 16px);
+  border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .add-button:hover {
   background-color: #23938c;
   color: white;
+  box-shadow: 0 4px 12px rgba(35, 147, 140, 0.25);
+}
+
+@media (max-width: 640px) {
+  .children-list {
+    grid-template-columns: 1fr;
+  }
+
+  .child-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .menu-button,
+  .add-button {
+    width: 100%;
+    text-align: center;
+    background-position: 18px 50%;
+  }
+
+  .menu-button {
+    padding-left: clamp(44px, 8vw, 60px);
+  }
 }
 </style>

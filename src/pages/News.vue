@@ -102,10 +102,10 @@ onMounted(fetchNews);
 
 <style scoped>
 .standard-page {
-  /* max-width: 1050px; */
-  max-width: 1200px;
+  max-width: 1050px;
   margin: 0 auto;
   padding: 32px 16px;
+  
 }
 
 .standard-page h1 {
@@ -114,8 +114,8 @@ onMounted(fetchNews);
   text-align: center;
 }
 
-.family-stories {
-  margin-top: 48px;
+.news-block {
+  margin-top: 0;
 }
 
 .block-title {
@@ -125,7 +125,7 @@ onMounted(fetchNews);
 
 .news-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 600px));
   gap: 24px;
 }
 

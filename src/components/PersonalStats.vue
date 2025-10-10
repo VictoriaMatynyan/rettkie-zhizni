@@ -1,20 +1,6 @@
 <template>
   <div class="personal-stats">
     <h2 class="block-title">Статистика</h2>
-    <StandardContent
-      :paragraphs="paragraphs"
-      :image-src="symptomsImg"
-      :image-src-modal="symptomsImg"
-      :show-map="true"
-      :map-points="points"
-      map-title="География пациентов"
-      image-alt="Схема симптомов Ретта"
-      image-alt-modal="Схема симптомов Ретта"
-      download-link="/files/rett-info-brochure.pdf"
-      download-label="Скачать памятку по заболеванию: "
-      caption-text="Изображение: основные проявления синдрома Ретта"
-      download-link-name="Гайд-заглушка (1.2 МБ)"
-    />
 
     <div class="chart-section card">
       <h3>Статистика по мутациям</h3>
@@ -123,12 +109,16 @@
         </tbody>
       </table>
     </div>
+
+    <div class="map-section">
+      <h3>География пациентов</h3>
+      <OSMMap :points="points" />
+    </div>
   </div>
 </template>
 
 <script>
-import StandardContent from '../components/StandardContent.vue';
-import symptomsImg from '../assets/symptoms.png';
+import OSMMap from '../components/OSMMap.vue';
 import { api } from '../services/api.js';
 
 /**
@@ -233,14 +223,9 @@ const MOCK_COUNTS = {
 
 export default {
   name: 'PersonalStats',
-  components: { StandardContent },
+  components: { OSMMap },
   data() {
     return {
-      paragraphs: [
-        'На этой странице собрана агрегированная статистика по географии и мутациям.',
-      ],
-      symptomsImg: symptomsImg,
-
       /** @type {CityPoint[]} */
       points: [],
       mapError: '',
@@ -653,6 +638,16 @@ td {
 }
 tbody tr:hover {
   background: #fafafa;
+}
+
+.map-section {
+  margin-top: 32px;
+  margin-bottom: 24px;
+}
+
+.map-section h3 {
+  font-size: 22px;
+  margin-bottom: 16px;
 }
 
 @media (max-width: 768px) {

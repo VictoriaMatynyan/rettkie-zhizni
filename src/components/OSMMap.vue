@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount, nextTick} from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 
 const props = defineProps({
   points: {
@@ -38,7 +38,9 @@ function createMap() {
     minZoom: 2,
     attributionControl: true,
   });
-  try { mapInstance.attributionControl.setPrefix(''); } catch {}
+  try {
+    mapInstance.attributionControl.setPrefix('');
+  } catch {}
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
@@ -46,9 +48,15 @@ function createMap() {
   }).addTo(mapInstance);
 
   markersLayer = L.layerGroup().addTo(mapInstance);
-  nextTick(() => mapInstance.invalidateSize(true));
+  nextTick(() => {
+    if (mapInstance) {
+      mapInstance.invalidateSize(true);
+    }
+  });
   ro = new ResizeObserver(() => mapInstance && mapInstance.invalidateSize());
   ro.observe(mapEl.value);
+
+  updateMarkers();
 }
 
 function updateMarkers() {
@@ -101,16 +109,18 @@ function updateMarkers() {
   nextTick(() => mapInstance && mapInstance.invalidateSize());
 }
 
-
 onMounted(() => {
   createMap();
-  updateMarkers();
 });
 
 onBeforeUnmount(() => {
   if (waitTimer) clearTimeout(waitTimer);
-  try { ro && ro.disconnect(); } catch {}
-  try { mapInstance?.remove(); } catch {}
+  try {
+    ro && ro.disconnect();
+  } catch {}
+  try {
+    mapInstance?.remove();
+  } catch {}
   mapInstance = null;
   markersLayer = null;
 });
@@ -120,7 +130,6 @@ watch(
   () => updateMarkers(),
   { deep: true }
 );
-
 </script>
 
 <style scoped>

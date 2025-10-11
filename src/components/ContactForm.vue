@@ -305,25 +305,51 @@ async function handleSubmit() {
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: clamp(6px, 1.5vw, 10px);
+}
+
+.form-group label {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.5vw, 10px);
+  font-size: clamp(14px, 2.1vw, 16px);
 }
 
 .notications {
-  margin-top: 15px;
+  grid-column: 1 / -1;
+  margin-top: clamp(4px, 1vw, 12px);
+}
+
+.notications label {
+  flex-direction: row;
+  align-items: center;
+  gap: clamp(8px, 2vw, 14px);
 }
 
 .label-text {
   font-weight: 600;
-  margin-bottom: 4px;
+  display: inline-flex;
+  align-items: center;
 }
 
 input[type='text'],
 input[type='email'],
 input[type='tel'] {
-  padding: 8px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: clamp(10px, 2.6vw, 14px);
+  font-size: clamp(15px, 2.2vw, 16px);
+  border: 1px solid #c7cfda;
+  border-radius: 8px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+input[type='text']:focus,
+input[type='email']:focus,
+input[type='tel']:focus {
+  outline: none;
+  border-color: #2aaea2;
+  box-shadow: 0 0 0 3px rgba(42, 174, 162, 0.12);
 }
 
 .form-input.invalid {
@@ -334,9 +360,9 @@ input[type='tel'] {
 .field-error {
   color: #dc3545;
   font-size: 12px;
-  margin: 5px 0;
-  min-height: 10px;
-  line-height: 12px;
+  margin: 2px 0 0;
+  min-height: 14px;
+  line-height: 1.3;
   visibility: hidden;
 }
 .field-error.visible {
@@ -344,34 +370,38 @@ input[type='tel'] {
 }
 
 .save-button:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 .help-text {
   display: block;
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 4px;
+  font-size: clamp(11px, 1.8vw, 13px);
+  color: #6b7485;
 }
 
 .save-button {
-  margin-top: 16px;
+  grid-column: 1 / -1;
+  justify-self: start;
   background-color: #2aaea2;
-  color: white;
+  color: #fff;
   border: none;
-  padding: 10px 16px;
-  font-size: 16px;
-  border-radius: 6px;
+  padding: clamp(12px, 3vw, 16px) clamp(18px, 4vw, 24px);
+  font-size: clamp(15px, 2.3vw, 17px);
+  border-radius: 8px;
   cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .save-button:hover {
   background-color: #23938c;
+  box-shadow: 0 4px 12px rgba(42, 174, 162, 0.25);
 }
 
 .success-message {
-  margin-top: 12px;
+  margin-top: clamp(10px, 2vw, 16px);
   color: #2aaea2;
   font-weight: 500;
 }
@@ -379,5 +409,36 @@ input[type='tel'] {
 input[type='checkbox'] {
   margin: 0;
   cursor: pointer;
+  width: clamp(16px, 3vw, 20px);
+  height: clamp(16px, 3vw, 20px);
+}
+
+@media (max-width: 690px) {
+  .contact-form {
+    padding: clamp(16px, 6vw, 28px);
+    padding-left: 0;
+    box-shadow: none;
+  }
+
+  .notications label {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .save-button {
+    width: 100%;
+    justify-self: stretch;
+    text-align: center;
+  }
+}
+
+@media (min-width: 920px) {
+  .contact-form {
+    max-width: 820px;
+  }
+
+  .contact-form form {
+    grid-template-columns: repeat(2, minmax(280px, 1fr));
+  }
 }
 </style>

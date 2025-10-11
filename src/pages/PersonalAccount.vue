@@ -61,6 +61,7 @@
             Согласие{{ showConsentDot ? ' •' : '' }}
           </option>
           <option value="stats">Статистика</option>
+          <option value="consent">Согласие</option>
         </select>
         <button class="button logout" @click="requestLogout">Выйти</button>
       </div>
@@ -174,25 +175,15 @@ function cancelLogout() {
 .personal-account {
   max-width: 1050px;
   margin: 0 auto;
-  padding: 0 16px 25px;
-}
-
-@media (min-width: 768px) {
-  .personal-account {
-    padding: 0 24px 25px;
-  }
-}
-@media (min-width: 1200px) {
-  .personal-account {
-    padding: 0 32px 25px;
-  }
+  padding: clamp(20px, 6vw, 48px) clamp(16px, 5vw, 56px) clamp(28px, 6vw, 64px);
 }
 
 .tabs {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 0;
+  gap: clamp(10px, 2vw, 20px);
+  margin-bottom: clamp(12px, 2.5vw, 24px);
+  flex-wrap: wrap;
 }
 
 .tabs-list {
@@ -285,7 +276,7 @@ function cancelLogout() {
     padding: 6px 12px;
   }
 }
-@media (max-width: 640px) {
+@media (max-width: 690px) {
   .tab,
   .logout {
     font-size: 12px;

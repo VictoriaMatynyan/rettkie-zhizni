@@ -138,29 +138,29 @@ onMounted(loadArticles);
 
 <style scoped>
 .standard-page {
-  max-width: 1050px;
+  max-width: 1080px;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: clamp(24px, 5vw, 48px) clamp(16px, 6vw, 56px);
 }
 
 .standard-page h1 {
-  font-size: 28px;
-  margin-bottom: 24px;
+  font-size: clamp(26px, 4vw, 36px);
+  margin-bottom: clamp(20px, 4vw, 40px);
   text-align: center;
 }
 
 .block-title {
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: clamp(20px, 3.2vw, 28px);
+  margin-bottom: clamp(16px, 3.5vw, 28px);
   font-weight: 700;
   border-left: 6px solid #1976d2;
-  padding-left: 12px;
+  padding-left: clamp(10px, 2vw, 16px);
 }
 
 .article-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(16px, 4vw, 28px);
   padding-left: 0;
   list-style: none;
 }
@@ -171,8 +171,8 @@ onMounted(loadArticles);
 
 .article-card {
   display: flex;
-  gap: 16px;
-  padding: 16px;
+  gap: clamp(12px, 2.5vw, 20px);
+  padding: clamp(14px, 3vw, 20px);
   background-color: #f4f6fb;
   border: 1px solid #d0d7e2;
   border-radius: 12px;
@@ -189,7 +189,7 @@ onMounted(loadArticles);
 
 .article-thumb {
   flex: 0 0 140px;
-  height: 100px;
+  height: clamp(100px, 18vw, 160px);
   border-radius: 10px;
   overflow: hidden;
   background: #d0d7e2;
@@ -214,20 +214,20 @@ onMounted(loadArticles);
 .article-meta {
   margin: 0;
   color: #53627b;
-  font-size: 14px;
+  font-size: clamp(13px, 1.8vw, 15px);
 }
 
 .article-title {
   margin: 0;
-  font-size: 18px;
+  font-size: clamp(17px, 2.5vw, 20px);
   font-weight: 600;
   color: #1976d2;
 }
 
 .article-preview {
   color: #39445a;
-  font-size: 15px;
-  line-height: 1.5;
+  font-size: clamp(14px, 2vw, 16px);
+  line-height: 1.55;
 }
 
 .article-preview :deep(p) {
@@ -235,8 +235,8 @@ onMounted(loadArticles);
 }
 
 .status {
-  margin: 12px 0;
-  font-size: 16px;
+  margin: clamp(10px, 2.5vw, 14px) 0;
+  font-size: clamp(14px, 2.1vw, 16px);
   text-align: left;
 }
 
@@ -250,6 +250,38 @@ onMounted(loadArticles);
 
 .no-articles {
   color: #53627b;
-  font-size: 16px;
+  font-size: clamp(14px, 2.2vw, 16px);
+}
+
+@media (max-width: 900px) {
+  .article-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .article-thumb {
+    flex-basis: auto;
+    width: 100%;
+    max-width: none;
+    height: clamp(160px, 35vw, 220px);
+  }
+}
+
+@media (max-width: 600px) {
+  .standard-page {
+    padding: clamp(20px, 7vw, 32px) clamp(14px, 8vw, 28px);
+  }
+
+  .article-list {
+    grid-template-columns: 1fr;
+  }
+
+  .block-title {
+    border-left-width: 4px;
+  }
+
+  .article-card {
+    padding: clamp(12px, 4vw, 18px);
+  }
 }
 </style>

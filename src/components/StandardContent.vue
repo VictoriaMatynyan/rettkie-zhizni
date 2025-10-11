@@ -111,13 +111,14 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
 }
 
 .standard-text {
+  font-size: clamp(13px, calc(8px + 2vw), 18px);
   line-height: 1.6;
-  margin-bottom: 16px;
+  margin-bottom: clamp(12px, calc(8px + 1.5vw), 16px);
   text-align: center;
 }
 
 .media-section {
-  margin: 32px 0;
+  margin: clamp(20px, calc(12px + 4vw), 36px) 0;
   text-align: center;
 }
 
@@ -154,9 +155,9 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
 }
 
 .caption {
-  font-size: 14px;
+  font-size: clamp(11px, calc(7px + 1.5vw), 14px);
   color: #666;
-  margin-top: 8px;
+  margin-top: clamp(6px, calc(4px + 1.2vw), 12px);
 }
 
 .download-link {
@@ -164,14 +165,15 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
 }
 
 .file-download {
-  margin: 24px 0;
+  margin: clamp(20px, calc(14px + 4vw), 32px) 0;
   background: #f5f5f5;
-  padding: 12px 16px;
+  padding: clamp(8px, calc(6px + 1.8vw), 14px) clamp(12px, calc(8px + 3.5vw), 22px);
   border-radius: 6px;
+  font-size: clamp(12px, calc(8px + 2vw), 16px);
 }
 
 .video-section {
-  margin-top: 32px;
+  margin-top: clamp(24px, calc(16px + 4vw), 44px);
   position: relative;
   padding-bottom: 56.25%;
   height: 0;
@@ -189,11 +191,21 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
 }
 
 .map-section {
-  margin-top: 32px;
+  margin-top: clamp(24px, calc(16px + 4vw), 44px);
 }
 .map-title {
-  font-size: 22px;
-  margin-bottom: 16px;
+  font-size: clamp(15px, calc(9px + 2.4vw), 22px);
+  margin-bottom: clamp(12px, calc(8px + 2vw), 20px);
   text-align: left;
+}
+
+@media (max-width: 480px) {
+  .standard-text {
+    line-height: 1.5;
+  }
+  .media-section__modal-image {
+    max-width: 90%;
+    max-height: 70%;
+  }
 }
 </style>

@@ -211,7 +211,8 @@ onMounted(fetchLatestStories);
 
 .news-card,
 .story-card {
-  width: 300px;
+  max-width: 300px;
+  width: 100%;
   background: #fff;
   padding: 16px;
   border: 1px solid #ddd;

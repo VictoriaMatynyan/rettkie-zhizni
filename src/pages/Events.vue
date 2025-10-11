@@ -224,7 +224,7 @@ onMounted(loadEvents);
 }
 
 .event-card {
-  width: 800px;
+  max-width: 800px;
   border: 1px solid #ccc;
   padding: 16px;
   margin-bottom: 16px;

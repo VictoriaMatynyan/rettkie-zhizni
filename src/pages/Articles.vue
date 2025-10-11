@@ -211,7 +211,7 @@ onMounted(async () => {
 }
 
 .article-card {
-  width: 800px;
+  max-width: 800px;
   display: flex;
   flex-direction: column;
   cursor: pointer;

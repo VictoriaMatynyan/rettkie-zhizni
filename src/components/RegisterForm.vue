@@ -250,6 +250,16 @@
             {{ consentError }}
           </p>
         </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input
+              v-model="form.receive_news"
+              type="checkbox"
+              :disabled="loading || isLocked"
+            />
+            <span class="checkbox-text"> Подписаться на важные новости </span>
+          </label>
+        </div>
         <div v-if="dictError" class="error-message">
           {{ dictError }}
         </div>
@@ -322,6 +332,7 @@ export default {
         password: '',
         password_confirm: '',
         consent: false,
+        receive_news: true,
       },
       // Сохраняем email, использованный при регистрации, для ссылки на почту
       submittedEmail: '',
@@ -596,6 +607,7 @@ export default {
         password: '',
         password_confirm: '',
         consent: false,
+        receive_news: true,
       };
     },
     async handleRegister() {

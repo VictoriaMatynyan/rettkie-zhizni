@@ -29,9 +29,17 @@
           v-if="showConsentTab"
           :class="{ active: tab === 'consent' }"
           class="button tab"
-          @click="tab = 'consent'"
+          @click="
+            tab = 'consent';
+            loadConsentStatus();
+          "
         >
           Согласие
+          <span
+            v-if="showConsentDot"
+            class="notification-dot"
+            aria-label="Требуется действие"
+          ></span>
         </button>
         <button
           :class="{ active: tab === 'stats' }"
@@ -49,6 +57,9 @@
         <select id="tabs-select" v-model="tab" class="tabs-select">
           <option value="contact">Контактные данные</option>
           <option value="children">Анкеты подопечных</option>
+          <option v-if="showConsentTab" value="consent">
+            Согласие{{ showConsentDot ? ' •' : '' }}
+          </option>
           <option value="stats">Статистика</option>
           <option value="consent">Согласие</option>
         </select>
@@ -69,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, provide } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth.js';
 import { api } from '../services/api.js';
@@ -85,6 +96,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 const showConsentTab = ref(false);
 const showLogoutConfirm = ref(false);
+const consentStatus = ref('none'); // 'none' | 'pending' | 'active'
 
 const currentTabComponent = computed(() => {
   switch (tab.value) {
@@ -101,6 +113,29 @@ const currentTabComponent = computed(() => {
   }
 });
 
+const showConsentDot = computed(() => {
+  return showConsentTab.value && consentStatus.value === 'none';
+});
+
+function updateConsentStatus(newStatus) {
+  consentStatus.value = newStatus;
+}
+
+provide('updateConsentStatus', updateConsentStatus);
+
+async function loadConsentStatus() {
+  try {
+    const data = await api.accounts.getConsentStatus?.();
+    if (data && typeof data.status === 'string') {
+      const s = data.status.toLowerCase();
+      consentStatus.value =
+        s === 'active' ? 'active' : s === 'pending' ? 'pending' : 'none';
+    }
+  } catch {
+    consentStatus.value = 'none';
+  }
+}
+
 onMounted(async () => {
   try {
     const res = await api.accounts.getMyQuestionnaires();
@@ -110,8 +145,11 @@ onMounted(async () => {
         ? res.items
         : [];
     showConsentTab.value = items.length > 0;
+
+    if (showConsentTab.value) {
+      await loadConsentStatus();
+    }
   } catch (e) {
-    // Если эндпоинт недоступен, вкладку не показываем
     showConsentTab.value = false;
   }
 });
@@ -152,7 +190,6 @@ function cancelLogout() {
   display: flex;
   gap: 12px;
   flex: 1;
-  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   white-space: nowrap;
   scrollbar-width: thin;
@@ -184,19 +221,19 @@ function cancelLogout() {
 
 .tabs .button {
   padding: 8px 16px;
-  background: transparent;
+  background: #f0f0f0;
   border-radius: 6px;
   cursor: pointer;
+  border: 1px solid #d5d5d5;
 }
 
 .tabs .button.active {
   background-color: #2aaea2;
   color: white;
+  border-color: #2aaea2;
 }
 
 .tab {
-  border: none;
-  border-bottom: 1px solid rgba(42, 174, 162, 0.5);
   font-size: 14px;
   transition:
     background-color 0.2s ease,
@@ -204,19 +241,19 @@ function cancelLogout() {
     border-color 0.2s ease,
     transform 0.2s ease;
   flex: 0 0 auto;
+  position: relative;
 }
 
 .tab:hover {
-  background-color: rgba(42, 174, 162, 0.4);
-  border-bottom: 1px solid rgba(42, 174, 162, 0.1);
+  background-color: #e0e0e0;
+  border-color: #c0c0c0;
   transform: translateY(0);
 }
 
 .logout {
   margin-left: auto;
   background-color: #d4392e;
-  border: none;
-  border-bottom: 1px solid rgba(244, 67, 54, 0.5);
+  border: 1px solid #d4392e;
   font-size: 14px;
   transition:
     background-color 0.2s ease,
@@ -227,6 +264,7 @@ function cancelLogout() {
 
 .logout:hover {
   background-color: #f44336;
+  border-color: #f44336;
   color: white;
   transform: translateY(0);
 }
@@ -261,5 +299,17 @@ function cancelLogout() {
   .logout {
     margin-left: 0;
   }
+}
+
+.notification-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 10px;
+  height: 10px;
+  background-color: #dc3545;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #fff;
+  z-index: 1;
 }
 </style>

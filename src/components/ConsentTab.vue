@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, inject } from 'vue';
 import { api } from '../services/api.js';
 
 const status = ref('none'); // 'none' | 'pending' | 'active'
@@ -103,6 +103,9 @@ const fileInput = ref(null);
 const isDragging = ref(false);
 
 const templateUrl = '../../consent.docx';
+
+// Получаем функцию обновления статуса из родительского компонента
+const updateConsentStatus = inject('updateConsentStatus', () => {});
 
 onMounted(async () => {
   loading.value = true;
@@ -117,6 +120,8 @@ onMounted(async () => {
     status.value = 'none';
   } finally {
     loading.value = false;
+    // Уведомляем родительский компонент о текущем статусе
+    updateConsentStatus(status.value);
   }
 });
 
@@ -179,6 +184,8 @@ async function handleUpload() {
     sent.value = true;
     if (fileInput.value) fileInput.value.value = '';
     file.value = null;
+    // Уведомляем родительский компонент об изменении статуса
+    updateConsentStatus(status.value);
   } catch (e) {
     const msg =
       e?.response?.data?.message || e.message || 'Не удалось отправить файл';
@@ -191,7 +198,8 @@ async function handleUpload() {
 
 <style scoped>
 .consent-tab {
-  max-width: 760px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .status.muted {

@@ -1,12 +1,13 @@
 import axios from 'axios';
 
 // API базовый URL
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.DEV ? '/api' : 'http://127.0.0.1:8000';
 
 // Axios instance
 export const httpClient = axios.create({
   baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: false, // Отключаем credentials для CORS
 });
 
 function getAccessToken() {
@@ -37,6 +38,14 @@ let queue = [];
 httpClient.interceptors.response.use(
   r => r,
   async err => {
+    // Обработка CORS ошибок
+    if (err.code === 'ERR_NETWORK' || err.message?.includes('CORS')) {
+      console.error('CORS ошибка:', err);
+      throw new Error(
+        'Ошибка подключения к серверу. Проверьте, что API сервер запущен и настроен CORS.'
+      );
+    }
+
     const original = err.config || {};
     const isRefreshCall =
       typeof original?.url === 'string' &&
@@ -147,25 +156,33 @@ export const api = {
 
     // Мероприятия
     getEvents: () => httpClient.get('/accounts/events/').then(r => r.data),
-    getEventById: id => httpClient.get(`/accounts/events/${id}`).then(r => r.data),
+    getEventById: id =>
+      httpClient.get(`/accounts/events/${id}`).then(r => r.data),
 
     // Истории семей
-    getFamilyStories: () => httpClient.get('/accounts/family-stories/').then(r => r.data),
-    getFamilyStoryById: id => httpClient.get(`/accounts/family-stories/${id}`).then(r => r.data),
+    getFamilyStories: () =>
+      httpClient.get('/accounts/family-stories/').then(r => r.data),
+    getFamilyStoryById: id =>
+      httpClient.get(`/accounts/family-stories/${id}`).then(r => r.data),
 
     // Категории статей
-    getArticleCategories: () => httpClient.get('/accounts/article-categories/').then(r => r.data),
+    getArticleCategories: () =>
+      httpClient.get('/accounts/article-categories/').then(r => r.data),
 
     // Статьи
     getArticles: () => httpClient.get('/accounts/articles/').then(r => r.data),
-    getArticleById: id => httpClient.get(`/accounts/articles/${id}`).then(r => r.data),
+    getArticleById: id =>
+      httpClient.get(`/accounts/articles/${id}`).then(r => r.data),
 
     // Обратная связь
-    sendFeedback: payload => httpClient.post('/accounts/feedback/', payload).then(r => r.data),
+    sendFeedback: payload =>
+      httpClient.post('/accounts/feedback/', payload).then(r => r.data),
 
     // Статистика анкет по городам
     getQuestionnaireStatsByCity: () =>
-      httpClient.get('/accounts/questionnaires/stats/by-city/').then(r => r.data),
+      httpClient
+        .get('/accounts/questionnaires/stats/by-city/')
+        .then(r => r.data),
     // Мои анкеты подопечных
     getMyQuestionnaires: () =>
       httpClient.get('/accounts/questionnaires/my/').then(r => r.data),

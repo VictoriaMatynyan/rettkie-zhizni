@@ -1,20 +1,6 @@
 <template>
   <div class="personal-stats">
     <h2 class="block-title">Статистика</h2>
-    <StandardContent
-      :paragraphs="paragraphs"
-      :image-src="symptomsImg"
-      :image-src-modal="symptomsImg"
-      :show-map="true"
-      :map-points="points"
-      map-title="География пациентов"
-      image-alt="Схема симптомов Ретта"
-      image-alt-modal="Схема симптомов Ретта"
-      download-link="/files/rett-info-brochure.pdf"
-      download-label="Скачать памятку по заболеванию: "
-      caption-text="Изображение: основные проявления синдрома Ретта"
-      download-link-name="Гайд-заглушка (1.2 МБ)"
-    />
 
     <div class="chart-section card">
       <h3>Статистика по мутациям</h3>
@@ -123,12 +109,16 @@
         </tbody>
       </table>
     </div>
+
+    <div class="map-section">
+      <h3>География пациентов</h3>
+      <OSMMap :points="points" />
+    </div>
   </div>
 </template>
 
 <script>
-import StandardContent from '../components/StandardContent.vue';
-import symptomsImg from '../assets/symptoms.png';
+import OSMMap from '../components/OSMMap.vue';
 import { api } from '../services/api.js';
 
 /**
@@ -233,14 +223,9 @@ const MOCK_COUNTS = {
 
 export default {
   name: 'PersonalStats',
-  components: { StandardContent },
+  components: { OSMMap },
   data() {
     return {
-      paragraphs: [
-        'На этой странице собрана агрегированная статистика по географии и мутациям.',
-      ],
-      symptomsImg: symptomsImg,
-
       /** @type {CityPoint[]} */
       points: [],
       mapError: '',
@@ -499,6 +484,11 @@ export default {
 </script>
 
 <style scoped>
+.personal-stats {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
 .block-title {
   text-align: center;
 }
@@ -512,54 +502,74 @@ export default {
   margin-bottom: 24px;
 }
 
+.chart-section.card,
+.table-section.card {
+  max-width: 650px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 13px;
+  padding: 12px;
+}
+
+.chart-section h3,
+.table-section h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  margin-top: 0;
+}
+
 .chart-controls {
-  margin-top: 8px;
+  margin-top: 6px;
+  font-size: 12px;
 }
 .chart-controls input {
-  width: 72px;
-  padding: 6px 8px;
+  width: 60px;
+  padding: 4px 6px;
   border: 1px solid #ddd;
-  border-radius: 6px;
-  margin-left: 8px;
+  border-radius: 4px;
+  margin-left: 6px;
+  font-size: 12px;
 }
 .control-hint {
-  margin-left: 8px;
+  margin-left: 6px;
   color: #777;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .small {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .chart-filters {
-  margin-top: 12px;
+  margin-top: 10px;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 6px;
+  font-size: 12px;
 }
 .chk-inline {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 .mutations-select {
   border: 1px dashed #e3e7ea;
-  border-radius: 8px;
-  padding: 8px;
+  border-radius: 6px;
+  padding: 6px;
 }
 .select-actions {
   display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 .btn.ghost {
   background: #fff;
   color: #23938c;
   border: 1px solid #23938c;
-  padding: 6px 10px;
-  border-radius: 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
   cursor: pointer;
+  font-size: 11px;
 }
 .btn.ghost:hover {
   background: #23938c;
@@ -567,33 +577,34 @@ export default {
 }
 .checkbox-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 4px 12px;
-  max-height: 180px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 3px 8px;
+  max-height: 150px;
   overflow: auto;
+  font-size: 11px;
 }
 .chk {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .bar-chart {
   display: flex;
   align-items: flex-end;
-  gap: 10px;
-  height: 280px;
-  margin-top: 16px;
+  gap: 8px;
+  height: 240px;
+  margin-top: 12px;
   border-left: 1px solid #e5e7eb;
   border-bottom: 1px solid #e5e7eb;
-  padding: 8px 8px 0 8px;
+  padding: 6px 6px 0 6px;
 }
 .bar {
   position: relative;
   flex: 1 1 0;
-  min-width: 40px;
+  min-width: 35px;
   background: linear-gradient(180deg, #28b0a5, #23938c);
-  border-radius: 6px 6px 0 0;
+  border-radius: 4px 4px 0 0;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -607,16 +618,16 @@ export default {
 }
 .bar-value {
   position: absolute;
-  top: -20px;
-  font-size: 12px;
+  top: -18px;
+  font-size: 11px;
   color: #333;
 }
 .bar-label {
   position: absolute;
-  bottom: -40px;
+  bottom: -35px;
   width: 100%;
   text-align: center;
-  font-size: 12px;
+  font-size: 10px;
   color: #333;
   white-space: nowrap;
   overflow: hidden;
@@ -643,29 +654,43 @@ thead th {
   background: #f8fafb;
   color: #333;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
 }
 th,
 td {
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-bottom: 1px solid #eee;
   text-align: left;
+  font-size: 12px;
 }
 tbody tr:hover {
   background: #fafafa;
 }
 
+.map-section {
+  margin-top: 32px;
+  margin-bottom: 24px;
+}
+
+.map-section h3 {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
 @media (max-width: 768px) {
   .bar-chart {
-    height: 220px;
-    gap: 8px;
+    height: 200px;
+    gap: 6px;
   }
   .bar {
-    min-width: 32px;
+    min-width: 28px;
   }
   .bar-label {
-    bottom: -34px;
-    font-size: 11px;
+    bottom: -30px;
+    font-size: 9px;
+  }
+  .bar-value {
+    font-size: 10px;
   }
 }
 </style>

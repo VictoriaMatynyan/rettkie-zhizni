@@ -39,6 +39,15 @@
       @cancel="cancelEdit"
     />
     <ConfirmModal
+      v-model="showSuccessModal"
+      title="Анкета добавлена"
+      :message="successMessage"
+      confirm-text="Отлично"
+      :show-cancel="false"
+      @confirm="dismissSuccessModal"
+      @cancel="dismissSuccessModal"
+    />
+    <ConfirmModal
       v-model="showDeleteConfirm"
       title="Удалить анкету?"
       :message="deleteConfirmMessage"
@@ -68,6 +77,8 @@ export default {
       error: null,
       showDeleteConfirm: false,
       pendingDeleteIndex: null,
+      showSuccessModal: false,
+      successMessage: '',
     };
   },
   computed: {
@@ -225,9 +236,8 @@ export default {
         // Успех
         this.cancelEdit();
         await this.loadChildren();
-        try {
-          alert('Анкета успешно сохранена');
-        } catch (_) {}
+        this.successMessage = 'Анкета успешно сохранена';
+        this.showSuccessModal = true;
         return res;
       } catch (e) {
         this.error =
@@ -280,6 +290,9 @@ export default {
       this.editedIndex = null;
       this.showForm = false;
     },
+    dismissSuccessModal() {
+      this.showSuccessModal = false;
+    },
   },
 };
 </script>
@@ -296,7 +309,7 @@ export default {
   margin: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: clamp(16px, 3.5vw, 28px);
+  gap: clamp(16px, 3.5vw, 20px);
 }
 
 .child-card {
@@ -333,8 +346,7 @@ export default {
   margin-top: auto;
   display: flex;
   flex-wrap: wrap;
-  gap: clamp(10px, 2.5vw, 18px);
-  justify-content: flex-end;
+  gap: clamp(8px, 2.5vw, 12px);
 }
 
 .menu-button {
@@ -346,15 +358,15 @@ export default {
   background-color: transparent;
   border: 1px solid #23938c;
   color: #23938c;
-  padding: clamp(10px, 2.6vw, 14px) clamp(16px, 4vw, 28px);
-  font-size: clamp(13px, 2vw, 15px);
+  padding: clamp(10px, 2.6vw, 12px) clamp(16px, 4vw, 16px);
+  font-size: clamp(10px, 2vw, 12px);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   background-repeat: no-repeat;
-  background-position: 18px 50%;
-  background-size: clamp(16px, 3vw, 20px);
-  padding-left: clamp(40px, 5vw, 52px);
+  background-position: 14px 50%;
+  background-size: clamp(16px, 3vw, 18px);
+  padding-left: clamp(40px, 5vw, 44px);
 }
 
 .menu-button:hover {
@@ -383,6 +395,7 @@ export default {
   border: 1px solid #23938c;
   color: #23938c;
   padding: clamp(12px, 3vw, 16px) clamp(18px, 4vw, 24px);
+  margin-top: clamp(10px, 3vw, 20px);
   font-size: clamp(14px, 2.2vw, 16px);
   border-radius: 8px;
   cursor: pointer;

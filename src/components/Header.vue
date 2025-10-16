@@ -820,6 +820,7 @@ onBeforeUnmount(() => {
     transition: all 0.3s ease;
     filter: brightness(0) saturate(100%) invert(20%) sepia(8%) saturate(1012%)
       hue-rotate(169deg) brightness(96%) contrast(89%);
+    pointer-events: none;
   }
 
   .burger-mobile.open {

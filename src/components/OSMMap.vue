@@ -19,6 +19,18 @@ let leafletWaitTimer = null;
 let ro = null; // ResizeObserver
 let waitTimer = null;
 
+function formatQuestionnaireLabel(count) {
+  const n = Number(count) || 0;
+  const mod100 = Math.abs(n) % 100;
+  const mod10 = mod100 % 10;
+  let noun = 'анкет';
+  if (mod100 < 11 || mod100 > 14) {
+    if (mod10 === 1) noun = 'анкета';
+    else if (mod10 >= 2 && mod10 <= 4) noun = 'анкеты';
+  }
+  return `${n} ${noun}`;
+}
+
 function ensureLeaflet() {
   const L = window.L;
   return L || null;
@@ -71,17 +83,15 @@ function updateMarkers() {
     if (Number.isNaN(lat) || Number.isNaN(lon)) return;
 
     const icon = L.divIcon({
-      className: 'city-marker-wrapper',
+      className: 'bio-marker-icon',
       html: `
-        <div class="city-marker">
-          <div class="city-marker__bubble">
-            <div class="city-marker__name">${p.name ?? ''}</div>
-            <div class="city-marker__count">Анкет: ${Number(p.count) || 0}</div>
-          </div>
-          <div class="city-marker__pin"></div>
-        </div>`,
-      iconSize: [200, 70],
-      iconAnchor: [100, 70],
+        <div class="bio-marker" role="presentation">
+          <span class="emoji" aria-hidden="true">🧬</span>
+          <span class="count">${Number(p.count) || 0}</span>
+        </div>
+      `,
+      iconSize: [36, 36],
+      iconAnchor: [18, 18],
     });
 
     const marker = L.marker([lat, lon], { icon }).addTo(markersLayer);
@@ -92,9 +102,19 @@ function updateMarkers() {
         const w = el.offsetWidth || 200;
         const h = el.offsetHeight || 60;
         el.style.marginLeft = `${-Math.round(w / 2)}px`;
-        el.style.marginTop = `${-Math.round(h)}px`;
+        el.style.marginTop = `${-Math.round(h / 2)}px`;
       }
     } catch {}
+
+    const tooltipParts = [];
+    if (p.name) tooltipParts.push(p.name);
+    tooltipParts.push(formatQuestionnaireLabel(p.count));
+    if (tooltipParts.length) {
+      marker.bindTooltip(tooltipParts.join(' • '), {
+        direction: 'top',
+        offset: [0, -12],
+      });
+    }
   });
 
   // Центрирование/зум:
@@ -157,40 +177,54 @@ watch(
   z-index: 0;
 }
 
-:deep(.city-marker) {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+:deep(.bio-marker-icon) {
+  pointer-events: none;
 }
-:deep(.city-marker__bubble) {
+
+:deep(.bio-marker) {
   display: inline-flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
-  background: #f1fbf9;
-  border: 1px solid rgba(42, 174, 162, 0.25);
-  border-radius: 6px;
-  padding: 8px 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  justify-content: center;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  /* width: 36px;
+  height: 36px; */
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7dd3fc, #a78bfa);
+  color: #fff;
+  font-size: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  animation: bioMarkerFadeIn 0.6s ease-in-out;
 }
-:deep(.city-marker__name) {
-  font-size: 16px;
-  font-weight: 800;
-  color: #123;
-  white-space: nowrap;
+
+:deep(.bio-marker .emoji) {
+  line-height: 1;
 }
-:deep(.city-marker__count) {
-  font-size: 15px;
-  font-weight: 700;
-  color: #2b6;
+
+:deep(.bio-marker .count) {
+  position: absolute;
+  bottom: -4px;
+  right: -6px;
+  background: #fff;
+  color: #4f46e5;
+  font-size: 12px;
+  border-radius: 10px;
+  padding: 0px 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+  min-width: 13px;
+  text-align: center;
 }
-:deep(.city-marker__pin) {
-  width: 0;
-  height: 0;
-  border-left: 7px solid transparent;
-  border-right: 7px solid transparent;
-  border-top: 8px solid #f1fbf9;
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.15));
-  margin-top: -1px;
+
+@keyframes bioMarkerFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 </style>

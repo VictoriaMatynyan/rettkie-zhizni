@@ -746,7 +746,6 @@ onBeforeUnmount(() => {
 
   .mobile-controls {
     display: flex;
-    flex-direction: column;
     position: fixed;
     top: 16px;
     right: 16px;

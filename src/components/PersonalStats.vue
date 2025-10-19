@@ -499,7 +499,7 @@ export default {
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-  margin-bottom: 24px;
+  margin: 0 0 24px;
 }
 
 .chart-section.card,
@@ -509,6 +509,7 @@ export default {
   margin-right: auto;
   font-size: 13px;
   padding: 12px;
+  min-width: 280px;
 }
 
 .chart-section h3,
@@ -661,7 +662,7 @@ td {
   padding: 8px 10px;
   border-bottom: 1px solid #eee;
   text-align: left;
-  font-size: 12px;
+  font-size: clamp(8px, 1.8vw, 12px);
 }
 tbody tr:hover {
   background: #fafafa;
@@ -692,5 +693,13 @@ tbody tr:hover {
   .bar-value {
     font-size: 10px;
   }
+}
+
+@media (max-width: 664px) {
+th,
+td {
+  word-break: break-all;
+}
+
 }
 </style>

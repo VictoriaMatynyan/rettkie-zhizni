@@ -395,7 +395,7 @@ export default {
   border: 1px solid #23938c;
   color: #23938c;
   padding: clamp(12px, 3vw, 16px) clamp(18px, 4vw, 24px);
-  margin-top: clamp(10px, 3vw, 20px);
+  margin: clamp(10px, 3vw, 20px) 0;
   font-size: clamp(14px, 2.2vw, 16px);
   border-radius: 8px;
   cursor: pointer;

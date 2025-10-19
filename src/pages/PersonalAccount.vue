@@ -61,7 +61,6 @@
             Согласие{{ showConsentDot ? ' •' : '' }}
           </option>
           <option value="stats">Статистика</option>
-          <option value="consent">Согласие</option>
         </select>
         <button class="button logout" @click="requestLogout">Выйти</button>
       </div>
@@ -175,7 +174,6 @@ function cancelLogout() {
 .personal-account {
   max-width: 1050px;
   margin: 0 auto;
-  padding: clamp(20px, 6vw, 48px) clamp(16px, 5vw, 56px) clamp(28px, 6vw, 64px);
 }
 
 .tabs {

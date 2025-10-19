@@ -27,6 +27,27 @@
           >
             <span class="dropdown-trigger" @click="toggleDropdown('patients')">
               Пациентам
+              <span
+                v-if="!isMobile"
+                class="dropdown-indicator"
+                aria-hidden="true"
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6 9l6 6 6-6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
               <span v-if="isMobile" class="dropdown-arrow">
                 <svg
                   width="16"
@@ -85,6 +106,27 @@
               <router-link to="/patient-registry" @click.stop="closeMenu"
                 >Реестр пациентов</router-link
               >
+              <span
+                v-if="!isMobile"
+                class="dropdown-indicator"
+                aria-hidden="true"
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6 9l6 6 6-6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
               <span
                 v-if="isMobile"
                 class="dropdown-arrow"
@@ -326,7 +368,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref, computed } from 'vue';
+import { onBeforeUnmount, onMounted, ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth.js';
 
@@ -359,8 +401,8 @@ function toggleDropdown(dropdownName) {
 function closeMenu() {
   if (isMobile.value) {
     menuOpen.value = false;
-    activeDropdown.value = null;
   }
+  activeDropdown.value = null;
 }
 
 function handleMouseLeave() {
@@ -374,6 +416,13 @@ onMounted(async () => {
   document.addEventListener('click', handleClickOutside);
   window.addEventListener('resize', handleResize);
 });
+
+watch(
+  () => router.currentRoute.value.fullPath,
+  () => {
+    closeMenu();
+  }
+);
 
 function handleClickOutside(event) {
   const clickedOutsideMenu =
@@ -465,7 +514,7 @@ onBeforeUnmount(() => {
 .main-nav {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
   flex-wrap: nowrap;
 }
 
@@ -480,7 +529,6 @@ onBeforeUnmount(() => {
   color: #333;
   padding: 0;
   transition: color 0.2s;
-  white-space: nowrap;
 }
 
 .main-nav a:hover {
@@ -531,10 +579,35 @@ onBeforeUnmount(() => {
   cursor: pointer;
   padding: 0;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
 }
 
 .dropdown-trigger:hover {
   color: #23938c;
+}
+
+.dropdown-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 3px;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+.dropdown-indicator svg {
+  width: 10px;
+  height: 10px;
+  display: block;
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+.dropdown.active > .dropdown-trigger .dropdown-indicator svg,
+.dropdown:hover > .dropdown-trigger .dropdown-indicator svg {
+  transform: rotate(180deg);
 }
 
 .dropdown-content {
@@ -542,18 +615,22 @@ onBeforeUnmount(() => {
   position: absolute;
   background-color: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  padding: 8px 0;
+  padding: 10px 14px;
+  border-radius: 8px;
   top: 100%;
   left: 0;
   z-index: 20;
-  min-width: 160px;
+  min-width: 215px;
+  word-break: break-word;
+  font-size: 15px;
 }
 
 .dropdown-content a {
   display: block;
-  padding: 6px 12px;
+  padding: 0 0 6px 18px;
   color: #333;
   text-decoration: none;
+  word-break: break-word;
 }
 
 .dropdown-content a:hover span:hover {

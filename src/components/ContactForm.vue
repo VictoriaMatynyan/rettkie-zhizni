@@ -104,6 +104,7 @@
             v-model="form.email_notifications"
             type="checkbox"
             name="email_notifications"
+            @change="onEmailNotificationsChange"
           />
 
           <span v-if="showHelp.email_notifications" class="label-text">
@@ -144,6 +145,7 @@ const touched = ref({
   last_name: false,
   email: false,
   phone: false,
+  email_notifications: false,
 });
 
 const showHelp = {
@@ -160,8 +162,10 @@ function syncFormFromUser() {
   form.value.last_name = u.last_name ?? u.lastName ?? '';
   form.value.email = u.email || '';
   form.value.phone = u.phone || '';
-  // Настройка уведомлений: используем только email_notifications с бэкенда
-  if (typeof u.email_notifications === 'boolean') {
+  // Настройка уведомлений: используем receive_news с бэкенда, fallback на email_notifications
+  if (typeof u.receive_news === 'boolean') {
+    form.value.email_notifications = u.receive_news;
+  } else if (typeof u.email_notifications === 'boolean') {
     form.value.email_notifications = u.email_notifications;
   }
 }
@@ -203,7 +207,9 @@ const original = computed(() => ({
   ).trim(),
   email: (authStore.user?.email || '').trim(),
   phone: (authStore.user?.phone || '').trim(),
-  email_notifications: !!authStore.user?.email_notifications,
+  email_notifications: !!(
+    authStore.user?.receive_news ?? authStore.user?.email_notifications
+  ),
 }));
 
 const dirty = computed(() => ({
@@ -213,6 +219,7 @@ const dirty = computed(() => ({
   email: trimmedEmail.value !== original.value.email,
   phone: (form.value.phone || '').trim() !== original.value.phone,
   email_notifications:
+    touched.value.email_notifications &&
     !!form.value.email_notifications !== original.value.email_notifications,
 }));
 
@@ -270,7 +277,10 @@ function onBlur(field) {
     form.value[field] = (form.value[field] || '').trim();
   }
 }
-// чекбокс необязательный — отдельной обработки не требуется
+
+function onEmailNotificationsChange() {
+  touched.value.email_notifications = true;
+}
 
 async function handleSubmit() {
   try {
@@ -283,7 +293,7 @@ async function handleSubmit() {
     if (dirty.value.email) payload.email = trimmedEmail.value;
     if (dirty.value.phone) payload.phone = form.value.phone.trim();
     if (dirty.value.email_notifications)
-      payload.email_notifications = !!form.value.email_notifications;
+      payload.receive_news = !!form.value.email_notifications;
 
     await authStore.updateProfile(payload);
     submitted.value = true;

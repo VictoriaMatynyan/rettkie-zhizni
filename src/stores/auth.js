@@ -206,6 +206,7 @@ export const useAuthStore = defineStore('auth', {
           'email',
           'phone',
           'email_notifications',
+          'receive_news',
         ];
         const data = {};
         for (const k of allowed) if (k in profileData) data[k] = profileData[k];

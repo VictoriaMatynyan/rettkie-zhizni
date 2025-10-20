@@ -139,9 +139,14 @@ export const useAuthStore = defineStore('auth', {
             lower.includes('not active') ||
             lower.includes('invalid credentials')
           ) {
-            msg = 'Неверный e-mail или пароль. Проверьте данные и попробуйте ещё раз';
-          } else if (lower.includes('not verified') || lower.includes('unverified')) {
-            msg = 'Аккаунт не активирован. Проверьте почту и подтвердите e-mail';
+            msg =
+              'Неверный e-mail или пароль. Проверьте данные и попробуйте ещё раз';
+          } else if (
+            lower.includes('not verified') ||
+            lower.includes('unverified')
+          ) {
+            msg =
+              'Аккаунт не активирован. Проверьте почту и подтвердите e-mail';
           } else {
             msg = 'Неверный e-mail или пароль';
           }
@@ -155,7 +160,8 @@ export const useAuthStore = defineStore('auth', {
           msg = 'Слишком много попыток входа. Попробуйте чуть позже';
         }
 
-        this.error = msg || 'Не удалось выполнить вход. Попробуйте ещё раз позже';
+        this.error =
+          msg || 'Не удалось выполнить вход. Попробуйте ещё раз позже';
         throw e;
       } finally {
         this.loading = false;
@@ -194,7 +200,13 @@ export const useAuthStore = defineStore('auth', {
       this.error = null;
       try {
         // Отправляем только переданные поля (частичное обновление)
-        const allowed = ['first_name', 'last_name', 'email', 'phone', 'email_notifications'];
+        const allowed = [
+          'first_name',
+          'last_name',
+          'email',
+          'phone',
+          'email_notifications',
+        ];
         const data = {};
         for (const k of allowed) if (k in profileData) data[k] = profileData[k];
         const updatedUser = await api.auth.updateMe(data);

@@ -14,10 +14,15 @@
             class="form-input"
             :class="{ invalid: touched.lastName && !!lastNameError }"
             type="text"
-            @blur="onBlur('lastName')"
             required
+            @blur="onBlur('lastName')"
           />
-          <p class="field-error" :class="{ visible: touched.lastName && !!lastNameError }">{{ lastNameError }}</p>
+          <p
+            class="field-error"
+            :class="{ visible: touched.lastName && !!lastNameError }"
+          >
+            {{ lastNameError }}
+          </p>
         </label>
       </div>
 
@@ -29,10 +34,15 @@
             class="form-input"
             :class="{ invalid: touched.firstName && !!firstNameError }"
             type="text"
-            @blur="onBlur('firstName')"
             required
+            @blur="onBlur('firstName')"
           />
-          <p class="field-error" :class="{ visible: touched.firstName && !!firstNameError }">{{ firstNameError }}</p>
+          <p
+            class="field-error"
+            :class="{ visible: touched.firstName && !!firstNameError }"
+          >
+            {{ firstNameError }}
+          </p>
         </label>
       </div>
 
@@ -44,10 +54,15 @@
             class="form-input"
             :class="{ invalid: touched.middleName && !!middleNameError }"
             type="text"
-            @blur="onBlur('middleName')"
             required
+            @blur="onBlur('middleName')"
           />
-          <p class="field-error" :class="{ visible: touched.middleName && !!middleNameError }">{{ middleNameError }}</p>
+          <p
+            class="field-error"
+            :class="{ visible: touched.middleName && !!middleNameError }"
+          >
+            {{ middleNameError }}
+          </p>
         </label>
       </div>
 
@@ -58,8 +73,8 @@
             v-model="form.gender"
             class="form-select"
             :class="{ invalid: touched.gender && !!genderError }"
-            @blur="onBlur('gender')"
             required
+            @blur="onBlur('gender')"
           >
             <option class="form-option gender" disabled value="">
               Выберите пол
@@ -67,7 +82,12 @@
             <option class="form-option" value="м">Мужской</option>
             <option class="form-option" value="ж">Женский</option>
           </select>
-          <p class="field-error" :class="{ visible: touched.gender && !!genderError }">{{ genderError }}</p>
+          <p
+            class="field-error"
+            :class="{ visible: touched.gender && !!genderError }"
+          >
+            {{ genderError }}
+          </p>
         </label>
       </div>
 
@@ -79,10 +99,15 @@
             class="form-input"
             :class="{ invalid: touched.birthDate && !!birthDateError }"
             type="date"
-            @blur="onBlur('birthDate')"
             required
+            @blur="onBlur('birthDate')"
           />
-          <p class="field-error" :class="{ visible: touched.birthDate && !!birthDateError }">{{ birthDateError }}</p>
+          <p
+            class="field-error"
+            :class="{ visible: touched.birthDate && !!birthDateError }"
+          >
+            {{ birthDateError }}
+          </p>
         </label>
       </div>
 
@@ -94,15 +119,20 @@
             v-model="form.citizenship"
             class="form-select"
             :class="{ invalid: touched.citizenship && !!citizenshipError }"
-            @blur="onBlur('citizenship')"
             required
+            @blur="onBlur('citizenship')"
           >
             <option disabled value="">Выберите</option>
             <option value="РФ">РФ</option>
             <option value="Другое">Другое</option>
           </select>
         </label>
-        <p class="field-error" :class="{ visible: touched.citizenship && !!citizenshipError }">{{ citizenshipError }}</p>
+        <p
+          class="field-error"
+          :class="{ visible: touched.citizenship && !!citizenshipError }"
+        >
+          {{ citizenshipError }}
+        </p>
         <p v-if="isCitizenshipOther" class="alert alert-warning">
           Для гражданства «Другое» сохранение анкеты недоступно.
         </p>
@@ -116,14 +146,19 @@
             v-model="form.countryOfResidence"
             class="form-select"
             :class="{ invalid: touched.countryOfResidence && !!countryError }"
-            @blur="onBlur('countryOfResidence')"
             required
+            @blur="onBlur('countryOfResidence')"
           >
             <option disabled value="">Выберите</option>
             <option value="Россия">Россия</option>
             <option value="Другая страна">Другая страна</option>
           </select>
-          <p class="field-error" :class="{ visible: touched.countryOfResidence && !!countryError }">{{ countryError }}</p>
+          <p
+            class="field-error"
+            :class="{ visible: touched.countryOfResidence && !!countryError }"
+          >
+            {{ countryError }}
+          </p>
         </label>
       </div>
 
@@ -135,8 +170,8 @@
             class="form-select"
             :class="{ invalid: touched.cityId && !!cityError }"
             :disabled="regionsLoading || !!regionsError"
-            @blur="onBlur('cityId')"
             required
+            @blur="onBlur('cityId')"
           >
             <option disabled value="">
               {{
@@ -152,7 +187,12 @@
             </option>
           </select>
         </label>
-        <p class="field-error" :class="{ visible: touched.cityId && !!cityError }">{{ cityError }}</p>
+        <p
+          class="field-error"
+          :class="{ visible: touched.cityId && !!cityError }"
+        >
+          {{ cityError }}
+        </p>
         <p v-if="regionsError" class="alert alert-error">{{ regionsError }}</p>
       </div>
 
@@ -163,15 +203,26 @@
           <select
             v-model="form.geneticTestConfirmed"
             class="form-select"
-            :class="{ invalid: touched.geneticTestConfirmed && !!geneticTestConfirmedError }"
-            @blur="onBlur('geneticTestConfirmed')"
+            :class="{
+              invalid:
+                touched.geneticTestConfirmed && !!geneticTestConfirmedError,
+            }"
             required
+            @blur="onBlur('geneticTestConfirmed')"
           >
             <option disabled value="">Выберите</option>
             <option value="да">да</option>
             <option value="нет">нет</option>
           </select>
-          <p class="field-error" :class="{ visible: touched.geneticTestConfirmed && !!geneticTestConfirmedError }">{{ geneticTestConfirmedError }}</p>
+          <p
+            class="field-error"
+            :class="{
+              visible:
+                touched.geneticTestConfirmed && !!geneticTestConfirmedError,
+            }"
+          >
+            {{ geneticTestConfirmedError }}
+          </p>
         </label>
       </div>
 
@@ -183,8 +234,8 @@
             class="form-select"
             :class="{ invalid: touched.geneId && !!geneIdError }"
             :disabled="mutationGenesLoading || !!mutationGenesError"
-            @blur="onBlur('geneId')"
             required
+            @blur="onBlur('geneId')"
           >
             <option disabled value="">
               {{
@@ -195,17 +246,20 @@
                     : 'Выберите'
               }}
             </option>
-            <option
-              v-for="g in mutationGenes"
-              :key="g.id"
-              :value="g.id"
-            >
+            <option v-for="g in mutationGenes" :key="g.id" :value="g.id">
               {{ g.name }}
             </option>
           </select>
-          <p class="field-error" :class="{ visible: touched.geneId && !!geneIdError }">{{ geneIdError }}</p>
+          <p
+            class="field-error"
+            :class="{ visible: touched.geneId && !!geneIdError }"
+          >
+            {{ geneIdError }}
+          </p>
         </label>
-        <p v-if="mutationGenesError" class="alert alert-error">{{ mutationGenesError }}</p>
+        <p v-if="mutationGenesError" class="alert alert-error">
+          {{ mutationGenesError }}
+        </p>
       </div>
 
       <div v-if="isGeneticConfirmed && isGeneOther" class="form-group">
@@ -216,10 +270,15 @@
             class="form-input"
             :class="{ invalid: touched.geneOther && !!geneOtherError }"
             type="text"
-            @blur="onBlur('geneOther')"
             required
+            @blur="onBlur('geneOther')"
           />
-          <p class="field-error" :class="{ visible: touched.geneOther && !!geneOtherError }">{{ geneOtherError }}</p>
+          <p
+            class="field-error"
+            :class="{ visible: touched.geneOther && !!geneOtherError }"
+          >
+            {{ geneOtherError }}
+          </p>
         </label>
       </div>
 
@@ -250,12 +309,21 @@
           <textarea
             v-model="form.diagnosisDescription"
             class="form-input textarea"
-            :class="{ invalid: touched.diagnosisDescription && !!diagnosisError }"
+            :class="{
+              invalid: touched.diagnosisDescription && !!diagnosisError,
+            }"
             :maxlength="2000"
             required
             @blur="onBlur('diagnosisDescription')"
           />
-          <p class="field-error" :class="{ visible: touched.diagnosisDescription && !!diagnosisError }">{{ diagnosisError }}</p>
+          <p
+            class="field-error"
+            :class="{
+              visible: touched.diagnosisDescription && !!diagnosisError,
+            }"
+          >
+            {{ diagnosisError }}
+          </p>
         </label>
         <div class="muted">
           Осталось символов:
@@ -276,11 +344,20 @@
             ребенка/подопечного (родитель, опекун, попечитель)</span
           >
         </label>
-        <p class="field-error" :class="{ visible: touched.isLegalRepresentative && !!isLegalRepError }">{{ isLegalRepError }}</p>
+        <p
+          class="field-error"
+          :class="{
+            visible: touched.isLegalRepresentative && !!isLegalRepError,
+          }"
+        >
+          {{ isLegalRepError }}
+        </p>
       </div>
 
       <div class="form-buttons">
-        <button class="btn submit" type="submit" :disabled="!canSubmit">Сохранить</button>
+        <button class="btn submit" type="submit" :disabled="!canSubmit">
+          Сохранить
+        </button>
         <button class="btn cancel" type="button" @click="$emit('cancel')">
           Отмена
         </button>
@@ -355,7 +432,9 @@ export default {
     },
     isGeneOther() {
       if (!this.form.geneId) return false;
-      const g = this.mutationGenes.find(x => String(x.id) === String(this.form.geneId));
+      const g = this.mutationGenes.find(
+        x => String(x.id) === String(this.form.geneId)
+      );
       const name = (g?.name || '').toLowerCase();
       return name === 'другое' || name === 'другой';
     },
@@ -389,7 +468,8 @@ export default {
     },
     citizenshipError() {
       if (!this.form.citizenship) return 'Выберите гражданство';
-      if (this.isCitizenshipOther) return 'Для гражданства «Другое» сохранение недоступно';
+      if (this.isCitizenshipOther)
+        return 'Для гражданства «Другое» сохранение недоступно';
       return '';
     },
     countryError() {
@@ -401,7 +481,8 @@ export default {
       return '';
     },
     geneticTestConfirmedError() {
-      if (!this.form.geneticTestConfirmed) return 'Укажите подтверждение генетического теста';
+      if (!this.form.geneticTestConfirmed)
+        return 'Укажите подтверждение генетического теста';
       return '';
     },
     geneIdError() {
@@ -409,17 +490,25 @@ export default {
       return '';
     },
     geneOtherError() {
-      if (this.isGeneticConfirmed && this.isGeneOther && !this.form.geneOther?.trim()) return 'Укажите название гена';
+      if (
+        this.isGeneticConfirmed &&
+        this.isGeneOther &&
+        !this.form.geneOther?.trim()
+      )
+        return 'Укажите название гена';
       return '';
     },
     diagnosisError() {
       const text = (this.form.diagnosisDescription || '').trim();
-      if (this.isGeneticNotConfirmed && !text) return 'Опишите, кем и когда поставлен диагноз';
-      if (text.length > 2000) return 'Описание не должно превышать 2000 символов';
+      if (this.isGeneticNotConfirmed && !text)
+        return 'Опишите, кем и когда поставлен диагноз';
+      if (text.length > 2000)
+        return 'Описание не должно превышать 2000 символов';
       return '';
     },
     isLegalRepError() {
-      if (!this.form.isLegalRepresentative) return 'Подтвердите, что вы законный представитель';
+      if (!this.form.isLegalRepresentative)
+        return 'Подтвердите, что вы законный представитель';
       return '';
     },
     isFormValid() {
@@ -458,7 +547,15 @@ export default {
     onBlur(field) {
       if (field in this.touched) this.touched[field] = true;
       // Тримим текстовые поля
-      if (['lastName', 'firstName', 'middleName', 'geneOther', 'diagnosisDescription'].includes(field)) {
+      if (
+        [
+          'lastName',
+          'firstName',
+          'middleName',
+          'geneOther',
+          'diagnosisDescription',
+        ].includes(field)
+      ) {
         this.form[field] = (this.form[field] || '').trim();
       }
     },
@@ -494,7 +591,9 @@ export default {
         }
       } catch (e) {
         this.mutationGenesError =
-          e?.response?.data?.message || e.message || 'Не удалось загрузить список генов';
+          e?.response?.data?.message ||
+          e.message ||
+          'Не удалось загрузить список генов';
         this.mutationGenes = [];
       } finally {
         this.mutationGenesLoading = false;
@@ -550,7 +649,15 @@ export default {
     submitForm() {
       this.triedSubmit = true;
       // Показать ошибки под всеми активными полями
-      const toTouch = ['lastName','firstName','middleName','gender','birthDate','citizenship','countryOfResidence'];
+      const toTouch = [
+        'lastName',
+        'firstName',
+        'middleName',
+        'gender',
+        'birthDate',
+        'citizenship',
+        'countryOfResidence',
+      ];
       if (this.isRussia) toTouch.push('cityId');
       toTouch.push('geneticTestConfirmed');
       if (this.isGeneticConfirmed) {
@@ -630,7 +737,9 @@ select:focus {
   text-overflow: ellipsis;
   visibility: hidden;
 }
-.field-error.visible { visibility: visible; }
+.field-error.visible {
+  visibility: visible;
+}
 
 .form-buttons {
   display: flex;
@@ -649,7 +758,10 @@ select:focus {
   font-size: 16px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .btn:disabled,

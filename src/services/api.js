@@ -183,6 +183,11 @@ export const api = {
       httpClient
         .get('/accounts/questionnaires/stats/by-city/')
         .then(r => r.data),
+    // Статистика анкет по генам
+    getQuestionnaireStatsByGene: () =>
+      httpClient
+        .get('/accounts/questionnaires/stats/by-gene/')
+        .then(r => r.data),
     // Мои анкеты подопечных
     getMyQuestionnaires: () =>
       httpClient.get('/accounts/questionnaires/my/').then(r => r.data),

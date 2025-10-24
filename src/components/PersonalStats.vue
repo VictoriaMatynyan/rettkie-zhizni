@@ -3,14 +3,14 @@
     <h2 class="block-title">Статистика</h2>
 
     <div class="chart-section card">
-      <h3>Статистика по мутациям</h3>
+      <h3>Статистика по генам</h3>
       <p v-if="usingMocks" class="muted">
         Показаны демонстрационные данные (моки)
       </p>
 
       <div class="chart-controls">
         <label>
-          Количество отображаемых мутаций:
+          Количество отображаемых генов:
           <input
             v-model.number="displayLimit"
             type="number"
@@ -21,7 +21,11 @@
           <span class="control-hint">от 2 до {{ maxDisplayLimit }}</span>
         </label>
         <p v-if="selectedIds.length > 0" class="muted small">
-          При выбранных мутациях ограничение по количеству не применяется
+          При выбранных генах ограничение по количеству не применяется
+        </p>
+        <p v-if="chartItems.length > 8" class="muted small">
+          Отображается {{ chartItems.length }} столбцов в компактном режиме
+          <span v-if="chartItems.length > 15"> (прокрутка доступна)</span>
         </p>
       </div>
 
@@ -42,12 +46,12 @@
           <div class="checkbox-list">
             <label
               v-for="m in sortedMutations"
-              :key="'chk-' + m.id"
+              :key="'chk-' + (m.id || m.gene)"
               class="chk"
             >
               <input v-model="selectedIds" type="checkbox" :value="m.id" />
               <span :class="{ self: userMutationId === m.id }">{{
-                m.shortName || m.gene
+                m.gene
               }}</span>
               <span class="muted small"> ({{ m.count }})</span>
             </label>
@@ -55,7 +59,14 @@
         </div>
       </div>
 
-      <div v-if="chartItems.length" class="bar-chart">
+      <div
+        v-if="chartItems.length"
+        class="bar-chart"
+        :class="{
+          'many-bars': chartItems.length > 8,
+          'too-many-bars': chartItems.length > 15,
+        }"
+      >
         <div
           v-for="bar in chartItems"
           :key="bar.key"
@@ -81,28 +92,17 @@
         <thead>
           <tr>
             <th>Ген</th>
-            <th>Краткое наименование</th>
-            <th>Прочие названия</th>
-            <th>Тип мутации</th>
-            <th>Ссылка</th>
-            <th>Кол-во пациентов</th>
+            <th>Количество анкет</th>
             <th>% от общего</th>
           </tr>
         </thead>
         <tbody>
           <tr
             v-for="m in sortedMutations"
-            :key="m.id"
+            :key="m.id || `unknown-${m.gene}`"
             :class="{ highlight: userMutationId === m.id }"
           >
             <td>{{ m.gene }}</td>
-            <td>{{ m.shortName }}</td>
-            <td>{{ m.altNames || '-' }}</td>
-            <td>{{ m.type || '-' }}</td>
-            <td>
-              <a v-if="m.link" :href="m.link" target="_blank">Ссылка</a>
-              <span v-else>-</span>
-            </td>
             <td>{{ m.count }}</td>
             <td>{{ percent(m.count) }}</td>
           </tr>
@@ -291,14 +291,14 @@ export default {
         key: 'others',
         id: null,
         short: 'Прочие',
-        tooltip: 'Прочие мутации',
+        tooltip: 'Прочие гены',
         count: rest.reduce((s, x) => s + x.count, 0),
       };
       const bars = chosen.map(m => ({
-        key: `m-${m.id}`,
+        key: `m-${m.id || m.gene}`,
         id: m.id,
-        short: m.shortName || m.gene || String(m.id),
-        tooltip: m.description || m.shortName || m.gene,
+        short: m.gene || String(m.id),
+        tooltip: m.gene,
         count: m.count,
       }));
 
@@ -432,36 +432,40 @@ export default {
         return;
       }
       try {
-        const dictRes = await api.accounts.getMutationGenes();
-        this.dict = Array.isArray(dictRes?.items) ? dictRes.items : [];
+        // Используем новый API для получения статистики по генам
+        const statsRes = await api.accounts.getQuestionnaireStatsByGene();
 
-        try {
-          const statsRes =
-            await api.accounts.getQuestionnaireStatsByMutation?.();
-          const items = Array.isArray(statsRes?.items) ? statsRes.items : [];
-          this.countsByMutation = items.reduce((acc, it) => {
-            const id = it.id ?? it.mutation_id ?? it.gene_id;
-            const count = Number(it.count) || 0;
-            if (id != null) acc[id] = count;
+        if (statsRes?.ok && Array.isArray(statsRes.items)) {
+          // Преобразуем данные в формат, совместимый с существующей логикой
+          this.dict = statsRes.items.map(item => ({
+            id: item.id,
+            gene: item.name,
+            short_name: item.name,
+            alt_names: '',
+            type: '',
+            link: '',
+            description: item.name,
+          }));
+
+          this.countsByMutation = statsRes.items.reduce((acc, item) => {
+            if (item.id != null) {
+              acc[item.id] = item.count;
+            }
             return acc;
           }, {});
-        } catch (_) {
-          this.countsByMutation = {};
-        }
 
-        const hasCounts = Object.values(this.countsByMutation || {}).some(
-          n => Number(n) > 0
-        );
-        if (!this.dict.length || !hasCounts) {
-          this.dict = MOCK_MUTATIONS;
-          this.countsByMutation = { ...MOCK_COUNTS };
-          this.usingMocks = true;
+          this.usingMocks = false;
+        } else {
+          throw new Error('Неверный формат ответа от API');
         }
       } catch (e) {
         this.dictError =
+          e?.response?.data?.error ||
           e?.response?.data?.message ||
           e.message ||
-          'Не удалось загрузить справочник мутаций';
+          'Не удалось загрузить статистику по генам';
+
+        // Fallback на моки при ошибке
         this.dict = MOCK_MUTATIONS;
         this.countsByMutation = { ...MOCK_COUNTS };
         this.usingMocks = true;
@@ -613,6 +617,64 @@ export default {
     transform 0.2s ease,
     opacity 0.2s ease;
 }
+
+/* Адаптивная ширина столбцов в зависимости от количества */
+.bar-chart.many-bars {
+  gap: 4px; /* Уменьшенный отступ между столбцами */
+}
+
+.bar-chart.many-bars .bar {
+  min-width: 20px; /* Уменьшенная минимальная ширина */
+}
+
+.bar-chart.many-bars .bar-value {
+  font-size: 9px; /* Меньший шрифт для значений */
+}
+
+.bar-chart.many-bars .bar-label {
+  font-size: 8px; /* Меньший шрифт для подписей */
+  bottom: -30px; /* Поднятые подписи */
+}
+
+/* Для очень большого количества столбцов */
+.bar-chart.too-many-bars {
+  gap: 2px; /* Минимальный отступ */
+  overflow-x: auto; /* Горизонтальная прокрутка при необходимости */
+  padding-bottom: 20px; /* Место для полосы прокрутки */
+}
+
+.bar-chart.too-many-bars .bar {
+  min-width: 15px; /* Еще более узкие столбцы */
+  flex-shrink: 0; /* Запрещаем сжатие */
+}
+
+.bar-chart.too-many-bars .bar-value {
+  font-size: 8px;
+}
+
+.bar-chart.too-many-bars .bar-label {
+  font-size: 7px;
+  bottom: -25px;
+}
+
+/* Стилизация полосы прокрутки */
+.bar-chart.too-many-bars::-webkit-scrollbar {
+  height: 8px;
+}
+
+.bar-chart.too-many-bars::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.bar-chart.too-many-bars::-webkit-scrollbar-thumb {
+  background: #23938c;
+  border-radius: 4px;
+}
+
+.bar-chart.too-many-bars::-webkit-scrollbar-thumb:hover {
+  background: #1e7a73;
+}
 .bar:hover {
   opacity: 0.95;
   transform: translateY(-2px);
@@ -693,13 +755,41 @@ tbody tr:hover {
   .bar-value {
     font-size: 10px;
   }
+
+  /* Адаптация для мобильных с большим количеством столбцов */
+  .bar-chart.many-bars {
+    gap: 3px;
+  }
+  .bar-chart.many-bars .bar {
+    min-width: 18px;
+  }
+  .bar-chart.many-bars .bar-value {
+    font-size: 8px;
+  }
+  .bar-chart.many-bars .bar-label {
+    font-size: 7px;
+    bottom: -25px;
+  }
+
+  .bar-chart.too-many-bars {
+    gap: 1px;
+  }
+  .bar-chart.too-many-bars .bar {
+    min-width: 12px;
+  }
+  .bar-chart.too-many-bars .bar-value {
+    font-size: 7px;
+  }
+  .bar-chart.too-many-bars .bar-label {
+    font-size: 6px;
+    bottom: -20px;
+  }
 }
 
 @media (max-width: 664px) {
-th,
-td {
-  word-break: break-all;
-}
-
+  th,
+  td {
+    word-break: break-all;
+  }
 }
 </style>

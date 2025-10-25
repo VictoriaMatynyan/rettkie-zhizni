@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from '../services/api.js';
 
-// Приводим объект пользователя к единому формату
 function normalizeUser(user) {
   if (!user || typeof user !== 'object') return user;
   const firstName =
@@ -88,7 +87,6 @@ export const useAuthStore = defineStore('auth', {
         this.registrationSuccess = true;
         return data;
       } catch (e) {
-        // Go API может вернуть ошибки валидации в виде объекта
         if (e.response?.data?.errors) {
           this.error = Object.values(e.response.data.errors).flat().join(', ');
         } else {
@@ -111,11 +109,9 @@ export const useAuthStore = defineStore('auth', {
         localStorage.setItem('accessToken', data.access);
         localStorage.setItem('refreshToken', data.refresh);
 
-        // После успешного логина получаем данные пользователя
         await this.fetchUserProfile();
         return this.user;
       } catch (e) {
-        // обработка ошибок аутентификации
         const status = e?.response?.status;
         const data = e?.response?.data || {};
         const tryExtract = () => {
@@ -185,7 +181,6 @@ export const useAuthStore = defineStore('auth', {
           await api.auth.logout(rt);
         }
       } catch (e) {
-        // Не блокируем локальный выход, даже если сервер вернул ошибку
         console.warn(
           'Не удалось выйти из аккаунта:',
           e?.response?.data || e.message || e
@@ -199,7 +194,6 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true;
       this.error = null;
       try {
-        // Отправляем только переданные поля (частичное обновление)
         const allowed = [
           'first_name',
           'last_name',

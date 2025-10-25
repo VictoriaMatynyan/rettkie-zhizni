@@ -51,7 +51,6 @@ const routes = [
     name: 'PatientRegistry',
     component: PatientRegistry,
   },
-  // Ранее поддерживался префикс "/rettkie-zhizni" — убрано
   {
     path: '/patient-registry/personal-account',
     name: 'PersonalAccount',
@@ -63,7 +62,6 @@ const routes = [
     name: 'PatientMap',
     component: PatientMap,
   },
-  // Ранее поддерживался префикс "/rettkie-zhizni" — убрано
   {
     path: '/patient-registry/privacy-policy',
     name: 'PrivacyPolicy',
@@ -72,27 +70,29 @@ const routes = [
   { path: '/privacy-policy', redirect: '/patient-registry/privacy-policy' },
   { path: '/donate', name: 'Donate', component: Donate },
 
-  // Аутентификация
   { path: '/login', name: 'Login', component: LoginForm },
   { path: '/register', name: 'Register', component: RegisterForm },
-  { path: '/password-reset', name: 'PasswordReset', component: () => import('../pages/PasswordReset.vue') },
-  { path: '/password-reset/confirm/:uid/:token', name: 'PasswordResetConfirm', component: () => import('../pages/PasswordResetConfirm.vue') },
-
-  // Перенаправления
+  {
+    path: '/password-reset',
+    name: 'PasswordReset',
+    component: () => import('../pages/PasswordReset.vue'),
+  },
+  {
+    path: '/password-reset/confirm/:uid/:token',
+    name: 'PasswordResetConfirm',
+    component: () => import('../pages/PasswordResetConfirm.vue'),
+  },
   { path: '/personal-account', redirect: '/patient-registry/personal-account' },
 ];
 
-// Создание роутера
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-  // автоматически прокручивает страницу вверх после перехода на другую
   scrollBehavior() {
     return { top: 0 };
   },
 });
 
-// Охранники маршрутов
 import { useAuthStore } from '../stores/auth.js';
 router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore();

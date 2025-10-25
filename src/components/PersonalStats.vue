@@ -4,9 +4,6 @@
 
     <div class="chart-section card">
       <h3>Статистика по генам</h3>
-      <p v-if="usingMocks" class="muted">
-        Показаны демонстрационные данные (моки)
-      </p>
 
       <div class="chart-controls">
         <label>
@@ -30,10 +27,6 @@
       </div>
 
       <div class="chart-filters">
-        <label class="chk-inline">
-          <input v-model="includeOthers" type="checkbox" />
-          <span>Добавить столбец «Прочие»</span>
-        </label>
         <div class="mutations-select">
           <div class="select-actions">
             <button type="button" class="btn ghost" @click="selectAll">
@@ -85,9 +78,6 @@
 
     <div class="table-section card">
       <h3>Подробная статистика</h3>
-      <p v-if="usingMocks" class="muted">
-        Показаны демонстрационные данные (моки)
-      </p>
       <table>
         <thead>
           <tr>
@@ -125,102 +115,6 @@ import { api } from '../services/api.js';
  * @typedef {{id:number|string,name:string,lat:number,lon:number,count:number}} CityPoint
  */
 
-const MOCK_MUTATIONS = [
-  {
-    id: 101,
-    gene: 'MECP2',
-    short_name: 'R106W',
-    alt_names: 'Arg106Trp',
-    type: 'missense',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/17601/',
-    description: 'Заменa аминокислоты (Arg→Trp) в MECP2',
-  },
-  {
-    id: 102,
-    gene: 'MECP2',
-    short_name: 'T158M',
-    alt_names: 'Thr158Met',
-    type: 'missense',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/11821/',
-    description: 'Заменa аминокислоты (Thr→Met) в MECP2',
-  },
-  {
-    id: 103,
-    gene: 'MECP2',
-    short_name: 'R168X',
-    alt_names: 'Arg168Ter, R168*',
-    type: 'nonsense',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/16376/',
-    description: 'Нонсенс‑мутация (стоп‑кодон) в MECP2',
-  },
-  {
-    id: 104,
-    gene: 'MECP2',
-    short_name: 'R255X',
-    alt_names: 'Arg255Ter, R255*',
-    type: 'nonsense',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/16377/',
-    description: 'Нонсенс‑мутация (стоп‑кодон) в MECP2',
-  },
-  {
-    id: 105,
-    gene: 'MECP2',
-    short_name: 'R270X',
-    alt_names: 'Arg270Ter, R270*',
-    type: 'nonsense',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/16378/',
-    description: 'Нонсенс‑мутация (стоп‑кодон) в MECP2',
-  },
-  {
-    id: 201,
-    gene: 'CDKL5',
-    short_name: 'c.404_405del',
-    alt_names: 'p.Glu135Valfs*20',
-    type: 'frameshift',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/?term=CDKL5%20c.404_405del',
-    description: 'Сдвиг рамки считывания в CDKL5',
-  },
-  {
-    id: 202,
-    gene: 'FOXG1',
-    short_name: 'c.460C>T',
-    alt_names: 'p.Arg154Cys',
-    type: 'missense',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/?term=FOXG1%20c.460C%3ET',
-    description: 'Замена аминокислоты в FOXG1',
-  },
-  {
-    id: 301,
-    gene: 'Другой',
-    short_name: 'Индел',
-    alt_names: 'Реже встречающиеся варианты',
-    type: 'indel',
-    link: '',
-    description: 'Прочие редкие варианты вне основных генов',
-  },
-  {
-    id: 302,
-    gene: 'MECP2',
-    short_name: 'ΔExon4',
-    alt_names: 'Deletion Exon 4',
-    type: 'deletion',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/?term=MECP2%20exon%204%20deletion',
-    description: 'Делеция экзона 4 в MECP2',
-  },
-];
-
-const MOCK_COUNTS = {
-  101: 22,
-  102: 18,
-  103: 15,
-  104: 10,
-  105: 7,
-  201: 6,
-  202: 4,
-  301: 3,
-  302: 2,
-};
-
 export default {
   name: 'PersonalStats',
   components: { OSMMap },
@@ -237,15 +131,12 @@ export default {
       userMutationId: null,
       dictLoading: false,
       dictError: '',
-      usingMocks: false,
-      forceMocks: false,
       selectedIds: [],
-      includeOthers: true,
     };
   },
   computed: {
     maxDisplayLimit() {
-      const MAX_TOP = 10;
+      const MAX_TOP = 32;
       const available = Math.max(2, this.sortedMutations.length);
       return Math.min(MAX_TOP, available);
     },
@@ -282,7 +173,7 @@ export default {
       } else {
         const limitRaw = Number(this.displayLimit) || 5;
         const limit = Math.min(Math.max(2, limitRaw), this.maxDisplayLimit);
-        chosen = list.slice(0, limit - 1);
+        chosen = list.slice(0, limit);
       }
 
       const chosenIds = new Set(chosen.map(m => String(m.id)));
@@ -290,8 +181,8 @@ export default {
       const others = {
         key: 'others',
         id: null,
-        short: 'Прочие',
-        tooltip: 'Прочие гены',
+        short: 'Прочие мутации',
+        tooltip: 'Прочие мутации',
         count: rest.reduce((s, x) => s + x.count, 0),
       };
       const bars = chosen.map(m => ({
@@ -302,7 +193,7 @@ export default {
         count: m.count,
       }));
 
-      if (this.includeOthers && others.count > 0) return [...bars, others];
+      if (others.count > 0) return [...bars, others];
       return bars;
     },
     maxCount() {
@@ -317,16 +208,6 @@ export default {
     },
   },
   mounted() {
-    try {
-      const fromEnv =
-        (import.meta && import.meta.env && import.meta.env.VITE_USE_MOCKS) ===
-        '1';
-      const fromQuery =
-        new URLSearchParams(window.location.search).get('useMocks') === '1';
-      this.forceMocks = !!(fromEnv || fromQuery);
-    } catch (_) {
-      this.forceMocks = false;
-    }
     this.fetchMapPoints();
     this.fetchMutationsDictAndStats();
     this.fetchUserMutation();
@@ -424,19 +305,10 @@ export default {
     async fetchMutationsDictAndStats() {
       this.dictLoading = true;
       this.dictError = '';
-      if (this.forceMocks) {
-        this.dict = MOCK_MUTATIONS;
-        this.countsByMutation = { ...MOCK_COUNTS };
-        this.usingMocks = true;
-        this.dictLoading = false;
-        return;
-      }
       try {
-        // Используем новый API для получения статистики по генам
         const statsRes = await api.accounts.getQuestionnaireStatsByGene();
 
         if (statsRes?.ok && Array.isArray(statsRes.items)) {
-          // Преобразуем данные в формат, совместимый с существующей логикой
           this.dict = statsRes.items.map(item => ({
             id: item.id,
             gene: item.name,
@@ -453,8 +325,6 @@ export default {
             }
             return acc;
           }, {});
-
-          this.usingMocks = false;
         } else {
           throw new Error('Неверный формат ответа от API');
         }
@@ -464,11 +334,6 @@ export default {
           e?.response?.data?.message ||
           e.message ||
           'Не удалось загрузить статистику по генам';
-
-        // Fallback на моки при ошибке
-        this.dict = MOCK_MUTATIONS;
-        this.countsByMutation = { ...MOCK_COUNTS };
-        this.usingMocks = true;
       } finally {
         this.dictLoading = false;
       }
@@ -480,7 +345,7 @@ export default {
         const withGene = items.find(x => x?.mutation_gene?.id != null);
         this.userMutationId = withGene?.mutation_gene?.id ?? null;
       } catch (_) {
-        this.userMutationId = this.usingMocks ? 102 : null;
+        this.userMutationId = null;
       }
     },
   },
@@ -584,8 +449,6 @@ export default {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 3px 8px;
-  max-height: 150px;
-  overflow: auto;
   font-size: 11px;
 }
 .chk {
@@ -618,34 +481,31 @@ export default {
     opacity 0.2s ease;
 }
 
-/* Адаптивная ширина столбцов в зависимости от количества */
 .bar-chart.many-bars {
-  gap: 4px; /* Уменьшенный отступ между столбцами */
+  gap: 4px;
 }
 
 .bar-chart.many-bars .bar {
-  min-width: 20px; /* Уменьшенная минимальная ширина */
+  min-width: 20px;
 }
 
 .bar-chart.many-bars .bar-value {
-  font-size: 9px; /* Меньший шрифт для значений */
+  font-size: 9px;
 }
 
 .bar-chart.many-bars .bar-label {
-  font-size: 8px; /* Меньший шрифт для подписей */
-  bottom: -30px; /* Поднятые подписи */
+  font-size: 8px;
+  bottom: -30px;
 }
 
-/* Для очень большого количества столбцов */
 .bar-chart.too-many-bars {
-  gap: 2px; /* Минимальный отступ */
-  overflow-x: auto; /* Горизонтальная прокрутка при необходимости */
-  padding-bottom: 20px; /* Место для полосы прокрутки */
+  gap: 2px;
+  padding-bottom: 20px;
 }
 
 .bar-chart.too-many-bars .bar {
-  min-width: 15px; /* Еще более узкие столбцы */
-  flex-shrink: 0; /* Запрещаем сжатие */
+  min-width: 15px;
+  flex-shrink: 0;
 }
 
 .bar-chart.too-many-bars .bar-value {
@@ -657,7 +517,6 @@ export default {
   bottom: -25px;
 }
 
-/* Стилизация полосы прокрутки */
 .bar-chart.too-many-bars::-webkit-scrollbar {
   height: 8px;
 }
@@ -756,7 +615,6 @@ tbody tr:hover {
     font-size: 10px;
   }
 
-  /* Адаптация для мобильных с большим количеством столбцов */
   .bar-chart.many-bars {
     gap: 3px;
   }

@@ -559,7 +559,6 @@ export default {
           api.accounts.getUserTypes(),
         ]);
 
-        // Проверяем структуру ответа
         if (
           regionsRes &&
           typeof regionsRes === 'object' &&

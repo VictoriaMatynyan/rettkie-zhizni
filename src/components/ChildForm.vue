@@ -382,13 +382,13 @@ export default {
         middleName: '',
         gender: '',
         birthDate: '',
-        citizenship: '', // РФ / Другое
-        countryOfResidence: '', // Россия / Другая страна
+        citizenship: '',
+        countryOfResidence: '',
         cityId: '',
-        geneticTestConfirmed: '', // да / нет
+        geneticTestConfirmed: '',
         geneId: '',
         geneOther: '',
-        geneticTestFile: null, // { name, type, size, dataUrl }
+        geneticTestFile: null,
         diagnosisDescription: '',
         isLegalRepresentative: false,
       },
@@ -534,7 +534,6 @@ export default {
   },
   mounted() {
     if (this.child) {
-      // Заполняем форму, сохраняя значения по умолчанию для новых полей
       this.form = { ...this.form, ...this.child };
     }
     this.fetchRegions();

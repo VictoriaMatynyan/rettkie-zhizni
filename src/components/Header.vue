@@ -4,7 +4,7 @@
       <div class="header-container">
         <router-link to="/" class="logo-block">
           <img
-            src="/src/assets/logo_square.png"
+            src="/src/assets/logo_square_compressed.png"
             alt="Логотип"
             class="logo-img"
           />
@@ -48,16 +48,16 @@
                   />
                 </svg>
               </span>
-              <span v-if="isMobile" class="dropdown-arrow">
+              <span v-if="isMobile" class="dropdown-indicator">
                 <svg
-                  width="16"
-                  height="16"
+                  width="13"
+                  height="13"
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M12 3V21M12 21L5 14M12 21L19 14"
+                    d="M6 9l6 6 6-6"
                     stroke="currentColor"
                     stroke-width="2"
                     stroke-linecap="round"
@@ -129,18 +129,18 @@
               </span>
               <span
                 v-if="isMobile"
-                class="dropdown-arrow"
+                class="dropdown-indicator"
                 @click.stop="toggleDropdown('registry')"
               >
                 <svg
-                  width="16"
-                  height="16"
+                  width="12"
+                  height="12"
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M12 3V21M12 21L5 14M12 21L19 14"
+                    d="M6 9l6 6 6-6"
                     stroke="currentColor"
                     stroke-width="2"
                     stroke-linecap="round"
@@ -192,7 +192,7 @@
       <div class="mobile-header">
         <router-link to="/" class="mobile-logo-block" @click="closeMenu">
           <img
-            src="/src/assets/logo_square.png"
+            src="/src/assets/logo_square_compressed.png"
             alt="Логотип"
             class="mobile-logo-img"
           />
@@ -204,7 +204,7 @@
       <div class="dropdown" :class="{ active: activeDropdown === 'patients' }">
         <span class="dropdown-trigger" @click="toggleDropdown('patients')">
           Пациентам
-          <span v-if="isMobile" class="dropdown-arrow">
+          <span v-if="isMobile" class="dropdown-indicator">
             <svg
               width="16"
               height="16"
@@ -213,7 +213,7 @@
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M12 3V21M12 21L5 14M12 21L19 14"
+                d="M6 9l6 6 6-6"
                 stroke="currentColor"
                 stroke-width="2"
                 stroke-linecap="round"
@@ -261,7 +261,7 @@
           >
           <span
             v-if="isMobile"
-            class="dropdown-arrow"
+            class="dropdown-indicator"
             @click.stop="toggleDropdown('registry')"
           >
             <svg
@@ -272,7 +272,7 @@
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M12 3V21M12 21L5 14M12 21L19 14"
+                d="M6 9l6 6 6-6"
                 stroke="currentColor"
                 stroke-width="2"
                 stroke-linecap="round"
@@ -311,15 +311,54 @@
 
     <div class="mobile-controls" :class="{ 'menu-open': menuOpen }">
       <router-link to="/" class="home-icon-mobile" @click="closeMenu">
-        <img
-          :src="
-            $route.path === '/'
-              ? '/src/assets/home_icon_white.svg'
-              : '/src/assets/home_icon.svg'
-          "
-          alt="Домой"
+        <svg
+          v-if="$route.path === '/'"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
           class="home-icon-img"
-        />
+        >
+          <path
+            d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+            stroke="#000000"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <polyline
+            points="9,22 9,12 15,12 15,22"
+            stroke="#000000"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <svg
+          v-else
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          class="home-icon-img"
+        >
+          <path
+            d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+            stroke="#000000"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <polyline
+            points="9,22 9,12 15,12 15,22"
+            stroke="#000000"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
       </router-link>
       <button
         ref="burgerMobileRef"
@@ -598,15 +637,14 @@ onBeforeUnmount(() => {
 }
 
 .dropdown-indicator svg {
-  width: 10px;
-  height: 10px;
+  width: 13px;
+  height: 13px;
   display: block;
   transform-origin: center;
   transition: transform 0.2s ease;
 }
 
-.dropdown.active > .dropdown-trigger .dropdown-indicator svg,
-.dropdown:hover > .dropdown-trigger .dropdown-indicator svg {
+.dropdown.active > .dropdown-trigger .dropdown-indicator svg {
   transform: rotate(180deg);
 }
 
@@ -947,7 +985,7 @@ onBeforeUnmount(() => {
   }
 
   .mobile-logo-img {
-    height: 32px;
+    height: 52px;
     margin-right: 8px;
   }
 
@@ -989,19 +1027,24 @@ onBeforeUnmount(() => {
     flex: 1;
   }
 
-  .main-nav-mobile .dropdown-arrow {
-    display: inline-block;
+  .main-nav-mobile .dropdown-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transform-origin: center;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
   }
 
-  .main-nav-mobile .dropdown-arrow svg {
+  .main-nav-mobile .dropdown-indicator svg {
+    width: 13px;
+    height: 13px;
+    display: block;
     color: #23938c;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
   }
 
-  .main-nav-mobile .dropdown.active .dropdown-arrow svg {
-    transform: rotate(90deg);
+  .main-nav-mobile .dropdown.active .dropdown-indicator svg {
+    transform: rotate(180deg);
   }
 
   .main-nav-mobile .dropdown.active > .dropdown-trigger {

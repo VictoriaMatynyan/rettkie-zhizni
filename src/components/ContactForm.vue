@@ -121,6 +121,10 @@
     <div v-if="submitted" class="success-message">
       Данные успешно сохранены!
     </div>
+
+    <div v-if="showError" class="error-message">
+      Произошла ошибка при сохранении данных. Попробуйте еще раз.
+    </div>
   </div>
 </template>
 
@@ -139,6 +143,7 @@ const form = ref({
 });
 
 const submitted = ref(false);
+const showError = ref(false);
 
 const touched = ref({
   first_name: false,
@@ -162,7 +167,6 @@ function syncFormFromUser() {
   form.value.last_name = u.last_name ?? u.lastName ?? '';
   form.value.email = u.email || '';
   form.value.phone = u.phone || '';
-  // Настройка уведомлений: используем receive_news с бэкенда, fallback на email_notifications
   if (typeof u.receive_news === 'boolean') {
     form.value.email_notifications = u.receive_news;
   } else if (typeof u.email_notifications === 'boolean') {
@@ -170,7 +174,6 @@ function syncFormFromUser() {
   }
 }
 
-// Обновляем поля, когда меняется пользователь
 watch(
   () => authStore.user,
   () => syncFormFromUser(),
@@ -178,7 +181,6 @@ watch(
 );
 
 onMounted(async () => {
-  // На всякий случай подтягиваем профиль, если есть токен, а пользователя ещё нет
   if (authStore.isAuthenticated && !authStore.user) {
     try {
       await authStore.fetchUserProfile();
@@ -193,7 +195,6 @@ const digitsPhone = computed(() =>
   String(form.value.phone || '').replace(/\D/g, '')
 );
 
-// Оригинальные значения из профиля для сравнения
 const original = computed(() => ({
   first_name: (
     authStore.user?.first_name ??
@@ -242,14 +243,12 @@ const emailError = computed(() => {
 });
 const phoneError = computed(() => {
   if (!dirty.value.phone) return '';
-  // Ожидаем 11 цифр: 7XXXXXXXXXX
   if (!digitsPhone.value) return 'Введите номер телефона';
   if (digitsPhone.value.length !== 11 || !/^7\d{10}$/.test(digitsPhone.value)) {
     return 'Введите номер в формате +7 (999) 999-99-99';
   }
   return '';
 });
-// Чекбокс необязателен, поэтому ошибок для него нет
 const hasErrors = computed(
   () =>
     !!(
@@ -263,7 +262,6 @@ const isDirty = computed(() => Object.values(dirty.value).some(Boolean));
 const canSave = computed(() => isDirty.value && !hasErrors.value);
 
 function onEmailInput(e) {
-  // Убираем пробелы внутри/по краям
   form.value.email = String(e.target.value).replace(/\s+/g, '');
 }
 function onBlur(field) {
@@ -285,7 +283,6 @@ function onEmailNotificationsChange() {
 async function handleSubmit() {
   try {
     authStore.clearError();
-    // Отправляем только изменённые поля
     const payload = {};
     if (dirty.value.first_name)
       payload.first_name = form.value.first_name.trim();
@@ -299,7 +296,8 @@ async function handleSubmit() {
     submitted.value = true;
     setTimeout(() => (submitted.value = false), 5000);
   } catch (e) {
-    // Ошибка уже хранится в authStore.error, можно дополнительно показать alert
+    showError.value = true;
+    setTimeout(() => (showError.value = false), 5000);
   }
 }
 </script>
@@ -431,6 +429,12 @@ input[type='tel']:focus {
 .success-message {
   margin-top: clamp(10px, 2vw, 16px);
   color: #2aaea2;
+  font-weight: 500;
+}
+
+.error-message {
+  margin-top: clamp(10px, 2vw, 16px);
+  color: #dc3545;
   font-weight: 500;
 }
 

@@ -60,9 +60,7 @@
   </footer>
 </template>
 
-<script setup>
-// никаких настроек не требуется
-</script>
+<script setup></script>
 
 <style scoped>
 .site-footer {

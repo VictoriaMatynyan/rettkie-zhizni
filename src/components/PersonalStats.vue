@@ -3,14 +3,11 @@
     <h2 class="block-title">Статистика</h2>
 
     <div class="chart-section card">
-      <h3>Статистика по мутациям</h3>
-      <p v-if="usingMocks" class="muted">
-        Показаны демонстрационные данные (моки)
-      </p>
+      <h3>Статистика по генам</h3>
 
       <div class="chart-controls">
         <label>
-          Количество отображаемых мутаций:
+          Количество отображаемых генов:
           <input
             v-model.number="displayLimit"
             type="number"
@@ -21,15 +18,15 @@
           <span class="control-hint">от 2 до {{ maxDisplayLimit }}</span>
         </label>
         <p v-if="selectedIds.length > 0" class="muted small">
-          При выбранных мутациях ограничение по количеству не применяется
+          При выбранных генах ограничение по количеству не применяется
+        </p>
+        <p v-if="chartItems.length > 8" class="muted small">
+          Отображается {{ chartItems.length }} столбцов в компактном режиме
+          <span v-if="chartItems.length > 15"> (прокрутка доступна)</span>
         </p>
       </div>
 
       <div class="chart-filters">
-        <label class="chk-inline">
-          <input v-model="includeOthers" type="checkbox" />
-          <span>Добавить столбец «Прочие»</span>
-        </label>
         <div class="mutations-select">
           <div class="select-actions">
             <button type="button" class="btn ghost" @click="selectAll">
@@ -42,12 +39,12 @@
           <div class="checkbox-list">
             <label
               v-for="m in sortedMutations"
-              :key="'chk-' + m.id"
+              :key="'chk-' + (m.id || m.gene)"
               class="chk"
             >
               <input v-model="selectedIds" type="checkbox" :value="m.id" />
               <span :class="{ self: userMutationId === m.id }">{{
-                m.shortName || m.gene
+                m.gene
               }}</span>
               <span class="muted small"> ({{ m.count }})</span>
             </label>
@@ -55,7 +52,14 @@
         </div>
       </div>
 
-      <div v-if="chartItems.length" class="bar-chart">
+      <div
+        v-if="chartItems.length"
+        class="bar-chart"
+        :class="{
+          'many-bars': chartItems.length > 8,
+          'too-many-bars': chartItems.length > 15,
+        }"
+      >
         <div
           v-for="bar in chartItems"
           :key="bar.key"
@@ -74,35 +78,21 @@
 
     <div class="table-section card">
       <h3>Подробная статистика</h3>
-      <p v-if="usingMocks" class="muted">
-        Показаны демонстрационные данные (моки)
-      </p>
       <table>
         <thead>
           <tr>
             <th>Ген</th>
-            <th>Краткое наименование</th>
-            <th>Прочие названия</th>
-            <th>Тип мутации</th>
-            <th>Ссылка</th>
-            <th>Кол-во пациентов</th>
+            <th>Количество анкет</th>
             <th>% от общего</th>
           </tr>
         </thead>
         <tbody>
           <tr
             v-for="m in sortedMutations"
-            :key="m.id"
+            :key="m.id || `unknown-${m.gene}`"
             :class="{ highlight: userMutationId === m.id }"
           >
             <td>{{ m.gene }}</td>
-            <td>{{ m.shortName }}</td>
-            <td>{{ m.altNames || '-' }}</td>
-            <td>{{ m.type || '-' }}</td>
-            <td>
-              <a v-if="m.link" :href="m.link" target="_blank">Ссылка</a>
-              <span v-else>-</span>
-            </td>
             <td>{{ m.count }}</td>
             <td>{{ percent(m.count) }}</td>
           </tr>
@@ -125,102 +115,6 @@ import { api } from '../services/api.js';
  * @typedef {{id:number|string,name:string,lat:number,lon:number,count:number}} CityPoint
  */
 
-const MOCK_MUTATIONS = [
-  {
-    id: 101,
-    gene: 'MECP2',
-    short_name: 'R106W',
-    alt_names: 'Arg106Trp',
-    type: 'missense',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/17601/',
-    description: 'Заменa аминокислоты (Arg→Trp) в MECP2',
-  },
-  {
-    id: 102,
-    gene: 'MECP2',
-    short_name: 'T158M',
-    alt_names: 'Thr158Met',
-    type: 'missense',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/11821/',
-    description: 'Заменa аминокислоты (Thr→Met) в MECP2',
-  },
-  {
-    id: 103,
-    gene: 'MECP2',
-    short_name: 'R168X',
-    alt_names: 'Arg168Ter, R168*',
-    type: 'nonsense',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/16376/',
-    description: 'Нонсенс‑мутация (стоп‑кодон) в MECP2',
-  },
-  {
-    id: 104,
-    gene: 'MECP2',
-    short_name: 'R255X',
-    alt_names: 'Arg255Ter, R255*',
-    type: 'nonsense',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/16377/',
-    description: 'Нонсенс‑мутация (стоп‑кодон) в MECP2',
-  },
-  {
-    id: 105,
-    gene: 'MECP2',
-    short_name: 'R270X',
-    alt_names: 'Arg270Ter, R270*',
-    type: 'nonsense',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/16378/',
-    description: 'Нонсенс‑мутация (стоп‑кодон) в MECP2',
-  },
-  {
-    id: 201,
-    gene: 'CDKL5',
-    short_name: 'c.404_405del',
-    alt_names: 'p.Glu135Valfs*20',
-    type: 'frameshift',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/?term=CDKL5%20c.404_405del',
-    description: 'Сдвиг рамки считывания в CDKL5',
-  },
-  {
-    id: 202,
-    gene: 'FOXG1',
-    short_name: 'c.460C>T',
-    alt_names: 'p.Arg154Cys',
-    type: 'missense',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/?term=FOXG1%20c.460C%3ET',
-    description: 'Замена аминокислоты в FOXG1',
-  },
-  {
-    id: 301,
-    gene: 'Другой',
-    short_name: 'Индел',
-    alt_names: 'Реже встречающиеся варианты',
-    type: 'indel',
-    link: '',
-    description: 'Прочие редкие варианты вне основных генов',
-  },
-  {
-    id: 302,
-    gene: 'MECP2',
-    short_name: 'ΔExon4',
-    alt_names: 'Deletion Exon 4',
-    type: 'deletion',
-    link: 'https://www.ncbi.nlm.nih.gov/clinvar/?term=MECP2%20exon%204%20deletion',
-    description: 'Делеция экзона 4 в MECP2',
-  },
-];
-
-const MOCK_COUNTS = {
-  101: 22,
-  102: 18,
-  103: 15,
-  104: 10,
-  105: 7,
-  201: 6,
-  202: 4,
-  301: 3,
-  302: 2,
-};
-
 export default {
   name: 'PersonalStats',
   components: { OSMMap },
@@ -237,15 +131,12 @@ export default {
       userMutationId: null,
       dictLoading: false,
       dictError: '',
-      usingMocks: false,
-      forceMocks: false,
       selectedIds: [],
-      includeOthers: true,
     };
   },
   computed: {
     maxDisplayLimit() {
-      const MAX_TOP = 10;
+      const MAX_TOP = 32;
       const available = Math.max(2, this.sortedMutations.length);
       return Math.min(MAX_TOP, available);
     },
@@ -282,7 +173,7 @@ export default {
       } else {
         const limitRaw = Number(this.displayLimit) || 5;
         const limit = Math.min(Math.max(2, limitRaw), this.maxDisplayLimit);
-        chosen = list.slice(0, limit - 1);
+        chosen = list.slice(0, limit);
       }
 
       const chosenIds = new Set(chosen.map(m => String(m.id)));
@@ -290,19 +181,19 @@ export default {
       const others = {
         key: 'others',
         id: null,
-        short: 'Прочие',
+        short: 'Прочие мутации',
         tooltip: 'Прочие мутации',
         count: rest.reduce((s, x) => s + x.count, 0),
       };
       const bars = chosen.map(m => ({
-        key: `m-${m.id}`,
+        key: `m-${m.id || m.gene}`,
         id: m.id,
-        short: m.shortName || m.gene || String(m.id),
-        tooltip: m.description || m.shortName || m.gene,
+        short: m.gene || String(m.id),
+        tooltip: m.gene,
         count: m.count,
       }));
 
-      if (this.includeOthers && others.count > 0) return [...bars, others];
+      if (others.count > 0) return [...bars, others];
       return bars;
     },
     maxCount() {
@@ -317,16 +208,6 @@ export default {
     },
   },
   mounted() {
-    try {
-      const fromEnv =
-        (import.meta && import.meta.env && import.meta.env.VITE_USE_MOCKS) ===
-        '1';
-      const fromQuery =
-        new URLSearchParams(window.location.search).get('useMocks') === '1';
-      this.forceMocks = !!(fromEnv || fromQuery);
-    } catch (_) {
-      this.forceMocks = false;
-    }
     this.fetchMapPoints();
     this.fetchMutationsDictAndStats();
     this.fetchUserMutation();
@@ -424,47 +305,35 @@ export default {
     async fetchMutationsDictAndStats() {
       this.dictLoading = true;
       this.dictError = '';
-      if (this.forceMocks) {
-        this.dict = MOCK_MUTATIONS;
-        this.countsByMutation = { ...MOCK_COUNTS };
-        this.usingMocks = true;
-        this.dictLoading = false;
-        return;
-      }
       try {
-        const dictRes = await api.accounts.getMutationGenes();
-        this.dict = Array.isArray(dictRes?.items) ? dictRes.items : [];
+        const statsRes = await api.accounts.getQuestionnaireStatsByGene();
 
-        try {
-          const statsRes =
-            await api.accounts.getQuestionnaireStatsByMutation?.();
-          const items = Array.isArray(statsRes?.items) ? statsRes.items : [];
-          this.countsByMutation = items.reduce((acc, it) => {
-            const id = it.id ?? it.mutation_id ?? it.gene_id;
-            const count = Number(it.count) || 0;
-            if (id != null) acc[id] = count;
+        if (statsRes?.ok && Array.isArray(statsRes.items)) {
+          this.dict = statsRes.items.map(item => ({
+            id: item.id,
+            gene: item.name,
+            short_name: item.name,
+            alt_names: '',
+            type: '',
+            link: '',
+            description: item.name,
+          }));
+
+          this.countsByMutation = statsRes.items.reduce((acc, item) => {
+            if (item.id != null) {
+              acc[item.id] = item.count;
+            }
             return acc;
           }, {});
-        } catch (_) {
-          this.countsByMutation = {};
-        }
-
-        const hasCounts = Object.values(this.countsByMutation || {}).some(
-          n => Number(n) > 0
-        );
-        if (!this.dict.length || !hasCounts) {
-          this.dict = MOCK_MUTATIONS;
-          this.countsByMutation = { ...MOCK_COUNTS };
-          this.usingMocks = true;
+        } else {
+          throw new Error('Неверный формат ответа от API');
         }
       } catch (e) {
         this.dictError =
+          e?.response?.data?.error ||
           e?.response?.data?.message ||
           e.message ||
-          'Не удалось загрузить справочник мутаций';
-        this.dict = MOCK_MUTATIONS;
-        this.countsByMutation = { ...MOCK_COUNTS };
-        this.usingMocks = true;
+          'Не удалось загрузить статистику по генам';
       } finally {
         this.dictLoading = false;
       }
@@ -476,7 +345,7 @@ export default {
         const withGene = items.find(x => x?.mutation_gene?.id != null);
         this.userMutationId = withGene?.mutation_gene?.id ?? null;
       } catch (_) {
-        this.userMutationId = this.usingMocks ? 102 : null;
+        this.userMutationId = null;
       }
     },
   },
@@ -580,8 +449,6 @@ export default {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 3px 8px;
-  max-height: 150px;
-  overflow: auto;
   font-size: 11px;
 }
 .chk {
@@ -612,6 +479,60 @@ export default {
   transition:
     transform 0.2s ease,
     opacity 0.2s ease;
+}
+
+.bar-chart.many-bars {
+  gap: 4px;
+}
+
+.bar-chart.many-bars .bar {
+  min-width: 20px;
+}
+
+.bar-chart.many-bars .bar-value {
+  font-size: 9px;
+}
+
+.bar-chart.many-bars .bar-label {
+  font-size: 8px;
+  bottom: -30px;
+}
+
+.bar-chart.too-many-bars {
+  gap: 2px;
+  padding-bottom: 20px;
+}
+
+.bar-chart.too-many-bars .bar {
+  min-width: 15px;
+  flex-shrink: 0;
+}
+
+.bar-chart.too-many-bars .bar-value {
+  font-size: 8px;
+}
+
+.bar-chart.too-many-bars .bar-label {
+  font-size: 7px;
+  bottom: -25px;
+}
+
+.bar-chart.too-many-bars::-webkit-scrollbar {
+  height: 8px;
+}
+
+.bar-chart.too-many-bars::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.bar-chart.too-many-bars::-webkit-scrollbar-thumb {
+  background: #23938c;
+  border-radius: 4px;
+}
+
+.bar-chart.too-many-bars::-webkit-scrollbar-thumb:hover {
+  background: #1e7a73;
 }
 .bar:hover {
   opacity: 0.95;
@@ -693,13 +614,40 @@ tbody tr:hover {
   .bar-value {
     font-size: 10px;
   }
+
+  .bar-chart.many-bars {
+    gap: 3px;
+  }
+  .bar-chart.many-bars .bar {
+    min-width: 18px;
+  }
+  .bar-chart.many-bars .bar-value {
+    font-size: 8px;
+  }
+  .bar-chart.many-bars .bar-label {
+    font-size: 7px;
+    bottom: -25px;
+  }
+
+  .bar-chart.too-many-bars {
+    gap: 1px;
+  }
+  .bar-chart.too-many-bars .bar {
+    min-width: 12px;
+  }
+  .bar-chart.too-many-bars .bar-value {
+    font-size: 7px;
+  }
+  .bar-chart.too-many-bars .bar-label {
+    font-size: 6px;
+    bottom: -20px;
+  }
 }
 
 @media (max-width: 664px) {
-th,
-td {
-  word-break: break-all;
-}
-
+  th,
+  td {
+    word-break: break-all;
+  }
 }
 </style>

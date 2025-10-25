@@ -70,7 +70,7 @@ export default {
   components: { ChildForm, ConfirmModal },
   data() {
     return {
-      children: [], // список анкет текущего пользователя
+      children: [],
       showForm: false,
       editedIndex: null,
       loading: false,
@@ -114,14 +114,11 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        // Обеспечим наличие токена/пользователя
         if (!this.authStore.isAuthenticated || !this.authStore.user) {
           await this.authStore.initAuth();
         }
-        // Загружаем анкеты текущего пользователя с backend
         const res = await api.accounts.getMyQuestionnaires();
         const items = Array.isArray(res?.items) ? res.items : [];
-        // Приводим к внутреннему формату полей, совместимому с ChildForm
         this.children = items.map(item => ({
           id: item.id,
           userId: item.user_id,
@@ -144,7 +141,6 @@ export default {
           geneId: item.mutation_gene?.id ?? '',
           geneOther: item.mutation_gene_other || '',
           isLegalRepresentative: !!item.is_legal_representative,
-          // Показываем в плейсхолдере название файла, если пришёл URL
           geneticTestFile: (() => {
             const url = item.genetic_scan || '';
             if (!url) return null;
@@ -156,7 +152,6 @@ export default {
               return name ? { name, url } : null;
             }
           })(),
-          // Дополнительно сохраняем для потенциального отображения
           city: item.city || null,
           mutationGene: item.mutation_gene || null,
           createdAt: item.created_at,
@@ -179,7 +174,6 @@ export default {
       try {
         let res;
         if (this.editedIndex !== null) {
-          // Редактирование: отправляем только изменённые поля
           const original = this.children[this.editedIndex] || {};
           const updated = data || {};
           const diff = {};
@@ -205,16 +199,13 @@ export default {
             const b = updated?.[k];
             if ((a ?? '') !== (b ?? '')) diff[k] = b;
           }
-          // Обработка файла: если выбран новый файл — отправляем
           if (updated?.geneticTestFile?.file instanceof File) {
             diff.geneticTestFile = updated.geneticTestFile;
           }
-          // city_id алиас для API
           if ('cityId' in diff && diff.cityId != null) {
             diff.city_id = diff.cityId;
           }
 
-          // Если нет изменений — просто закрываем форму
           const hasChanges =
             Object.keys(diff).length > 0 ||
             updated?.geneticTestFile?.file instanceof File;
@@ -226,14 +217,12 @@ export default {
           const id = original.id;
           res = await api.accounts.updateQuestionnaire(id, diff);
         } else {
-          // Создание
           res = await api.accounts.createQuestionnaire({
             ...data,
             city_id: data.cityId ?? data.city_id,
           });
         }
 
-        // Успех
         this.cancelEdit();
         await this.loadChildren();
         this.successMessage = 'Анкета успешно сохранена';
@@ -269,7 +258,6 @@ export default {
         const child = this.children[this.pendingDeleteIndex];
         if (!child) throw new Error('Анкета не найдена');
         await api.accounts.deleteQuestionnaire(child.id);
-        // После успешного удаления — обновим список с сервера
         await this.loadChildren();
         this.cancelDelete();
       } catch (e) {

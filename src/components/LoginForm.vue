@@ -16,7 +16,10 @@
             :disabled="loading"
             placeholder="Введите ваш email"
             @input="onEmailInput"
-            @blur="emailTouched = true; trimEmail()"
+            @blur="
+              emailTouched = true;
+              trimEmail();
+            "
           />
           <p
             class="field-error"
@@ -119,7 +122,8 @@ export default {
     emailError() {
       const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
       if (!this.trimmedEmail) return 'Введите e-mail';
-      if (!EMAIL_RE.test(this.trimmedEmail)) return 'Укажите корректный e-mail (например, ivan@example.com)';
+      if (!EMAIL_RE.test(this.trimmedEmail))
+        return 'Укажите корректный e-mail (например, ivan@example.com)';
       return '';
     },
     passwordError() {
@@ -129,7 +133,6 @@ export default {
     },
   },
   mounted() {
-    // Очищаем ошибки при монтировании компонента
     this.authStore.clearError();
   },
   methods: {
@@ -153,10 +156,8 @@ export default {
         });
         this.showPassword = false;
 
-        // Перенаправляем в личный кабинет
         this.$router.push('/personal-account');
       } catch (error) {
-        // Ошибка уже обработана в store
         console.error('Login failed:', error);
       }
     },
@@ -280,7 +281,9 @@ export default {
   line-height: 18px;
   visibility: hidden;
 }
-.field-error.visible { visibility: visible; }
+.field-error.visible {
+  visibility: visible;
+}
 
 .auth-button {
   width: 100%;

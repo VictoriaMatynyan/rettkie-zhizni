@@ -1080,12 +1080,31 @@ onBeforeUnmount(() => {
 
   .main-nav-mobile .dropdown-content a {
     padding: 8px 20px 8px 36px;
-    border-bottom: none;
+    border-bottom: 1px solid #e5e7eb;
     font-size: 14px;
     color: #555;
     display: block;
     width: 100%;
     box-sizing: border-box;
+    transition: background-color 0.2s ease;
+  }
+
+  .main-nav-mobile .dropdown-content a:last-child {
+    border-bottom: none;
+  }
+
+  .main-nav-mobile .dropdown-content a.router-link-active {
+    background-color: #23938c;
+    color: #fff;
+    font-weight: 500;
+  }
+
+  .main-nav-mobile .dropdown-content a:hover {
+    background-color: #f0f9f8;
+  }
+
+  .main-nav-mobile .dropdown-content a.router-link-active:hover {
+    background-color: #1e7a73;
   }
 
   .main-nav-mobile .dropdown-content .auth-buttons {

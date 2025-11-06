@@ -23,7 +23,9 @@
           <router-link to="/doctors">Врачам</router-link>
           <div
             class="dropdown"
-            :class="{ active: activeDropdown === 'patients' }"
+            :class="{ 
+              active: activeDropdown === 'patients' || isPatientsActive 
+            }"
           >
             <span class="dropdown-trigger" @click="toggleDropdown('patients')">
               Пациентам
@@ -100,7 +102,9 @@
           <router-link to="/about-us">О нас</router-link>
           <div
             class="dropdown"
-            :class="{ active: activeDropdown === 'registry' }"
+            :class="{ 
+              active: activeDropdown === 'registry' || isRegistryActive 
+            }"
           >
             <span class="dropdown-trigger" @click="toggleDropdown('registry')">
               <router-link to="/patient-registry" @click.stop="closeMenu"
@@ -201,7 +205,12 @@
       </div>
       <router-link to="/about-rett">О синдроме Ретта</router-link>
       <router-link to="/doctors">Врачам</router-link>
-      <div class="dropdown" :class="{ active: activeDropdown === 'patients' }">
+      <div 
+        class="dropdown" 
+        :class="{ 
+          active: activeDropdown === 'patients' || isPatientsActive 
+        }"
+      >
         <span class="dropdown-trigger" @click="toggleDropdown('patients')">
           Пациентам
           <span v-if="isMobile" class="dropdown-indicator">
@@ -254,7 +263,12 @@
       <router-link to="/news">Новости</router-link>
       <router-link to="/events">Мероприятия</router-link>
       <router-link to="/about-us">О нас</router-link>
-      <div class="dropdown" :class="{ active: activeDropdown === 'registry' }">
+      <div 
+        class="dropdown" 
+        :class="{ 
+          active: activeDropdown === 'registry' || isRegistryActive 
+        }"
+      >
         <span class="dropdown-trigger" @click="toggleDropdown('registry')">
           <router-link to="/patient-registry" @click.stop="closeMenu"
             >Реестр пациентов</router-link
@@ -408,7 +422,7 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, ref, computed, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../stores/auth.js';
 
 const menuOpen = ref(false);
@@ -420,8 +434,18 @@ const windowWidth = ref(window.innerWidth);
 
 const authStore = useAuthStore();
 const router = useRouter();
+const route = useRoute();
 
 const isMobile = computed(() => windowWidth.value <= 1190);
+
+// Проверка активных маршрутов для dropdown меню
+const isPatientsActive = computed(() => {
+  return route.path.startsWith('/patients/');
+});
+
+const isRegistryActive = computed(() => {
+  return route.path.startsWith('/patient-registry');
+});
 
 function handleResize() {
   windowWidth.value = window.innerWidth;
@@ -574,6 +598,11 @@ onBeforeUnmount(() => {
   color: #23938c;
 }
 
+.main-nav a.router-link-active {
+  color: #23938c;
+  font-weight: 500;
+}
+
 .main-nav > .btn-donate,
 .main-nav > .btn-help {
   display: flex;
@@ -599,6 +628,12 @@ onBeforeUnmount(() => {
   box-shadow: 0 2px 6px rgba(16, 129, 63, 0.4);
 }
 
+.main-nav > .btn-donate.router-link-active {
+  color: white;
+  background-color: #23938c;
+  font-weight: 500;
+}
+
 .main-nav > .btn-help {
   color: #8232ad;
   border: 1px solid #8232ad;
@@ -608,6 +643,12 @@ onBeforeUnmount(() => {
   color: white;
   box-shadow: 0 2px 6px rgba(41, 128, 185, 0.4);
   background-color: #8232ad;
+}
+
+.main-nav > .btn-help.router-link-active {
+  color: white;
+  background-color: #8232ad;
+  font-weight: 500;
 }
 
 .dropdown {
@@ -620,10 +661,21 @@ onBeforeUnmount(() => {
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  transition: color 0.2s;
 }
 
 .dropdown-trigger:hover {
   color: #23938c;
+}
+
+.dropdown.active > .dropdown-trigger {
+  color: #23938c;
+  font-weight: 500;
+}
+
+.dropdown.active > .dropdown-trigger a {
+  color: #23938c;
+  font-weight: 500;
 }
 
 .dropdown-indicator {
@@ -669,6 +721,16 @@ onBeforeUnmount(() => {
   color: #333;
   text-decoration: none;
   word-break: break-word;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.dropdown-content a:hover {
+  color: #23938c;
+}
+
+.dropdown-content a.router-link-active {
+  color: #23938c;
+  font-weight: 500;
 }
 
 .dropdown-content a:hover span:hover {

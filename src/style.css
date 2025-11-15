@@ -1,7 +1,8 @@
 /* Inter variable font: normal */
 @font-face {
   font-family: 'Inter';
-  src: url('/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype-variations');
+  src: url('/fonts/Inter/Inter-VariableFont_opsz,wght.ttf')
+    format('truetype-variations');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -10,7 +11,8 @@
 /* Inter variable font: italic */
 @font-face {
   font-family: 'Inter';
-  src: url('/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype-variations');
+  src: url('/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf')
+    format('truetype-variations');
   font-weight: 100 900;
   font-style: italic;
   font-display: swap;
@@ -26,4 +28,38 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-optical-sizing: auto;
+}
+
+/* Глобальная рамка для всех элементов */
+* {
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+/* Базовые стили для предотвращения выхода элементов за пределы */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Стили для корневого элемента приложения */
+#app {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Стили для контейнера приложения */
+.app-container {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
 }

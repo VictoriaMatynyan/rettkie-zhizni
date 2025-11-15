@@ -522,6 +522,17 @@ onMounted(fetchLatestStories);
   border-radius: 6px;
 }
 
+@media (max-width: 1129px) {
+  .carousel-container {
+    max-width: 900px;
+  }
+
+  .latest-news,
+  .stories-block {
+    max-width: 900px;
+  }
+}
+
 @media (max-width: 1024px) {
   .news-card,
   .story-card {

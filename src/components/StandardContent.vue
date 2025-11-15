@@ -158,6 +158,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
   font-size: clamp(11px, calc(7px + 1.5vw), 14px);
   color: #666;
   margin-top: clamp(6px, calc(4px + 1.2vw), 12px);
+  text-align: center;
 }
 
 .download-link {
@@ -167,9 +168,13 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
 .file-download {
   margin: clamp(20px, calc(14px + 4vw), 32px) 0;
   background: #f5f5f5;
-  padding: clamp(8px, calc(6px + 1.8vw), 14px) clamp(12px, calc(8px + 3.5vw), 22px);
+  padding: clamp(8px, calc(6px + 1.8vw), 14px)
+    clamp(12px, calc(8px + 3.5vw), 22px);
   border-radius: 6px;
   font-size: clamp(12px, calc(8px + 2vw), 16px);
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .video-section {

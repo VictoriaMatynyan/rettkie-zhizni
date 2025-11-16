@@ -3,10 +3,16 @@
     <h1>Новости</h1>
 
     <section class="news-block">
-      <h2 class="block-title">Последние новости</h2>
+      <h2 v-if="showBlockTitle" class="block-title">Последние новости</h2>
       <p v-if="loading" class="status muted">Загрузка новостей…</p>
       <p v-else-if="error" class="status error">{{ error }}</p>
-      <div class="news-list">
+      <p
+        v-else-if="!visibleNews.length"
+        class="status muted no-news"
+      >
+        Пока новостей нет, но мы готовим для вас новые материалы!
+      </p>
+      <div v-else class="news-list">
         <div
           v-for="news in visibleNews"
           :key="news.id"
@@ -24,7 +30,7 @@
           <p class="preview">{{ news.preview }}</p>
         </div>
       </div>
-      <button v-if="hasMore" class="load-more" @click="loadMore">
+      <button v-if="hasMore && visibleNews.length" class="load-more" @click="loadMore">
         Загрузить ещё
       </button>
     </section>
@@ -32,12 +38,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, defineProps } from 'vue';
 import { useRouter } from 'vue-router';
 import { api } from '../services/api.js';
 import symptomsImg from '../assets/symptoms.png';
 import newsImg from '../assets/news.jpeg';
 import StandardContent from '../components/StandardContent.vue';
+
+const { showBlockTitle = false } = defineProps({
+  showBlockTitle: { type: Boolean, default: false },
+});
 
 const router = useRouter();
 

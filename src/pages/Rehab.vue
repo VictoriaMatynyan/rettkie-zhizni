@@ -49,7 +49,7 @@
           </RouterLink>
         </li>
       </ul>
-      <p v-else class="no-articles">Пока нет статей в категории «Реабилитация».</p>
+      <p v-else class="no-articles">Пока нет статей на эту тему, но скоро они здесь появятся!</p>
     </section>
   </div>
 </template>

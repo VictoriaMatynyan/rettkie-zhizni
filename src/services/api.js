@@ -148,7 +148,7 @@ export const api = {
 
     getEvents: () => httpClient.get('/accounts/events/').then(r => r.data),
     getEventById: id =>
-      httpClient.get(`/accounts/events/${id}`).then(r => r.data),
+      httpClient.get(`/accounts/events/${id}/`).then(r => r.data),
 
     getFamilyStories: () =>
       httpClient.get('/accounts/family-stories/').then(r => r.data),
@@ -160,7 +160,7 @@ export const api = {
 
     getArticles: () => httpClient.get('/accounts/articles/').then(r => r.data),
     getArticleById: id =>
-      httpClient.get(`/accounts/articles/${id}`).then(r => r.data),
+      httpClient.get(`/accounts/articles/${id}/`).then(r => r.data),
 
     sendFeedback: payload =>
       httpClient.post('/accounts/feedback/', payload).then(r => r.data),

@@ -18,9 +18,15 @@
     </StandardContent>
     <section class="family-stories">
       <h2 class="block-title">Истории семей</h2>
-      <div v-if="loading" class="status muted">Загрузка…</div>
-      <div v-if="error" class="status error">{{ error }}</div>
-      <div class="card-list">
+      <p v-if="loading" class="status muted">Загрузка…</p>
+      <p v-else-if="error" class="status error">{{ error }}</p>
+      <p
+        v-else-if="!visibleStories.length"
+        class="status muted no-stories"
+      >
+        Пока здесь нет историй, но совсем скоро мы начнём делиться ими здесь!
+      </p>
+      <div v-else class="card-list">
         <div
           v-for="story in visibleStories"
           :key="story.id"
@@ -32,7 +38,7 @@
           <p class="card-date">{{ formatDate(story.created_at) }}</p>
         </div>
       </div>
-      <button v-if="hasMore" class="load-more" @click="loadMore">
+      <button v-if="hasMore && visibleStories.length" class="load-more" @click="loadMore">
         Загрузить ещё
       </button>
     </section>
@@ -63,7 +69,6 @@ async function loadStories() {
   try {
     const res = await api.accounts.getFamilyStories();
     const items = Array.isArray(res?.items) ? res.items : [];
-    // Храним как есть, только нормализуем поле даты для сортировки
     stories.value = items.map(it => ({
       id: it.id,
       title: it.title,
@@ -170,6 +175,7 @@ function formatDate(d) {
 .status { text-align: center; margin: 16px 0; }
 .status.muted { color: #666; }
 .status.error { color: #c33; }
+.no-stories { font-style: italic; }
 
 .load-more {
   margin: 24px auto 0;

@@ -42,7 +42,13 @@
       <h2 class="block-title">Статьи</h2>
       <p v-if="loading" class="status muted">Загрузка…</p>
       <p v-else-if="error" class="status error">{{ error }}</p>
-      <div class="article-list">
+      <p
+        v-else-if="!visibleArticles.length"
+        class="status muted no-articles"
+      >
+        {{ selectedCategories.length ? 'Нет статей по выбранным категориям.' : 'Пока нет статей, но мы готовим для вас новые материалы!' }}
+      </p>
+      <div v-else class="article-list">
         <div
           v-for="article in visibleArticles"
           :key="article.id"
@@ -60,12 +66,9 @@
           <h3 class="card-title">{{ article.title }}</h3>
         </div>
       </div>
-      <button v-if="hasMore" class="load-more" @click="loadMore">
+      <button v-if="hasMore && visibleArticles.length" class="load-more" @click="loadMore">
         Загрузить ещё
       </button>
-      <p v-if="!visibleArticles.length" class="no-articles">
-        Нет статей по выбранным категориям.
-      </p>
     </section>
   </div>
 </template>

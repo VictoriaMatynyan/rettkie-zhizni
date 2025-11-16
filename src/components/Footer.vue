@@ -124,4 +124,10 @@
   width: 20px;
   height: 20px;
 }
+
+@media (max-width: 1129px) {
+  .footer-container {
+    max-width: 900px;
+  }
+}
 </style>

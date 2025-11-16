@@ -143,7 +143,8 @@ export const api = {
     getMutationGenes: () =>
       httpClient.get('/accounts/mutation-genes/').then(r => r.data),
     getNews: () => httpClient.get('/accounts/news/').then(r => r.data),
-    getNewsById: id => httpClient.get(`/accounts/news/${id}`).then(r => r.data),
+    getNewsById: id =>
+      httpClient.get(`/accounts/news/${id}/`).then(r => r.data),
 
     getEvents: () => httpClient.get('/accounts/events/').then(r => r.data),
     getEventById: id =>
@@ -152,7 +153,7 @@ export const api = {
     getFamilyStories: () =>
       httpClient.get('/accounts/family-stories/').then(r => r.data),
     getFamilyStoryById: id =>
-      httpClient.get(`/accounts/family-stories/${id}`).then(r => r.data),
+      httpClient.get(`/accounts/family-stories/${id}/`).then(r => r.data),
 
     getArticleCategories: () =>
       httpClient.get('/accounts/article-categories/').then(r => r.data),

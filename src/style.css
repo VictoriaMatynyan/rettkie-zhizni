@@ -32,7 +32,7 @@
 
 /* Глобальная рамка для всех элементов */
 * {
-  border: 1px solid #ccc;
+  /* border: 1px solid #ccc; */
   box-sizing: border-box;
 }
 

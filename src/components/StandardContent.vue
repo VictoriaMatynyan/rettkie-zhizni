@@ -124,6 +124,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
 
 .media-section__symptoms {
   max-width: 100%;
+  width: 100%;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -204,10 +205,106 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
   text-align: left;
 }
 
+@media (max-width: 1129px) {
+  .media-section__symptoms {
+    max-width: 95%;
+    width: 95%;
+  }
+
+  .file-download {
+    max-width: 95%;
+    width: 95%;
+  }
+}
+
+@media (max-width: 980px) {
+  .standard-content {
+    width: 100%;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+
+  .media-section {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .media-section__symptoms {
+    max-width: 90%;
+    width: 90%;
+    height: auto;
+    box-sizing: border-box;
+  }
+
+  .file-download {
+    max-width: 90%;
+    width: 90%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .media-section__symptoms {
+    max-width: 85%;
+    width: 85%;
+  }
+
+  .file-download {
+    max-width: 85%;
+    width: 85%;
+  }
+}
+
+@media (max-width: 768px) {
+  .standard-content {
+    padding: 0 12px;
+  }
+
+  .media-section__symptoms {
+    max-width: 80%;
+    width: 80%;
+  }
+
+  .file-download {
+    max-width: 80%;
+    width: 80%;
+  }
+}
+
+@media (max-width: 600px) {
+  .standard-content {
+    padding: 0 16px;
+  }
+
+  .media-section__symptoms {
+    max-width: 75%;
+    width: 75%;
+  }
+
+  .file-download {
+    max-width: 75%;
+    width: 75%;
+  }
+}
+
 @media (max-width: 480px) {
   .standard-text {
     line-height: 1.5;
   }
+
+  .standard-content {
+    padding: 0 20px;
+  }
+
+  .media-section__symptoms {
+    max-width: 70%;
+    width: 70%;
+  }
+
+  .file-download {
+    max-width: 70%;
+    width: 70%;
+  }
+
   .media-section__modal-image {
     max-width: 90%;
     max-height: 70%;

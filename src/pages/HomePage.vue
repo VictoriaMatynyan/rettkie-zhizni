@@ -271,7 +271,9 @@ onMounted(fetchLatestStories);
 
 .banner-block {
   width: 100%;
+  max-width: 1420px;
   text-align: center;
+  margin: 0 auto;
 }
 
 .banner-image {
@@ -288,6 +290,8 @@ onMounted(fetchLatestStories);
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .carousel-container {
@@ -523,6 +527,10 @@ onMounted(fetchLatestStories);
 }
 
 @media (max-width: 1129px) {
+  .banner-block {
+    max-width: 95%;
+  }
+
   .carousel-container {
     max-width: 900px;
   }
@@ -533,7 +541,77 @@ onMounted(fetchLatestStories);
   }
 }
 
+@media (max-width: 980px) {
+  .home-page {
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+  .banner-block {
+    width: 90%;
+    max-width: 90%;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .home-page-logo {
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .standard-content {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .carousel-container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .carousel-wrapper {
+    overflow-x: visible;
+  }
+
+  .card-list {
+    width: 100%;
+    max-width: 100%;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .news-card,
+  .story-card {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .carousel-btn {
+    display: none;
+  }
+  .latest-news,
+  .stories-block {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 8px;
+    box-sizing: border-box;
+  }
+}
+
 @media (max-width: 1024px) {
+  .banner-block {
+    max-width: 85%;
+    width: 85%;
+  }
+
   .news-card,
   .story-card {
     flex: 0 0 280px;
@@ -552,6 +630,10 @@ onMounted(fetchLatestStories);
 }
 
 @media (max-width: 768px) {
+  .banner-block {
+    max-width: 80%;
+    width: 80%;
+  }
   .news-card,
   .story-card {
     flex: 0 0 260px;
@@ -570,19 +652,43 @@ onMounted(fetchLatestStories);
 
   .latest-news,
   .stories-block {
-    padding: 0 8px;
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .banner-block {
+    max-width: 75%;
+    width: 75%;
+  }
+
+  .latest-news,
+  .stories-block {
+    padding: 0 16px;
   }
 }
 
 @media (max-width: 480px) {
+  .banner-block {
+    max-width: 70%;
+    width: 70%;
+  }
+
   .news-card,
   .story-card {
-    flex: 0 0 240px;
-    width: 240px;
+    flex: 0 0 100%;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
   }
 
   .card-list {
     gap: 16px;
+  }
+
+  .latest-news,
+  .stories-block {
+    padding: 0 20px;
   }
 }
 </style>

@@ -340,7 +340,7 @@ onMounted(fetchLatestStories);
   flex-shrink: 0;
   width: 48px;
   height: 48px;
-  border-radius: 50%;
+  border-radius: 8px;
   border: 2px solid #2aaea2;
   background: #fff;
   color: #2aaea2;
@@ -352,11 +352,17 @@ onMounted(fetchLatestStories);
   justify-content: center;
   transition: all 0.2s;
   z-index: 1;
+  outline: none;
 }
 
 .carousel-btn:hover {
   background: #2aaea2;
   color: #fff;
+}
+
+.carousel-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(42, 174, 162, 0.4);
 }
 
 .carousel-btn:active {
@@ -626,6 +632,7 @@ onMounted(fetchLatestStories);
     width: 40px;
     height: 40px;
     font-size: 28px;
+    border-radius: 6px;
   }
 }
 
@@ -648,6 +655,7 @@ onMounted(fetchLatestStories);
     width: 36px;
     height: 36px;
     font-size: 24px;
+    border-radius: 6px;
   }
 
   .latest-news,

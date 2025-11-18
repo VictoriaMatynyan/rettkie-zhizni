@@ -360,8 +360,8 @@ onMounted(fetchLatestStories);
 
 .news-card,
 .story-card {
-  flex: 0 0 300px;
-  width: 300px;
+  max-width: 330px;
+  width: 100%;
   background: #fff;
   padding: 16px;
   border: 1px solid #ddd;
@@ -427,6 +427,11 @@ onMounted(fetchLatestStories);
   width: 100%;
   border-radius: 6px;
   margin-bottom: 12px;
+}
+
+.latest-news, .stories-block {
+  max-width: 1050px;
+  width: 100%;
 }
 
 .latest-news .news-card .news-image-wrap {

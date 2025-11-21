@@ -215,6 +215,11 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
     max-width: 95%;
     width: 95%;
   }
+
+  .standard-text {
+    font-size: 16px;
+    margin: 0;
+  }
 }
 
 @media (max-width: 980px) {
@@ -230,8 +235,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
   }
 
   .media-section__symptoms {
-    max-width: 90%;
-    width: 90%;
+    /* max-width: 90%;
+    width: 90%; */
     height: auto;
     box-sizing: border-box;
   }
@@ -244,8 +249,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
 
 @media (max-width: 1024px) {
   .media-section__symptoms {
-    max-width: 85%;
-    width: 85%;
+    /* max-width: 85%;
+    width: 85%; */
   }
 
   .file-download {
@@ -260,8 +265,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
   }
 
   .media-section__symptoms {
-    max-width: 80%;
-    width: 80%;
+    /* max-width: 80%;
+    width: 80%; */
   }
 
   .file-download {
@@ -276,8 +281,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
   }
 
   .media-section__symptoms {
-    max-width: 75%;
-    width: 75%;
+    /* max-width: 75%;
+    width: 75%; */
   }
 
   .file-download {
@@ -296,8 +301,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
   }
 
   .media-section__symptoms {
-    max-width: 70%;
-    width: 70%;
+    /* max-width: 70%;
+    width: 70%; */
   }
 
   .file-download {

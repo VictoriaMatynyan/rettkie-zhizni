@@ -35,9 +35,7 @@
     <div class="donate-section">
       <h2>Способ оплаты</h2>
       <div class="methods">
-        <button class="method-button">Банковская карта</button>
         <button class="method-button">СБП (QR-код)</button>
-        <button class="method-button">СМС</button>
       </div>
     </div>
     <div class="donate-section">

@@ -608,41 +608,49 @@ onMounted(fetchLatestStories);
 
   .carousel-container {
     width: 100%;
-    max-width: 100%;
+    max-width: 730px;
+    margin: 0 auto;
     box-sizing: border-box;
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
     gap: 12px;
   }
 
   .carousel-wrapper {
-    overflow-x: visible;
+    overflow-x: auto;
   }
 
   .card-list {
-    width: 100%;
-    max-width: 100%;
+    width: max-content;
+    max-width: none;
     gap: 16px;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
   }
 
   .news-card,
   .story-card {
-    flex: 1 1 100%;
-    width: 100%;
-    max-width: 100%;
+    flex: 0 0 300px;
+    width: 300px;
+    max-width: 300px;
   }
 
   .carousel-btn {
-    display: none;
+    display: flex;
   }
   .latest-news,
   .stories-block {
     width: 100%;
-    max-width: 100%;
-    padding: 0 8px;
+    max-width: 730px;
+    padding: 0;
+    margin: 0 auto;
     box-sizing: border-box;
+  }
+}
+
+@media (max-width: 980px) and (min-width: 750px) {
+  .stories-block {
+    max-width: 730px;
   }
 }
 
@@ -690,6 +698,33 @@ onMounted(fetchLatestStories);
     height: 36px;
     font-size: 24px;
     border-radius: 6px;
+  }
+
+  .carousel-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .carousel-wrapper {
+    overflow-x: visible;
+  }
+
+  .card-list {
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .news-card,
+  .story-card {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .carousel-btn {
+    display: none;
   }
 
   .latest-news,

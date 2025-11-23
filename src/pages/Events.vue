@@ -21,7 +21,13 @@
       <h2 class="block-title">Мероприятия</h2>
       <p v-if="loading" class="status muted">Загрузка…</p>
       <p v-else-if="error" class="status error">{{ error }}</p>
-      <div class="event-list">
+      <p
+        v-else-if="!visibleEvents.length"
+        class="status muted no-events"
+      >
+        Пока нет запланированных мероприятий, но скоро они начнут здесь появляться!
+      </p>
+      <div v-else class="event-list">
         <div
           v-for="event in visibleEvents"
           :key="event.id"
@@ -33,7 +39,7 @@
           <h3 class="card-title">{{ event.title }}</h3>
         </div>
       </div>
-      <button v-if="hasMore" class="load-more" @click="loadMore">
+      <button v-if="hasMore && visibleEvents.length" class="load-more" @click="loadMore">
         Загрузить ещё
       </button>
     </section>
@@ -169,6 +175,7 @@ onMounted(loadEvents);
 .status { text-align: center; margin: 16px 0; }
 .status.muted { color: #666; }
 .status.error { color: #c33; }
+.no-events { font-style: italic; }
 
 .load-more {
   margin: 24px auto 0;

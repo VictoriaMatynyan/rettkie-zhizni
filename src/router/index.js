@@ -83,6 +83,11 @@ const routes = [
     component: () => import('../pages/PasswordResetConfirm.vue'),
   },
   { path: '/personal-account', redirect: '/patient-registry/personal-account' },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('../pages/NotFound.vue'),
+  },
 ];
 
 const router = createRouter({

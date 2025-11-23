@@ -27,9 +27,12 @@
     </section>
 
     <section class="latest-news">
-      <h2 class="block-title">Последние новости</h2>
+      <h2 class="block-title" :showBlockTitle="true">Последние новости</h2>
       <p v-if="newsLoading" class="status muted">Загрузка…</p>
       <p v-else-if="newsError" class="status error">{{ newsError }}</p>
+      <p v-else-if="!sortedNews.length" class="status muted no-news">
+        Пока новостей нет, но мы готовим для вас новые материалы!
+      </p>
       <div v-else class="carousel-container">
         <button
           v-if="sortedNews.length > 3"
@@ -87,6 +90,9 @@
       <h2 class="block-title">Наши истории</h2>
       <p v-if="storiesLoading" class="status muted">Загрузка…</p>
       <p v-else-if="storiesError" class="status error">{{ storiesError }}</p>
+      <p v-else-if="!sortedStories.length" class="status muted no-stories">
+        Пока здесь нет историй, но совсем скоро мы начнём делиться ими здесь!
+      </p>
       <div v-else class="carousel-container">
         <button
           v-if="sortedStories.length > 3"
@@ -337,12 +343,12 @@ onMounted(fetchLatestStories);
   overflow-x: auto;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .carousel-wrapper::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
 }
 
 .card-list {
@@ -645,6 +651,17 @@ onMounted(fetchLatestStories);
     padding: 0;
     margin: 0 auto;
     box-sizing: border-box;
+  }
+}
+
+@media (max-width: 810px) {
+  .carousel-container {
+    max-width: 630px;
+  }
+
+  .latest-news,
+  .stories-block {
+    max-width: 630px;
   }
 }
 

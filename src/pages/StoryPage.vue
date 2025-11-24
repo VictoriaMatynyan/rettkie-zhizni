@@ -1,5 +1,23 @@
 <template>
   <div class="story-page">
+    <button class="back-btn" @click="goBack" aria-label="Назад">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M15 18l-6-6 6-6"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <span>Назад</span>
+    </button>
     <h1 class="story-title">{{ story?.title || 'История семьи' }}</h1>
 
     <p v-if="loading" class="status muted">Загрузка…</p>
@@ -18,12 +36,13 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { ref, computed, onMounted, watch } from 'vue';
 import familyImg from '../assets/family.png';
 import { api } from '../services/api.js';
 
 const route = useRoute();
+const router = useRouter();
 const story = ref(null);
 const loading = ref(false);
 const error = ref('');
@@ -63,6 +82,11 @@ const storyHtml = computed(() => {
   return sanitizeHtml(raw);
 });
 
+function goBack() {
+  if (window.history.length > 1) router.back();
+  else router.push('/stories');
+}
+
 onMounted(loadStory);
 watch(() => route.params.id, () => loadStory());
 </script>
@@ -72,6 +96,30 @@ watch(() => route.params.id, () => loadStory());
   max-width: 900px;
   margin: 0 auto;
   padding: 32px 16px;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border: 1px solid #2aaea2;
+  border-radius: 8px;
+  background: transparent;
+  color: #2aaea2;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.back-btn:hover {
+  background: rgba(42, 174, 162, 0.08);
+  color: #249b91;
+  border-color: #249b91;
+}
+
+.back-btn svg {
+  display: block;
 }
 
 .story-title {

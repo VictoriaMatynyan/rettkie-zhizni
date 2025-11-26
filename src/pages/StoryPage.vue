@@ -39,7 +39,7 @@
 import { useRoute, useRouter } from 'vue-router';
 import { ref, computed, onMounted, watch } from 'vue';
 import familyImg from '../assets/family.png';
-import { api } from '../services/api.js';
+import { api, httpClient } from '../services/api.js';
 
 const route = useRoute();
 const router = useRouter();
@@ -47,6 +47,7 @@ const story = ref(null);
 const loading = ref(false);
 const error = ref('');
 const fallbackImg = familyImg;
+const baseURL = (httpClient?.defaults?.baseURL || '').replace(/\/+$/, '');
 
 async function loadStory() {
   loading.value = true;
@@ -56,7 +57,13 @@ async function loadStory() {
     const id = route.params.id;
     const res = await api.accounts.getFamilyStoryById(id);
     // Ответ: { ok, id, title, announcement, created_at, photo }
-    story.value = res || null;
+    story.value = res
+      ? {
+          ...res,
+          photo: res.photo ? (res.photo.startsWith('/') ? `${baseURL}${res.photo}` : res.photo) : '',
+          announcement: res.announcement || '',
+        }
+      : null;
   } catch (e) {
     error.value = e?.response?.data?.message || e.message || 'Не удалось загрузить историю';
   } finally {
@@ -76,11 +83,18 @@ function sanitizeHtml(html) {
   return out;
 }
 
-const storyHtml = computed(() => {
-  const raw = story.value?.announcement;
-  if (!raw) return '';
-  return sanitizeHtml(raw);
-});
+function absolutize(html) {
+  if (!html || !baseURL) return html || '';
+  let out = String(html);
+  out = out.replace(/\b(src|href)=("|')\/(?!\/)([^"']+)\2/gi, (m, attr, q, rest) => `${attr}=${q}${baseURL}/${rest}${q}`);
+  out = out.replace(/url\(\s*(["'])?\/(?!\/)([^\)"']+)\1?\s*\)/gi, (m, q, rest) => {
+    const qq = q || '"';
+    return `url(${qq}${baseURL}/${rest}${qq})`;
+  });
+  return out;
+}
+
+const storyHtml = computed(() => absolutize(sanitizeHtml(story.value?.announcement)));
 
 function goBack() {
   if (window.history.length > 1) router.back();

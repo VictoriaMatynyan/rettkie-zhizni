@@ -76,6 +76,7 @@ onMounted(fetchStats);
 
 .map-section {
   width: 90vw;
+  max-width: 100%;
 }
 
 .registry-button {

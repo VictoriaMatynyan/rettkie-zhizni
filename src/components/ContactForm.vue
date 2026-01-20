@@ -307,7 +307,7 @@ async function handleSubmit() {
   display: flex;
   flex-direction: column;
   max-width: 720px;
-  margin: 0 auto;
+  margin: 0 auto 40px;
   padding: 0 clamp(16px, 5vw, 40px) clamp(16px, 5vw, 30px);
   border-radius: 12px;
   background: #fff;

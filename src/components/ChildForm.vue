@@ -679,14 +679,11 @@ export default {
   max-width: 500px;
   background: #ffffff;
   border-radius: 12px;
+  margin-bottom: 1.2rem;
 }
 
 .child-form-title {
   text-align: left;
-}
-
-.form-group {
-  margin-bottom: 1.2rem;
 }
 
 .form-label {

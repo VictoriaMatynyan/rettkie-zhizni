@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.DEV ? '/api' : 'http://127.0.0.1:8000';
+// In production we rely on the same origin (served by Django); override via VITE_API_BASE_URL if needed.
+const API_BASE_URL = import.meta.env.DEV
+  ? '/api'
+  : import.meta.env.VITE_API_BASE_URL || '';
 
 export const httpClient = axios.create({
   baseURL: API_BASE_URL,

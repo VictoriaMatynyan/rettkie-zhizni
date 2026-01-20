@@ -86,7 +86,8 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  // Keep router base at root; assets base is configured separately in Vite
+  history: createWebHistory('/'),
   routes,
   scrollBehavior() {
     return { top: 0 };

@@ -41,6 +41,9 @@ npm run lint:fix
 
 # Отформатировать код (Prettier)
 npm run format
+
+# Запуск под прод хостинга!
+npm run build -- --mode django
 ```
 
 ## 🔐 Система аутентификации
